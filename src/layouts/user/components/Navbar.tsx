@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Avatar, Box, Button, IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
@@ -7,8 +7,7 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import Icon from "./Icon";
-
-const NAV_ITEMS = ["Sản phẩm", "Bộ sưu tập", "Danh mục"];
+import SideBar from "./SideBar";
 
 const HEADER_ITEMS = [
 	{
@@ -35,6 +34,8 @@ const HEADER_ITEMS = [
 ];
 
 const Navbar = () => {
+	const [openMenu, setOpenMenu] = useState(false);
+
 	return (
 		<div className="sticky top-0 z-[1000] bg-white">
 			<div className="hidden lg:flex justify-between px-5 h-[35px] border-b font-normal text-base bg-yellow-500">
@@ -66,27 +67,30 @@ const Navbar = () => {
 				<div className="relative flex items-center justify-between px-4 md:px-5 h-[64px] md:h-[70px] border-b">
 					<div className="flex items-center gap-6">
 						<div className="flex items-center">
-							<IconButton aria-label="Open menu">
-								<MenuIcon />
-							</IconButton>
+							<button
+								onClick={() => setOpenMenu(true)}
+								className="flex items-center cursor-pointer"
+								aria-label="Open menu"
+							>
+								<div className="flex justify-center cursor-pointer">
+									<MenuIcon />
+									<div className="ml-2"></div>
+									Menu
+								</div>
+							</button>
 						</div>
-						<ul className="hidden lg:flex items-center font-medium text-gray-800">
-							{NAV_ITEMS.map((item, idx) => (
-								<li
-									key={idx}
-									className="mainCategory hover:text-primary hover:border-b-2 h-[50px] px-4 border-primary flex items-center cursor-pointer"
-								>
-									{item}
-								</li>
-							))}
-						</ul>
 					</div>
 
-					<div className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
+					<div
+						className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2"
+						onClick={() => {
+							window.location.href = "/";
+						}}
+					>
 						<div className="logo-icon w-7 h-7 md:w-8 md:h-8 flex items-center justify-center">
 							<Icon name="pancharm" />
 						</div>
-						<h1 className="cursor-pointer text-lg md:text-2xl text-primary leading-none uppercase">
+						<h1 className="cursor-pointer text-lg md:text-4xl text-primary leading-none uppercase">
 							Pancharm
 						</h1>
 					</div>
@@ -115,6 +119,8 @@ const Navbar = () => {
 					</div>
 				</div>
 			</Box>
+
+			<SideBar open={openMenu} onClose={() => setOpenMenu(false)} />
 		</div>
 	);
 };

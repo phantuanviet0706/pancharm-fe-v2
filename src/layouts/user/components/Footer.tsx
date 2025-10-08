@@ -3,49 +3,23 @@ import { Iframe } from "./Iframe";
 
 const FOOTER_ITEM = [
 	{
-		title: "Kết nối với chúng tôi",
-		content: (
-			<div>
-				<div>
-					HELIOS tạo ra những chế tác độc đáo dành cho những người đàn ông trưởng thành,
-					dám thay đổi, dám khác biệt và tôn thờ sự tự do ngay cả trong tâm hồn. Mỗi chế
-					tác đều có tinh thần riêng biệt, được làm thủ công từ đôi bàn tay thuần Việt với
-					mong muốn đưa các tác phẩm vươn tầm thế giới.
-				</div>
-				<div>
-					Hotline hỗ trợ:{" "}
-					<span>
-						<a href="tel:0971516201">097.151.6201</a>
-					</span>
-				</div>
-				<div>
-					Email:{" "}
-					<span>
-						<a href="mailto:vietphan565@gmail.com">vietphan565@gmail.com</a>
-					</span>
-				</div>
-			</div>
-		),
-		size_grid: 4,
-	},
-	{
 		title: "Chăm sóc khách hàng",
 		content: (
 			<div className="">
 				<div>
-					<a href="#">Hướng dẫn thanh toán</a>
+					<a href="huong-dan-thanh-toan">Hướng dẫn thanh toán</a>
 				</div>
 				<div>
-					<a href="#">Giao hàng</a>
+					<a href="giao-hang">Giao hàng</a>
 				</div>
 				<div>
-					<a href="#">Chính sách bảo hành</a>
+					<a href="chinh-sach-bao-hanh">Chính sách bảo hành</a>
 				</div>
 				<div>
-					<a href="#">Chính sách đổi trả</a>
+					<a href="chinh-sach-doi-tra">Chính sách đổi trả</a>
 				</div>
 				<div>
-					<a href="#">Bảng giá phí điều chỉnh sản phẩm</a>
+					<a href="bang-gia-dieu-chinh">Bảng giá phí điều chỉnh sản phẩm</a>
 				</div>
 			</div>
 		),
@@ -62,19 +36,40 @@ const FOOTER_ITEM = [
 		),
 		size_grid: 2,
 	},
-	{
-		title: "Fanpage",
-		content: (
-			<Iframe src="https://www.facebook.com/pancharm.official" title="Pancharm" allowFullScreen />
-		),
-		size_grid: 3,
-	},
 ];
 
 const Footer = () => {
 	return (
-		<div className="footer h-full px-10 mt-20">
+		<div className="footer h-full px-10 mt-15 pt-5 border-t-black border-t-1">
 			<div className="lg:grid grid-cols-12 gap-6">
+				<div className="footer-item pb-5" style={{ gridColumn: "span 4 / span 4" }}>
+					<div className="footer-item-title font-semibold mb-3 uppercase">
+						Kết nối với chúng tôi
+					</div>
+					<div className="footer-item-content text-sm leading-relaxed">
+						<div>
+							<div>
+								HELIOS tạo ra những chế tác độc đáo dành cho những người đàn ông
+								trưởng thành, dám thay đổi, dám khác biệt và tôn thờ sự tự do ngay
+								cả trong tâm hồn. Mỗi chế tác đều có tinh thần riêng biệt, được làm
+								thủ công từ đôi bàn tay thuần Việt với mong muốn đưa các tác phẩm
+								vươn tầm thế giới.
+							</div>
+							<div>
+								Hotline hỗ trợ:{" "}
+								<span>
+									<a href="tel:0971516201">097.151.6201</a>
+								</span>
+							</div>
+							<div>
+								Email:{" "}
+								<span>
+									<a href="mailto:vietphan565@gmail.com">vietphan565@gmail.com</a>
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
 				{FOOTER_ITEM.map((item, idx) => (
 					<div
 						key={idx}
@@ -91,6 +86,19 @@ const Footer = () => {
 						</div>
 					</div>
 				))}
+
+				<div className="footer-item pb-5" style={{ gridColumn: "span 3 / span 3" }}>
+					<div className="footer-item-title font-semibold mb-3 uppercase">
+						Fanpage
+					</div>
+					<div className="footer-item-content text-sm leading-relaxed">
+						<Iframe
+							src="https://www.facebook.com/pancharm.official"
+							title="Pancharm"
+							allowFullScreen
+						/>
+					</div>
+				</div>
 			</div>
 		</div>
 	);

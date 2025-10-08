@@ -1,5 +1,4 @@
 import React from "react";
-import SlideCard from "./SlideCard";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -7,6 +6,7 @@ import "slick-carousel/slick/slick-theme.css";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Button } from "@mui/material";
+import CardItem from "../../../components/CardItem";
 
 const PrevArrow = ({ onClick }) => (
 	<button
@@ -72,7 +72,7 @@ const Slide = () => {
 		<div className="py-5 px-16 mx-auto relative">
 			<Slider {...settings}>
 				{[1, 1, 1, 1, 1, 1].map((item) => (
-					<SlideCard />
+					<CardItem />
 				))}
 			</Slider>
 			<div className="w-full flex justify-center mt-4">
