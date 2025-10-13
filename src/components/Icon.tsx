@@ -34,8 +34,8 @@ const icons = {
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			version="1.0"
-			width="24px"
-			height="24px"
+			width="36px"
+			height="36px"
 			viewBox="0 0 445.000000 445.000000"
 			preserveAspectRatio="xMidYMid meet"
 		>

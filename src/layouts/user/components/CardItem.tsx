@@ -1,35 +1,88 @@
-import { Button } from "@mui/material";
-import React from "react";
+import { Button, IconButton, Link as MUILink } from "@mui/material";
+import React, { useState } from "react";
+import CartDrawer from "./CartDrawer";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { Link as RouterLink } from "react-router-dom";
 
-const CardItem = () => {
+export interface CardItemProps {
+	item: Object;
+}
+
+const CardItem = ({ item }: CardItemProps) => {
+	const [openCart, setOpenCart] = useState(false);
+
+	const dummyItems = [
+		{
+			id: 1,
+			name: "Gorgon Helios Black Silver",
+			variant: "Size 7",
+			price: 3750000,
+			quantity: 1,
+			image: "https://helios.vn/cdn/shop/files/HE-GorgonBlackSilver_1.jpg?v=1695460210",
+		},
+		{
+			id: 2,
+			name: "Kim Ngưu Helios Black Silver",
+			variant: "Default Title",
+			price: 650000,
+			quantity: 1,
+			image: "https://helios.vn/cdn/shop/files/HE-KimNguu_1.jpg?v=1695451231",
+		},
+	];
+
 	return (
-		<div className="w-[300px] mx-3 cursor-pointer">
-			<img
-				className="border-x-[2px] border-t-[2px] border-pink-400 w-full h-[20rem] object-cover object-top"
-				src=""
-				alt=""
-			/>
-			<div className="border-4 border-black bg-black text-white p-2 text-center mb-2">
-				<p className="text-lg font-semibold">Name</p>
-				<p className="text-2xl font-bold">100,000VND</p>
-			</div>
-			<Button
-				fullWidth
+		<div className="w-[280px] mx-3 cursor-pointer border-[1px]-[var(--color-text-light)] rounded-xl bg-[var(--color-card-bg)]">
+			<MUILink
+				component={RouterLink}
+				to="detail"
+				underline="none"
 				sx={{
-					backgroundColor: "white",
-					color: "#1976d2",
-					fontWeight: "bold",
 					"&:hover": {
-						backgroundColor: "#125ea5",
-						color: "white",
-						border: "1px solid white",
+						textDecoration: "none",
 					},
-					border: "1px solid #1976d2",
-					textTransform: "uppercase",
 				}}
 			>
-				SHOP NOW
-			</Button>
+				<div className="w-full h-[280px] object-cover object-top p-2">
+					<img
+						className="rounded-xl"
+						src="https://helios.vn/cdn/shop/files/ontario-lotus-helios-black-silver_3_1296x.jpg?v=1754845293"
+						alt=""
+					/>
+				</div>
+				<div className="p-2 text-center mb-2 text-[var(--color-cream-bg)] pt-0">
+					<div className="p-2 pt-0">
+						<p className="text-sm font-semibold uppercase">
+							Vòng tay thiên vi lắc bạc ngọc bích xanh
+						</p>
+					</div>
+					<div className="flex justify-between p-2">
+						<p className="flex text-xl font-bold pl-1">
+							1,000,000
+							<span className="">đ</span>
+						</p>
+						<Button
+							fullWidth
+							sx={{
+								backgroundColor: "var(--color-cream-bg)",
+								color: "var(--color-card-bg)",
+								"&:hover": {
+									backgroundColor: "var(--color-cream-light)",
+									color: "var(--color-card-light)",
+								},
+								fontWeight: "bold",
+								textTransform: "uppercase",
+								width: "100px",
+								height: "30px",
+								borderRadius: "20px",
+							}}
+						>
+							Mua ngay
+						</Button>
+					</div>
+				</div>
+			</MUILink>
+
+			<CartDrawer open={openCart} onClose={() => setOpenCart(false)} items={dummyItems} />
 		</div>
 	);
 };

@@ -5,6 +5,7 @@ import Footer from "./layouts/user/components/Footer";
 import Navbar from "./layouts/user/components/Navbar";
 import Home from "./layouts/user/pages/Home/Home";
 import Product from "./layouts/user/pages/Product/Product";
+import ProductDetail from "./layouts/user/pages/Product/ProductDetail";
 import DynamicPage from "./layouts/user/pages/DynamicPage/DynamicPage";
 
 function App() {
@@ -41,7 +42,10 @@ function App() {
 				{/* <Home /> */}
 				<Routes>
 					<Route path="/" element={<Home />} />
-					<Route path="/products" element={<Product />} />
+					<Route path="/products">
+						<Route index element={<Product />} />
+						<Route path="detail" element={<ProductDetail />} />
+					</Route>
 					{SAMPLE_DATA.map((item, index) => (
 						<Route
 							key={index}

@@ -123,15 +123,6 @@ const SideBar = ({ open, onClose }: SideBarProps) => {
 					<Panel list={panels[1]} onClickItem={goInto} />
 				</div>
 			</div>
-
-			<div className="mt-auto border-t">
-				<a href="/wishlist" className="block px-5 h-14 flex items-center hover:bg-gray-50">
-					Wishlist
-				</a>
-				<a href="/login" className="block px-5 h-14 flex items-center hover:bg-gray-50">
-					Login
-				</a>
-			</div>
 		</Drawer>
 	);
 };

@@ -16,7 +16,7 @@ export const Iframe = ({
 	height = 180,
 }: IframeProps) => {
 	return (
-		<div className="w-full max-w-[340px] bg-gray-50 rounded-md">
+		<div className="w-full max-w-[340px] rounded-md bg-[var(--color-cream-soft)]">
 			<h3 className="font-semibold mb-2">{title}</h3>
 			<iframe
 				title="Facebook Fanpage"

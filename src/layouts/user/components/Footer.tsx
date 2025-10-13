@@ -91,7 +91,7 @@ const Footer = () => {
 					<div className="footer-item-title font-semibold mb-3 uppercase">
 						Fanpage
 					</div>
-					<div className="footer-item-content text-sm leading-relaxed">
+					<div className="footer-item-content text-sm leading-relaxed bg-[var(--color-cream-soft)]">
 						<Iframe
 							src="https://www.facebook.com/pancharm.official"
 							title="Pancharm"
