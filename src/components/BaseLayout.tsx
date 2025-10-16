@@ -5,7 +5,7 @@ export interface BaseLayoutProps {
 }
 
 const BaseLayout = ({ children }: BaseLayoutProps) => {
-	return <div className="space-y-5 lg:space-y-10 relative top-10 mb-10">{children}</div>;
+	return <div className="space-y-5 lg:space-y-10 relative top-10 mb-20">{children}</div>;
 };
 
 export default BaseLayout;

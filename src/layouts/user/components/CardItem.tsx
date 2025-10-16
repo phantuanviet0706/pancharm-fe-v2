@@ -34,7 +34,7 @@ const CardItem = ({ item }: CardItemProps) => {
 		<div className="w-[280px] mx-3 cursor-pointer border-[1px]-[var(--color-text-light)] rounded-xl bg-[var(--color-card-bg)]">
 			<MUILink
 				component={RouterLink}
-				to="detail"
+				to="/products/detail"
 				underline="none"
 				sx={{
 					"&:hover": {

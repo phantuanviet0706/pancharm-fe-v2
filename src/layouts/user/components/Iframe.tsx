@@ -13,7 +13,7 @@ export const Iframe = ({
 	src,
 	allowFullScreen = false,
 	width = 320,
-	height = 180,
+	height = 150,
 }: IframeProps) => {
 	return (
 		<div className="w-full max-w-[340px] rounded-md bg-[var(--color-cream-soft)]">
@@ -24,12 +24,15 @@ export const Iframe = ({
 					"https://www.facebook.com/plugins/page.php" +
 					"?href=" +
 					encodeURIComponent(src) +
-					"&tabs=&width=" +
+					"&tabs=" +
+					"&width=" +
 					width +
 					"&height=" +
 					height +
-					"&small_header=true" +
-					"&adapt_container_width=true&hide_cover=false&show_facepile=true"
+					"&small_header=false" +
+					"&adapt_container_width=true" +
+					"&hide_cover=false" +
+					"&show_facepile=true"
 				}
 				width={width}
 				height={height}

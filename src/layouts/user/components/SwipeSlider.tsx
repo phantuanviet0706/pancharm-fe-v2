@@ -18,10 +18,10 @@ const DEFAULT_SLIDES = [
 		content: "Summer Collection (Video)",
 		autoplayVideo: true,
 		loopVideo: false,
-		muted: true /* controls removed */,
+		muted: true,
 	},
 	{
-		src: "https://images.unsplash.com/photo-1520975930498-6f67b5496aa7?q=80&w=1600&auto=format&fit=crop",
+		src: "https://helios.vn/cdn/shop/files/ontario-lotus-helios-black-silver_3_1080x.jpg?v=1754845293",
 		content: "Best Sellers",
 	},
 ];
@@ -59,7 +59,6 @@ export default function SwipeSlider({
 		});
 	};
 
-	// toggle play/pause khi ấn vào slide
 	const handleTap = (i: number) => {
 		const swiper = mainSwiperRef.current;
 		const slide = getSlideAt(i);
@@ -68,17 +67,14 @@ export default function SwipeSlider({
 		if (!v) return;
 
 		if (v.paused) {
-			// chơi video -> dừng autoplay của Swiper để không tự chuyển
 			swiper?.autoplay?.stop?.();
 			v.play().catch(() => {});
 		} else {
-			// pause video -> bật lại autoplay nếu có
 			v.pause();
 			if (autoplay) swiper?.autoplay?.start?.();
 		}
 	};
 
-	// play/pause tự động khi đổi slide
 	useEffect(() => {
 		const swiper = mainSwiperRef.current;
 		if (!swiper) return;
@@ -138,111 +134,54 @@ export default function SwipeSlider({
 			onMouseEnter={onMouseEnter}
 			onMouseLeave={onMouseLeave}
 		>
-			<Swiper
-				onSwiper={(swiper) => (mainSwiperRef.current = swiper)}
-				modules={[Navigation, Pagination, Autoplay, A11y, Thumbs, Keyboard]}
-				loop={loop}
-				autoplay={autoplay || false}
-				pagination={{ clickable: true }}
-				navigation
-				keyboard={{ enabled: true }}
-				a11y={{ enabled: true }}
-				thumbs={showThumbs ? { swiper: thumbsSwiper } : undefined}
+			<div
+				className="flex gap-4 items-stretch md:flex-row flex-col"
 				style={{ height: containerStyle.height }}
-				className="w-full"
 			>
-				{slides.map((s, i) => {
-					const kind = s?.kind || "image";
-					return (
-						<SwiperSlide key={i}>
-							{/* overlay bắt click toàn màn hình slide */}
-							<div
-								className="relative w-full h-full cursor-pointer"
-								onClick={() => handleTap(i)}
-								role={kind === "video" ? "button" : undefined}
-								aria-label={
-									kind === "video" ? "Toggle play/pause video" : undefined
-								}
-							>
-								{kind === "video" ? (
-									<video
-										ref={(el) => (videoRefs.current[i] = el!)}
-										className="absolute inset-0 w-full h-full object-cover"
-										src={s.src}
-										poster={s.poster}
-										muted={s.muted !== false}
-										loop={!!s.loopVideo}
-										controls={false}
-										playsInline
-										preload="metadata"
-									/>
-								) : (
-									<img
-										src={s.src}
-										alt={`slide-${i}`}
-										className="absolute inset-0 w-full h-full object-cover"
-										loading="lazy"
-									/>
-								)}
+				{showThumbs && (
+					<div className="select-none">
+						<Swiper
+							modules={[Thumbs, A11y]}
+							onSwiper={setThumbsSwiper}
+							direction="vertical"
+							watchSlidesProgress
+							slidesPerView={Math.min(thumbsPerView, slides.length)}
+							spaceBetween={10}
+							freeMode
+							a11y={{ enabled: true }}
+							style={{ width: 108 }}
+							className="h-full"
+						>
+							{slides.map((s, i) => {
+								const kind = s?.kind || "image";
+								const thumbSrc =
+									kind === "video"
+										? s.poster || s.thumb || s.fallback || s.src
+										: s.src;
 
-								{s.content && (
-									<span className="absolute bottom-6 left-6 rounded-lg bg-black/50 px-4 py-2 text-white text-base md:text-lg">
-										{s.content}
-									</span>
-								)}
-								{kind === "video" && (
-									<span className="pointer-events-none absolute top-4 right-4 rounded-md bg-black/55 text-white text-xs md:text-sm px-2 py-1">
-										Video
-									</span>
-								)}
-							</div>
-						</SwiperSlide>
-					);
-				})}
-			</Swiper>
-
-			{showThumbs && (
-				<div
-					className="mt-3 select-none"
-					style={{
-						height:
-							typeof thumbsHeight === "number" ? `${thumbsHeight}px` : thumbsHeight,
-					}}
-				>
-					<Swiper
-						modules={[Thumbs, A11y]}
-						onSwiper={setThumbsSwiper}
-						watchSlidesProgress
-						slidesPerView={Math.min(thumbsPerView, slides.length)}
-						spaceBetween={8}
-						freeMode
-						a11y={{ enabled: true }}
-						className="w-fit mx-auto flex justify-center h-full"
-						style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
-					>
-						{slides.map((s, i) => {
-							const kind = s?.kind || "image";
-							return (
-								<SwiperSlide key={`thumb-${i}`} className="!w-auto">
-									<button
-										type="button"
-										onClick={() => {
-											if (mainSwiperRef.current)
-												mainSwiperRef.current.slideToLoop(i);
-										}}
-										className="relative w-[88px] h-full overflow-hidden rounded-md border border-transparent hover:border-white/60 focus:outline-none transition-all"
-										aria-label={`Chọn ${kind === "video" ? "video" : "ảnh"} ${i + 1}`}
-										title={s.content || (kind === "video" ? "Video" : "Ảnh")}
-									>
-										{kind === "video" ? (
-											<>
-												<img
-													src={s.poster || s.thumb || s.fallback || s.src}
-													alt={`thumb-${i}`}
-													className="w-full h-full object-cover"
-													loading="lazy"
-												/>
-												<span className="absolute inset-0 flex items-center justify-center">
+								return (
+									<SwiperSlide key={`thumb-${i}`} className="!w-auto !h-auto">
+										<button
+											type="button"
+											onClick={() => mainSwiperRef.current?.slideToLoop(i)}
+											style={{
+												width: 100,
+												height: 100,
+											}}
+											className="relative inline-flex items-center justify-center overflow-hidden rounded-md border border-transparent hover:border-white/60 focus:outline-none transition-all bg-transparent	rounded-xl"
+											aria-label={`Chọn ${kind === "video" ? "video" : "ảnh"} ${i + 1}`}
+											title={
+												s.content || (kind === "video" ? "Video" : "Ảnh")
+											}
+										>
+											<img
+												src={thumbSrc}
+												alt={`thumb-${i}`}
+												className="block w-full h-full object-cover"
+												loading="lazy"
+											/>
+											{kind === "video" && (
+												<span className="pointer-events-none absolute inset-0 flex items-center justify-center">
 													<span className="rounded-full bg-black/55 px-2 py-2">
 														<svg
 															xmlns="http://www.w3.org/2000/svg"
@@ -254,22 +193,76 @@ export default function SwipeSlider({
 														</svg>
 													</span>
 												</span>
-											</>
-										) : (
-											<img
-												src={s.src}
-												alt={`thumb-${i}`}
-												className="w-full h-full object-cover"
-												loading="lazy"
-											/>
-										)}
-									</button>
-								</SwiperSlide>
-							);
-						})}
-					</Swiper>
-				</div>
-			)}
+											)}
+										</button>
+									</SwiperSlide>
+								);
+							})}
+						</Swiper>
+					</div>
+				)}
+				<Swiper
+					onSwiper={(swiper) => (mainSwiperRef.current = swiper)}
+					modules={[Navigation, Pagination, Autoplay, A11y, Thumbs, Keyboard]}
+					loop={loop}
+					autoplay={autoplay || false}
+					pagination={{ clickable: true }}
+					navigation
+					keyboard={{ enabled: true }}
+					a11y={{ enabled: true }}
+					thumbs={showThumbs ? { swiper: thumbsSwiper } : undefined}
+					style={{ height: containerStyle.height }}
+					className="w-full"
+				>
+					{slides.map((s, i) => {
+						const kind = s?.kind || "image";
+						return (
+							<SwiperSlide key={i}>
+								<div
+									className="relative w-full h-full cursor-pointer"
+									onClick={() => handleTap(i)}
+									role={kind === "video" ? "button" : undefined}
+									aria-label={
+										kind === "video" ? "Toggle play/pause video" : undefined
+									}
+								>
+									{kind === "video" ? (
+										<video
+											ref={(el) => (videoRefs.current[i] = el!)}
+											className="absolute inset-0 w-full h-full object-cover"
+											src={s.src}
+											poster={s.poster}
+											muted={s.muted !== false}
+											loop={!!s.loopVideo}
+											controls={false}
+											playsInline
+											preload="metadata"
+										/>
+									) : (
+										<img
+											src={s.src}
+											alt={`slide-${i}`}
+											className="absolute inset-0 w-full h-full object-cover"
+											loading="lazy"
+										/>
+									)}
+
+									{s.content && (
+										<span className="absolute bottom-6 left-6 rounded-lg bg-black/50 px-4 py-2 text-white text-base md:text-lg">
+											{s.content}
+										</span>
+									)}
+									{kind === "video" && (
+										<span className="pointer-events-none absolute top-4 right-4 rounded-md bg-black/55 text-white text-xs md:text-sm px-2 py-1">
+											Video
+										</span>
+									)}
+								</div>
+							</SwiperSlide>
+						);
+					})}
+				</Swiper>
+			</div>
 		</div>
 	);
 }
