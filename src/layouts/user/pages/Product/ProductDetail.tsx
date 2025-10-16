@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { Button } from "@mui/material";
 import BaseLayout from "../../../../components/BaseLayout";
 import SwipeSlider from "../../components/SwipeSlider";
@@ -7,12 +7,56 @@ import ProgressBar from "../../../../components/ProgressBar";
 import DetailSection from "../../../../components/DetailSection";
 
 const ProductDetail = () => {
-	useEffect(() => {
-		window.scrollTo({ top: 0, behavior: "smooth" });
+	const rootRef = useRef<HTMLDivElement | null>(null);
+
+	useLayoutEffect(() => {
+		const hasSR = "scrollRestoration" in window.history;
+		const prevSR = hasSR ? (window.history as any).scrollRestoration : undefined;
+		if (hasSR) (window.history as any).scrollRestoration = "manual";
+
+		const getScrollParent = (el: HTMLElement | null): HTMLElement | Window => {
+			let node: HTMLElement | null = el;
+			while (node && node !== document.body) {
+				const { overflowY } = getComputedStyle(node);
+				if (/(auto|scroll|overlay)/.test(overflowY)) return node;
+				node = node.parentElement;
+			}
+			return window;
+		};
+
+		const scrollParent = getScrollParent(rootRef.current!);
+
+		const toTop = () => {
+			if (scrollParent === window) {
+				window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+				document.documentElement.scrollTop = 0;
+				document.body.scrollTop = 0;
+			} else {
+				(scrollParent as HTMLElement).scrollTop = 0;
+				(scrollParent as HTMLElement).scrollLeft = 0;
+			}
+		};
+
+		toTop();
+		requestAnimationFrame(toTop);
+		setTimeout(toTop, 0);
+		setTimeout(toTop, 120);
+
+		const imgs = Array.from((rootRef.current ?? document).querySelectorAll("img"));
+		const onImg = () => setTimeout(toTop, 0);
+		imgs.forEach((img) => {
+			if (!img.complete) img.addEventListener("load", onImg, { once: true });
+		});
+
+		return () => {
+			imgs.forEach((img) => img.removeEventListener("load", onImg));
+			if (hasSR && prevSR) (window.history as any).scrollRestoration = prevSR;
+		};
 	}, []);
 
 	return (
 		<BaseLayout>
+			<div ref={rootRef} style={{margin: 0}}></div>
 			<div className="xl:flex justify-between gap-5 px-10">
 				<div className="product-images">
 					<SwipeSlider showThumbs width="55rem" height="35rem" />

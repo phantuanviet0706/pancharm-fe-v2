@@ -15,7 +15,6 @@ const DetailSection = ({ collapsedHeight = 420, children, className }: DetailSec
 	const [height, setHeight] = useState<number>(collapsedHeight);
 	const [fullHeight, setFullHeight] = useState<number | null>(null);
 
-	// Đo lại chiều cao nội dung thật (tính cả ảnh)
 	useLayoutEffect(() => {
 		const measure = () => {
 			if (contentRef.current) setFullHeight(contentRef.current.scrollHeight);
