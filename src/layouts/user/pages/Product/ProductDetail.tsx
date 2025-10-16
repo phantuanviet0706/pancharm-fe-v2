@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@mui/material";
 import BaseLayout from "../../../../components/BaseLayout";
 import SwipeSlider from "../../components/SwipeSlider";
@@ -7,6 +7,10 @@ import ProgressBar from "../../../../components/ProgressBar";
 import DetailSection from "../../../../components/DetailSection";
 
 const ProductDetail = () => {
+	useEffect(() => {
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	}, []);
+
 	return (
 		<BaseLayout>
 			<div className="xl:flex justify-between gap-5 px-10">
