@@ -7,6 +7,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Button } from "@mui/material";
 import CardItem from "../../../components/CardItem";
+import { useNavigate } from "react-router-dom";
 
 const PrevArrow = ({ onClick }) => (
 	<button
@@ -27,6 +28,8 @@ const NextArrow = ({ onClick }) => (
 );
 
 const Slide = () => {
+	const navigate = useNavigate();
+
 	const settings = {
 		dots: false,
 		infinite: true,
@@ -72,11 +75,12 @@ const Slide = () => {
 		<div className="py-5 px-16 mx-auto relative">
 			<Slider {...settings}>
 				{[1, 1, 1, 1, 1, 1].map((item) => (
-					<CardItem />
+					<CardItem item={item} />
 				))}
 			</Slider>
 			<div className="w-full flex justify-center mt-4">
 				<Button
+					onClick={() => navigate("/products")}
 					sx={{
 						width: "150px",
 						border: "2px solid #e0e0e0",
