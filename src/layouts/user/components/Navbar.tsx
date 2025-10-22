@@ -8,6 +8,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import Icon from "../../../components/Icon";
 import SideBar from "./SideBar";
+import UserNav from "../../../components/UserNav";
 
 const HEADER_ITEMS = [
 	{
@@ -47,7 +48,6 @@ const PROFILE_SETTINGS = [
 		key: "profile",
 		label: "Profile",
 		href: "/profile",
-		active: true,
 	},
 	{
 		key: "change-password",
@@ -86,6 +86,12 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 			document.removeEventListener("keydown", onKey);
 		};
 	}, []);
+
+	const suffix = location.pathname.split("/").filter(Boolean).pop();
+	PROFILE_SETTINGS.forEach((item) => {
+		if (item.key != suffix) return;
+		item.active = true;
+	});
 
 	return (
 		<div className="sticky top-0 z-[1000] bg-[var(--color-cream-thick)]">
@@ -194,33 +200,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 									className="absolute right-0 mt-3 w-48 overflow-hidden rounded-xl shadow-xl"
 									style={{ backgroundColor: "var(--color-card-bg)" }}
 								>
-									<div className="p-3">
-										{PROFILE_SETTINGS.map((item, idx) => (
-											<>
-												<a
-													href={item.href}
-													className="block rounded-lg px-3 py-2 text-sm text-white/95 hover:bg-black/10 uppercase text-center"
-													style={
-														item?.active
-															? {
-																	color: "var(--color-card-bg)",
-																	backgroundColor:
-																		"var(--color-cream-bg)",
-																	borderRadius: "0.5rem",
-																	fontWeight: "bolder",
-																}
-															: {}
-													}
-												>
-													{item.label}
-												</a>
-
-												{idx != PROFILE_SETTINGS.length - 1 && (
-													<div className="my-1 h-[1px] bg-white/10" />
-												)}
-											</>
-										))}
-									</div>
+									<UserNav settings={PROFILE_SETTINGS}></UserNav>
 								</div>
 							)}
 						</div>

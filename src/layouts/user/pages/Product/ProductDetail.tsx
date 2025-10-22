@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { Button } from "@mui/material";
-import BaseLayout from "../../../../components/BaseLayout";
+import BaseLayout from "../../components/BaseLayout";
 import SwipeSlider from "../../components/SwipeSlider";
 import InputNumber from "../../../../components/InputNumber";
 import ProgressBar from "../../../../components/ProgressBar";

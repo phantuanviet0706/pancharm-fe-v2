@@ -1,8 +1,8 @@
 import React from "react";
 
 const icons = {
-	star: () => (
-		<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+	star: (p: any) => (
+		<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" {...p}>
 			<path
 				d="M12 2l3.09 6.26L22 9.27l-5 4.88L18.18 22 
                12 18.9 5.82 22 7 14.15l-5-4.88 
@@ -11,8 +11,8 @@ const icons = {
 		</svg>
 	),
 
-	heart: () => (
-		<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+	heart: (p: any) => (
+		<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" {...p}>
 			<path
 				d="M12 21s-7.5-4.69-9.33-9.16C1.43 9.1 3.1 6 6.39 6c2.02 0 
                3.37 1.06 3.99 2.17C10.63 7.06 11.98 6 14 6c3.29 0 
@@ -21,8 +21,8 @@ const icons = {
 		</svg>
 	),
 
-	check: () => (
-		<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+	check: (p: any) => (
+		<svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" {...p}>
 			<path
 				d="M9 16.2l-3.5-3.5-1.4 1.4L9 19 
                20.3 7.7l-1.4-1.4z"
@@ -30,14 +30,15 @@ const icons = {
 		</svg>
 	),
 
-	pancharm: () => (
+	pancharm: (p: any) => (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			version="1.0"
-			width="36px"
-			height="36px"
+			width="24px"
+			height="24px"
 			viewBox="0 0 445.000000 445.000000"
 			preserveAspectRatio="xMidYMid meet"
+			{...p}
 		>
 			<g
 				transform="translate(0.000000,445.000000) scale(0.100000,-0.100000)"
@@ -49,12 +50,113 @@ const icons = {
 			</g>
 		</svg>
 	),
+
+	leaf: (p: any) => (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			aria-hidden="true"
+			width="24px"
+			height="24px"
+			{...p}
+		>
+			<path
+				d="M20.5 3.5C13 3 6 6.5 4.2 12.7c-1.6 5.5 2.6 7.8 6.5 7.8 6.8 0 9.8-6.6 9.8-17z"
+				strokeWidth="1.6"
+				fill="currentColor"
+				fillOpacity="0.08"
+			/>
+			<path d="M6 14c3.2-.4 6.3 1.1 8 4" strokeWidth="1.6" strokeLinecap="round" />
+			<path d="M12 8c.2 1.7-.3 3.8-2 6" strokeWidth="1.6" strokeLinecap="round" />
+		</svg>
+	),
+
+	inlineSparkle: (p: any) => (
+		<svg
+			className="text-amber-500 animate-pulse"
+			viewBox="0 0 16 16"
+			fill="none"
+			stroke="currentColor"
+			aria-hidden="true"
+			width="24px"
+			height="24px"
+			{...p}
+		>
+			<path
+				d="M8 2l1 2.4L12 6l-3 1.6L8 10 7 7.6 4 6l3-1.6L8 2z"
+				strokeWidth="1.2"
+				fill="currentColor"
+			/>
+		</svg>
+	),
+
+	sparkles: (p: any) => (
+		<svg
+			className="text-amber-500 animate-pulse"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			aria-hidden="true"
+			width="24px"
+			height="24px"
+			{...p}
+		>
+			<path
+				d="M12 3l1.6 3.8L17.5 9l-3.9 2.2L12 15l-1.6-3.8L6.5 9l3.9-2.2L12 3z"
+				strokeWidth="1.5"
+				fill="currentColor"
+				fillOpacity="0.15"
+			/>
+			<path
+				d="M19.5 4.5l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7.7-1.6z"
+				strokeWidth="1.2"
+			/>
+			<path d="M5 14l.6 1.4 1.4.6-1.4.6L5 18 4.4 16.6 3 16l1.4-.6L5 14z" strokeWidth="1.2" />
+			<path d="M3 21c4.5-3.2 8.8-3.2 13.3 0" strokeWidth="1.5" strokeLinecap="round" />
+		</svg>
+	),
+
+	// Admin SVG
+	// user: (p:any) => (
+
+	// )
 };
 
-const Icon = ({ name, ...props }) => {
-	const IconComp = icons[name];
-	if (!IconComp) return null;
-	return <IconComp {...props} />;
+export type IconProps = {
+	name: string;
+	sx?: React.CSSProperties;
+	className?: string;
+	size?: number | string;
+	color?: string;
+	strokeWidth?: number;
+	[key: string]: any;
+};
+
+function useSvgCommonProps({
+	sx,
+	className,
+	size,
+	color,
+	strokeWidth,
+	...rest
+}: Omit<IconProps, "name">) {
+	const wh =
+		size == null
+			? {}
+			: typeof size === "number"
+				? { width: size, height: size }
+				: { width: size, height: size };
+	const style: React.CSSProperties = { color, ...(sx || {}) };
+	const common = { className, style, strokeWidth, ...wh, ...rest };
+	return common;
+}
+
+const Icon: React.FC<IconProps> = ({ name, sx, className, size, color, strokeWidth, ...rest }) => {
+	const Comp = icons[name];
+	if (!Comp) return null;
+	const svgProps = useSvgCommonProps({ sx, className, size, color, strokeWidth, ...rest });
+	return <Comp {...svgProps} />;
 };
 
 export default Icon;

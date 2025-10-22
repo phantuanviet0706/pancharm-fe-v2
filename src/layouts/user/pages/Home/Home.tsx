@@ -2,7 +2,7 @@ import React from "react";
 import SwipeSlider from "../../components/SwipeSlider";
 import Slide from "./Slide/Slide";
 import { Video } from "../../components/Video";
-import BaseLayout from "../../../../components/BaseLayout";
+import BaseLayout from "../../components/BaseLayout";
 
 const Home = () => {
 	return (

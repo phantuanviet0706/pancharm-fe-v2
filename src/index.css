@@ -88,12 +88,18 @@ code {
 	--navbar-h: 70px;
 
 	--color-cream-soft: #f8eee2;
+	--color-cream-soft-hover: #fff9f3;
 	--color-cream-thick: #f5e4d3;
 	--color-cream-bg: #f8e7d5;
 	--color-cream-light: #f1d6bc;
 	--color-text-light: #edc0b3;
 	--color-card-bg: #b45c4e;
 	--color-card-light: #9e4e41;
+	--color-card-soft: #d18976;
+	--color-card-soft-hover: #b76e5e;
+	--color-card-weak: #eab59e;
+
+	--color-brand-bg: #161c25;
 }
 
 h1,
@@ -111,7 +117,7 @@ a {
 	text-decoration: none;
 }
 a:hover {
-	text-decoration: underline;
+	text-decoration: none;
 }
 
 .item-icons > svg {
@@ -127,6 +133,10 @@ body {
 
 button {
 	cursor: pointer;
+}
+
+.sep {
+	border: 1px solid var(--color-card-bg);
 }
 
 .footer-item-content a {
