@@ -75,7 +75,7 @@ const Slide = () => {
 		<div className="py-5 px-16 mx-auto relative">
 			<Slider {...settings}>
 				{[1, 1, 1, 1, 1, 1].map((item) => (
-					<CardItem item={item} />
+					<CardItem key={item} item={item} />
 				))}
 			</Slider>
 			<div className="w-full flex justify-center mt-4">

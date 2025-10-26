@@ -8,6 +8,13 @@ export default defineConfig({
 	clearScreen: false,
 	css: { devSourcemap: false },
 	server: {
+		host: true,
+		port: 5173,
+		open: true,
+		hmr: {
+			overlay: true
+		},
+		historyApiFallback: true,
 		watch: { usePolling: false },
 	},
 	optimizeDeps: {

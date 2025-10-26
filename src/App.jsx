@@ -15,6 +15,11 @@ import Order from "./layouts/user/pages/Order/Order";
 import AdminHome from "./layouts/admin/pages/Home/Home";
 import Category from "./layouts/admin/pages/Category/Category";
 import NotFound from "./layouts/common/NotFound";
+import User from "./layouts/admin/pages/User/User";
+import LoginPage from "./layouts/common/LoginPage";
+import RegisterPage from "./layouts/common/RegisterPage";
+import ForgotPage from "./layouts/common/ForgotPage";
+import ChangePasswordPage from "./layouts/common/ChangePasswordPage";
 
 function App() {
 	const SAMPLE_DATA = [
@@ -66,7 +71,16 @@ function App() {
 					))}
 
 					{/* Admin Routes */}
-					<Route path="admin" element={<AdminHome />}></Route>
+					<Route path="/admin">
+						<Route index element={<AdminHome />} />
+						<Route path="users" element={<User />} />
+					</Route>
+
+					{/* Common Routes */}
+					<Route path="/login" element={<LoginPage />}></Route>
+					<Route path="/register" element={<RegisterPage />}></Route>
+					<Route path="/forgot" element={<ForgotPage />}></Route>
+					<Route path="/change-password" element={<ChangePasswordPage />}></Route>
 
 					{/* Not Found */}
 					<Route path="*" element={<NotFound />} />

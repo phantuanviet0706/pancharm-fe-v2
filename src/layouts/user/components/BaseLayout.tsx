@@ -8,9 +8,11 @@ export interface BaseLayoutProps {
 
 const BaseLayout = ({ children }: BaseLayoutProps) => {
 	return (
-		<div className="user-layout-container space-y-5 lg:space-y-10 relative mb-20">
+		<div className="user-layout-container space-y-5 lg:space-y-10 relative">
 			<Navbar />
-			{children}
+			<div className="mt-15">
+				{children}
+			</div>
 			<Footer />
 		</div>
 	);

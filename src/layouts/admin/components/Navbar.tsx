@@ -13,11 +13,18 @@ const Navbar = () => {
 	let content = "";
 
 	return (
-		<div className="nav-container">
+		<div
+			className="nav-container fixed left-0 top-0 h-screen
+			bg-[var(--color-cream-thick)] w-[280px] flex flex-col overflow-hidden"
+		>
 			<Link to="/">
 				<div className="nav-header flex gap-2 p-[20px] px-[30px] align-center">
 					<div className="header-icon">
-						<Icon name="pancharm" className="w-[32px] h-[32px]"></Icon>
+						<Icon
+							name="pancharm"
+							className="w-[32px] h-[32px]"
+							color="var(--color-card-bg)"
+						></Icon>
 					</div>
 					<div className="header-title text-[24px] leading-[32px]">
 						<span className="title uppercase font-semibold text-[var(--color-card-bg)]">
@@ -26,14 +33,14 @@ const Navbar = () => {
 					</div>
 				</div>
 			</Link>
-			<div className="nav-body pt-[10px]">
+			<div className="nav-body pt-[10px] overflow-y-auto thin-scrollbar">
 				{navigation.items.map((item) => (
 					<div key={item.id}>
 						<NavGroup item={item} />
 					</div>
 				))}
 			</div>
-			<div className="nav-footer px-[30px]">
+			<div className="nav-footer px-[30px] pt-[30px]">
 				<div className="footer-container">
 					<div className="footer-content">
 						<div className="font-semibold text-[15px]">Cần hỗ trợ?</div>

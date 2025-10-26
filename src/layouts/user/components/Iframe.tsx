@@ -12,12 +12,11 @@ export const Iframe = ({
 	title,
 	src,
 	allowFullScreen = false,
-	width = 320,
-	height = 150,
+	width = 340,
+	height = 130,
 }: IframeProps) => {
 	return (
 		<div className="w-full max-w-[340px] rounded-md bg-[var(--color-cream-soft)]">
-			<h3 className="font-semibold mb-2">{title}</h3>
 			<iframe
 				title="Facebook Fanpage"
 				src={

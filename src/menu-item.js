@@ -25,14 +25,14 @@ const menuItems = {
 					id: "user",
 					title: "Người dùng",
 					type: "item",
-					url: "/users",
+					url: "/admin/users",
 					icon: "person",
 				},
 				{
 					id: "company",
 					title: "Công ty",
 					type: "item",
-					url: "/company",
+					url: "/admin/company",
 					icon: "business",
 				},
 			],
@@ -47,26 +47,40 @@ const menuItems = {
 					id: "categories",
 					title: "Danh mục",
 					type: "item",
-					url: "/categories",
+					url: "/admin/categories",
 					icon: "category",
 				},
 				{
 					id: "products",
 					title: "Sản phẩm",
 					type: "item",
-					url: "/products",
+					url: "/admin/products",
 					icon: "shopping_bag",
 				},
 				{
 					id: "collections",
 					title: "Bộ sưu tập",
 					type: "item",
-					url: "/collections",
+					url: "/admin/collections",
 					icon: "collections_bookmark",
 				},
 			],
 		},
-		{},
+		{
+			id: "other",
+			name: "Khác",
+			subtitle: "Quản lý dữ liệu tùy chỉnh",
+			type: "group",
+			children: [
+				{
+					id: "custom_footer",
+					title: "Danh mục khác",
+					type: "item",
+					url: "/admin/custom-footer",
+					icon: "widgets"
+				}
+			]
+		},
 	],
 };
 

@@ -94,7 +94,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 	});
 
 	return (
-		<div className="sticky top-0 z-[1000] bg-[var(--color-cream-thick)]">
+		<div className="sticky top-0 z-[1000] bg-[var(--color-cream-thick)] mb-0">
 			<div className="hidden lg:flex justify-between px-5 h-[30px] border-b font-normal text-base bg-[var(--color-card-bg)]">
 				{HEADER_ITEMS.map((item, idx) => (
 					<div key={idx} className={item.className + " top-0.5"}>
@@ -135,7 +135,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 						}}
 					>
 						<div className="logo-icon w-7 h-7 md:w-10 md:h-10 flex items-center justify-center">
-							<Icon name="pancharm" />
+							<Icon name="pancharm" color="var(--color-card-bg)"/>
 						</div>
 						<h1 className="cursor-pointer text-lg md:text-2xl text-[var(--color-card-bg)] leading-none uppercase">
 							Pancharm

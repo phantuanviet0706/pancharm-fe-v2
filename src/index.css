@@ -1,4 +1,5 @@
 @import "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap";
+@import url("assets/scss/style.scss");
 
 @theme {
 	--color-primary: #00927c;
@@ -91,9 +92,12 @@ code {
 	--color-cream-soft-hover: #fff9f3;
 	--color-cream-thick: #f5e4d3;
 	--color-cream-bg: #f8e7d5;
+	--color-cream-bg-hover: #fff8f0;
 	--color-cream-light: #f1d6bc;
 	--color-text-light: #edc0b3;
 	--color-card-bg: #b45c4e;
+	--color-card-bg-hover: #9e4e41;
+	--color-card-thick: #a44c40;
 	--color-card-light: #9e4e41;
 	--color-card-soft: #d18976;
 	--color-card-soft-hover: #b76e5e;
@@ -131,6 +135,10 @@ body {
 	overflow-x: hidden;
 }
 
+#root {
+	height: 100%;
+}
+
 button {
 	cursor: pointer;
 }
@@ -139,6 +147,40 @@ button {
 	border: 1px solid var(--color-card-bg);
 }
 
-.footer-item-content a {
+/* .footer-item-content a {
 	color: var(--color-card-bg) !important;
+} */
+
+.footer *:not(svg):not(svg *) {
+	color: var(--color-cream-bg);
+}
+
+/* Scroll bar Global CSS */
+@layer utilities {
+	.thin-scrollbar {
+		scrollbar-width: none;
+	}
+
+	.thin-scrollbar::-webkit-scrollbar {
+		width: 6px;
+		transition: all 0.2s ease;
+	}
+
+	.thin-scrollbar::-webkit-scrollbar-thumb,
+	.thin-scrollbar::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	.thin-scrollbar:hover::-webkit-scrollbar {
+		width: 6px;
+	}
+
+	.thin-scrollbar:hover::-webkit-scrollbar-thumb {
+		background: var(--color-card-thick);
+		border-radius: 9999px;
+	}
+
+	.thin-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+		background: var(--color-card-bg);
+	}
 }
