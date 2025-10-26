@@ -24,6 +24,18 @@ const DEFAULT_SLIDES = [
 		src: "https://helios.vn/cdn/shop/files/ontario-lotus-helios-black-silver_3_1080x.jpg?v=1754845293",
 		content: "Best Sellers",
 	},
+	{
+		src: "https://helios.vn/cdn/shop/files/ontario-lotus-helios-black-silver_3_1080x.jpg?v=1754845293",
+		content: "Best Sellers",
+	},
+	{
+		src: "https://helios.vn/cdn/shop/files/ontario-lotus-helios-black-silver_3_1080x.jpg?v=1754845293",
+		content: "Best Sellers",
+	},
+	{
+		src: "https://helios.vn/cdn/shop/files/ontario-lotus-helios-black-silver_3_1080x.jpg?v=1754845293",
+		content: "Best Sellers",
+	},
 ];
 
 export default function SwipeSlider({
@@ -135,72 +147,9 @@ export default function SwipeSlider({
 			onMouseLeave={onMouseLeave}
 		>
 			<div
-				className="flex gap-4 items-stretch md:flex-row flex-col"
+				className="flex gap-4 items-stretch flex-col"
 				style={{ height: containerStyle.height }}
 			>
-				{showThumbs && (
-					<div className="select-none">
-						<Swiper
-							modules={[Thumbs, A11y]}
-							onSwiper={setThumbsSwiper}
-							direction="vertical"
-							watchSlidesProgress
-							slidesPerView={Math.min(thumbsPerView, slides.length)}
-							spaceBetween={10}
-							freeMode
-							a11y={{ enabled: true }}
-							style={{ width: 108 }}
-							className="h-full"
-						>
-							{slides.map((s, i) => {
-								const kind = s?.kind || "image";
-								const thumbSrc =
-									kind === "video"
-										? s.poster || s.thumb || s.fallback || s.src
-										: s.src;
-
-								return (
-									<SwiperSlide key={`thumb-${i}`} className="!w-auto !h-auto">
-										<button
-											type="button"
-											onClick={() => mainSwiperRef.current?.slideToLoop(i)}
-											style={{
-												width: 100,
-												height: 100,
-											}}
-											className="relative inline-flex items-center justify-center overflow-hidden rounded-md border border-transparent hover:border-white/60 focus:outline-none transition-all bg-transparent	rounded-xl"
-											aria-label={`Chọn ${kind === "video" ? "video" : "ảnh"} ${i + 1}`}
-											title={
-												s.content || (kind === "video" ? "Video" : "Ảnh")
-											}
-										>
-											<img
-												src={thumbSrc}
-												alt={`thumb-${i}`}
-												className="block w-full h-full object-cover"
-												loading="lazy"
-											/>
-											{kind === "video" && (
-												<span className="pointer-events-none absolute inset-0 flex items-center justify-center">
-													<span className="rounded-full bg-black/55 px-2 py-2">
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															viewBox="0 0 24 24"
-															fill="currentColor"
-															className="w-4 h-4 text-white"
-														>
-															<path d="M8 5v14l11-7z" />
-														</svg>
-													</span>
-												</span>
-											)}
-										</button>
-									</SwiperSlide>
-								);
-							})}
-						</Swiper>
-					</div>
-				)}
 				<Swiper
 					onSwiper={(swiper) => (mainSwiperRef.current = swiper)}
 					modules={[Navigation, Pagination, Autoplay, A11y, Thumbs, Keyboard]}
@@ -262,6 +211,72 @@ export default function SwipeSlider({
 						);
 					})}
 				</Swiper>
+
+				{showThumbs && (
+					<div className="select-none">
+						<Swiper
+							modules={[Thumbs, A11y]}
+							onSwiper={setThumbsSwiper}
+							direction="horizontal"
+							watchSlidesProgress
+							slidesPerView={Math.min(thumbsPerView, slides.length)}
+							spaceBetween={10}
+							freeMode
+							a11y={{ enabled: true }}
+							className="w-full h-full justify-center thin-scrollbar"
+							style={{
+								overflowX: "auto"
+							}}
+						>
+							{slides.map((s, i) => {
+								const kind = s?.kind || "image";
+								const thumbSrc =
+									kind === "video"
+										? s.poster || s.thumb || s.fallback || s.src
+										: s.src;
+
+								return (
+									<SwiperSlide key={`thumb-${i}`} className="!w-auto !h-auto">
+										<button
+											type="button"
+											onClick={() => mainSwiperRef.current?.slideToLoop(i)}
+											style={{
+												width: 100,
+												height: 100,
+											}}
+											className="relative inline-flex items-center justify-center overflow-hidden rounded-md border border-transparent hover:border-white/60 focus:outline-none transition-all bg-transparent	rounded-xl"
+											aria-label={`Chọn ${kind === "video" ? "video" : "ảnh"} ${i + 1}`}
+											title={
+												s.content || (kind === "video" ? "Video" : "Ảnh")
+											}
+										>
+											<img
+												src={thumbSrc}
+												alt={`thumb-${i}`}
+												className="block w-full h-full object-cover"
+												loading="lazy"
+											/>
+											{kind === "video" && (
+												<span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+													<span className="rounded-full bg-black/55 px-2 py-2">
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															viewBox="0 0 24 24"
+															fill="currentColor"
+															className="w-4 h-4 text-white"
+														>
+															<path d="M8 5v14l11-7z" />
+														</svg>
+													</span>
+												</span>
+											)}
+										</button>
+									</SwiperSlide>
+								);
+							})}
+						</Swiper>
+					</div>
+				)}
 			</div>
 		</div>
 	);

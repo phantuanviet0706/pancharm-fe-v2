@@ -56,66 +56,63 @@ const ProductDetail = () => {
 
 	return (
 		<BaseLayout>
-			<div ref={rootRef} style={{margin: 0}}></div>
-			<div className="xl:flex justify-between gap-5 px-10">
-				<div className="product-images">
-					<SwipeSlider showThumbs width="55rem" height="35rem" />
+			<div ref={rootRef} style={{ margin: 0 }}></div>
+			<div className="xl:flex justify-between px-10">
+				<div className="product-images w-[45%]">
+					<SwipeSlider showThumbs width="35rem" height="35rem" />
 				</div>
-				<div
-					className="product-basic-info p-8"
-					style={{
-						width: "30rem",
-					}}
-				>
-					<div className="text-[var(--color-card-bg)]">
-						<div className="uppercase font-bold text-2xl pb-4">
-							Vòng tay thiên vi lắc bạc ngọc bích xanh
-						</div>
-						<div className="flex text-xl font-semibold pl-1">1,000,000đ</div>
-					</div>
-					<div className="mt-8">
-						<ProgressBar quantity={10} max={100} width={"full"}></ProgressBar>
-					</div>
-					<div className="pt-8">
-						<div className="flex justify-between gap-10">
-							<div>
-								<InputNumber min={1} max={100} initial={1} />
+				<div className="product-basic-info px-8 w-[55%] flex justify-left">
+					<div
+						className="product-info-wrapper"
+						style={{
+							width: "34rem",
+						}}
+					>
+						<div className="text-[var(--color-card-bg)]">
+							<div className="uppercase font-bold text-2xl pb-4">
+								Vòng tay thiên vi lắc bạc ngọc bích xanh
 							</div>
-							<Button
-								sx={{
-									border: "1px solid var(--color-text-light)",
-									width: "20em",
-									background: "white",
-									color: "var(--color-card-bg)",
-									"&:hover": {
-										background: "#eee",
-										borderColor: "var(--color-card-light)",
-									},
-								}}
-							>
-								Thêm vào giỏ hàng
-							</Button>
+							<div className="flex text-3xl font-bold pl-1">1,000,000đ</div>
 						</div>
-						<div className="mt-5">
-							<Button
-								sx={{
-									width: "100%",
-									height: "3.5em",
-									border: "1px solid var(--color-text-light)",
-									background: "var(--color-card-bg)",
-									color: "white",
-									"&:hover": {
-										background: "var(--color-card-light)",
-									},
-								}}
-							>
-								Mua ngay
-							</Button>
+						<div className="pt-8">
+							<div className="input-title font-semibold text-xl text-[var(--color-card-bg)] mb-2">Số lượng:</div>
+							<div className="flex justify-between gap-10">
+								<div>
+									<InputNumber min={1} max={100} initial={1} />
+								</div>
+							</div>
+							<div className="mt-5">
+								<Button
+									sx={{
+										border: "1px solid var(--color-text-light)",
+										background: "var(--color-card-bg)",
+										color: "white",
+										"&:hover": {
+											background: "var(--color-card-light)",
+										},
+										marginRight: "10px"
+									}}
+								>
+									Mua ngay
+								</Button>
+								<Button
+									sx={{
+										border: "1px solid var(--color-text-light)",
+										background: "var(--color-card-bg)",
+										color: "white",
+										"&:hover": {
+											background: "var(--color-card-light)",
+										},
+									}}
+								>
+									Thêm vào giỏ hàng
+								</Button>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div className="product-detail px-20 text-[var(--color-card-bg)]">
+			<div className="product-detail px-20 text-[var(--color-card-bg)] mt-10">
 				<div className="product-detail-title uppercase text-center text-2xl font-semibold">
 					Thông tin sản phẩm
 				</div>

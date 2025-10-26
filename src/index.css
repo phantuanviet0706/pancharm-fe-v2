@@ -158,29 +158,39 @@ button {
 /* Scroll bar Global CSS */
 @layer utilities {
 	.thin-scrollbar {
-		scrollbar-width: none;
+		scrollbar-width: thin;
+		scrollbar-color: #e4b8a2 transparent; /* Firefox */
 	}
 
 	.thin-scrollbar::-webkit-scrollbar {
-		width: 6px;
-		transition: all 0.2s ease;
-	}
-
-	.thin-scrollbar::-webkit-scrollbar-thumb,
-	.thin-scrollbar::-webkit-scrollbar-track {
+		width: 8px;
 		background: transparent;
 	}
 
-	.thin-scrollbar:hover::-webkit-scrollbar {
-		width: 6px;
-	}
-
-	.thin-scrollbar:hover::-webkit-scrollbar-thumb {
-		background: var(--color-card-thick);
+	.thin-scrollbar::-webkit-scrollbar-track {
+		background: linear-gradient(to bottom, #f8eee2, #f6e6da);
 		border-radius: 9999px;
 	}
 
-	.thin-scrollbar:hover::-webkit-scrollbar-thumb:hover {
-		background: var(--color-card-bg);
+	.thin-scrollbar::-webkit-scrollbar-thumb {
+		background: linear-gradient(180deg, #e4b8a2, #d18976);
+		border-radius: 9999px;
+		box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
+		transition: all 0.25s ease;
+	}
+
+	.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+		background: linear-gradient(180deg, #d18976, #b76a57);
+		box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.15);
+	}
+
+	.thin-scrollbar::-webkit-scrollbar-thumb:active {
+		background: #a85a47;
+	}
+
+	.thin-scrollbar::-webkit-scrollbar-button {
+		display: none;
+		width: 0;
+		height: 0;
 	}
 }
