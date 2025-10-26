@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Avatar, Box, Button, IconButton } from "@mui/material";
+import { Avatar, Box, Button, IconButton, Link } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -135,7 +135,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 						}}
 					>
 						<div className="logo-icon w-7 h-7 md:w-10 md:h-10 flex items-center justify-center">
-							<Icon name="pancharm" color="var(--color-card-bg)"/>
+							<Icon name="pancharm" color="var(--color-card-bg)" />
 						</div>
 						<h1 className="cursor-pointer text-lg md:text-2xl text-[var(--color-card-bg)] leading-none uppercase">
 							Pancharm
@@ -181,7 +181,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 							<ShoppingCartIcon />
 						</IconButton>
 
-						<div className="relative" ref={profileRef}>
+						{/* <div className="relative" ref={profileRef}>
 							<IconButton
 								sx={{ color: "var(--color-card-bg)" }}
 								aria-label="Tài khoản"
@@ -203,6 +203,32 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 									<UserNav settings={PROFILE_SETTINGS}></UserNav>
 								</div>
 							)}
+						</div> */}
+
+						<div className="relative authentication-btn">
+							<Button
+								sx={{
+									backgroundColor: "var(--color-card-bg)",
+									"&:hover": {
+										backgroundColor: "var(--color-card-bg-hover)",
+									},
+									borderRadius: "24px",
+									paddingInline: "15px"
+								}}
+							>
+								<Link
+									href="login"
+									sx={{
+										color: "var(--color-cream-bg)",
+										"&:hover": {
+											color: "var(--color-cream-bg-hover)",
+										},
+									}}
+									underline="none"
+								>
+									<div className="login-btn">Đăng nhập</div>
+								</Link>
+							</Button>
 						</div>
 					</div>
 				</div>
