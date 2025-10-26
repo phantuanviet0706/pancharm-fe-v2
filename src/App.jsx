@@ -20,6 +20,8 @@ import LoginPage from "./layouts/common/LoginPage";
 import RegisterPage from "./layouts/common/RegisterPage";
 import ForgotPage from "./layouts/common/ForgotPage";
 import ChangePasswordPage from "./layouts/common/ChangePasswordPage";
+import Profile from "./layouts/user/pages/User/Profile";
+import UserInfo from "./layouts/user/pages/User/UserInfo";
 
 function App() {
 	const SAMPLE_DATA = [
@@ -62,6 +64,11 @@ function App() {
 					<Route path="/orders">
 						<Route index element={<Order />} />
 					</Route>
+					<Route path="/profile">
+						<Route index element={<Profile />}></Route>
+						<Route path="info" element={<UserInfo />}></Route>
+					</Route>
+
 					{SAMPLE_DATA.map((item, index) => (
 						<Route
 							key={index}

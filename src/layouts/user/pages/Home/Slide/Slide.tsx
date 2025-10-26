@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 const PrevArrow = ({ onClick }) => (
 	<button
 		onClick={onClick}
-		className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-600 z-10"
+		className="absolute top-1/2 left-[-20px] transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-600 z-10"
 	>
 		<ChevronLeftIcon />
 	</button>
@@ -21,7 +21,7 @@ const PrevArrow = ({ onClick }) => (
 const NextArrow = ({ onClick }) => (
 	<button
 		onClick={onClick}
-		className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-600 z-10"
+		className="absolute top-1/2 right-[-20px] transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-600 z-10"
 	>
 		<ChevronRightIcon />
 	</button>

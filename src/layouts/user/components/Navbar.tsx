@@ -87,9 +87,10 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 		};
 	}, []);
 
-	const suffix = location.pathname.split("/").filter(Boolean).pop();
+	const suffix = location.pathname;
 	PROFILE_SETTINGS.forEach((item) => {
-		if (item.key != suffix) return;
+		const pattern = new RegExp(`(${item?.key})`, "i");
+		if (!pattern.test(suffix || '')) return;
 		item.active = true;
 	});
 
@@ -181,7 +182,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 							<ShoppingCartIcon />
 						</IconButton>
 
-						{/* <div className="relative" ref={profileRef}>
+						<div className="relative" ref={profileRef}>
 							<IconButton
 								sx={{ color: "var(--color-card-bg)" }}
 								aria-label="Tài khoản"
@@ -203,9 +204,9 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 									<UserNav settings={PROFILE_SETTINGS}></UserNav>
 								</div>
 							)}
-						</div> */}
+						</div>
 
-						<div className="relative authentication-btn">
+						{/* <div className="relative authentication-btn">
 							<Button
 								sx={{
 									backgroundColor: "var(--color-card-bg)",
@@ -229,7 +230,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 									<div className="login-btn">Đăng nhập</div>
 								</Link>
 							</Button>
-						</div>
+						</div> */}
 					</div>
 				</div>
 			</Box>

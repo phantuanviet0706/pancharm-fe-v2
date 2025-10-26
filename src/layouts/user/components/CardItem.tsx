@@ -31,7 +31,10 @@ const CardItem = ({ item }: CardItemProps) => {
 	];
 
 	return (
-		<div className="w-[280px] mx-3 cursor-pointer border-[1px]-[var(--color-text-light)] rounded-xl bg-[var(--color-card-bg)]">
+		<div
+			className="group w-[280px] mx-3 cursor-pointer border border-[var(--color-text-light)] 
+				bg-[var(--color-cream-bg)] hover:bg-[var(--color-card-bg)] transition-all duration-300"
+		>
 			<MUILink
 				component={RouterLink}
 				to="/products/detail"
@@ -42,41 +45,37 @@ const CardItem = ({ item }: CardItemProps) => {
 					},
 				}}
 			>
-				<div className="w-full h-[280px] object-cover object-top p-2">
+				<div className="w-full h-[280px] object-cover object-top">
 					<img
-						className="rounded-xl"
+						className=""
 						src="https://helios.vn/cdn/shop/files/ontario-lotus-helios-black-silver_3_1296x.jpg?v=1754845293"
 						alt=""
 					/>
 				</div>
-				<div className="p-2 text-center mb-2 text-[var(--color-cream-bg)] pt-0">
+				<div className="p-2 text-center mb-2 text-[var(--color-card-bg)] group-hover:text-[var(--color-cream-bg)] pt-0 mt-2 transition-colors duration-300">
 					<div className="p-2 pt-0">
 						<p className="text-sm font-semibold uppercase">
 							Vòng tay thiên vi lắc bạc ngọc bích xanh
 						</p>
 					</div>
-					<div className="flex justify-between p-2">
+					<div className="flex justify-center px-2">
 						<p className="flex text-xl font-bold pl-1">
 							1,000,000
 							<span className="">đ</span>
 						</p>
+					</div>
+					<div className="pt-2">
 						<Button
-							fullWidth
-							sx={{
-								backgroundColor: "var(--color-cream-bg)",
-								color: "var(--color-card-bg)",
-								"&:hover": {
-									backgroundColor: "var(--color-cream-light)",
-									color: "var(--color-card-light)",
-								},
-								fontWeight: "bold",
-								textTransform: "uppercase",
-								width: "100px",
-								height: "30px",
-								borderRadius: "20px",
-							}}
+							variant="contained"
+							color="inherit"
+							disableElevation
+							className="
+								btn-add transition-all duration-300
+								!bg-[var(--color-card-bg)] !text-[var(--color-cream-bg)]
+								group-hover:!bg-[var(--color-cream-bg)] group-hover:!text-[var(--color-card-bg)]
+								font-bold uppercase rounded-md h-[2em] px-4"
 						>
-							Mua ngay
+							<div className="font-[14px]">Thêm vào giỏ hàng</div>
 						</Button>
 					</div>
 				</div>
