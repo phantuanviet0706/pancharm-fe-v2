@@ -8,9 +8,9 @@ export interface MoneyDisplayProps {
 
 const MoneyDisplay = ({ price, className }: MoneyDisplayProps) => {
 	return (
-		<span className={className}>
-			<span className="font-normal text-[18px]">{formatVND(price)}</span>
-			<span className="text-[18px] relative -top-[1px] ml-1">đ</span>
+		<span className={className} >
+			<span>{formatVND(price)}</span>
+			<span className="relative -top-[0px] ml-1">đ</span>
 		</span>
 	);
 };

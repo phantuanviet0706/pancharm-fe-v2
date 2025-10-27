@@ -68,7 +68,7 @@ const Footer = () => {
 										width: "30px",
 										height: "30px",
 									}}
-									color="black"
+									color="var(--color-cream-bg)"
 								/>
 							</div>
 							<h1 className="cursor-pointer text-lg md:text-2xl leading-[28px] uppercase text-[var(--color-cream-bg)]">
@@ -79,9 +79,9 @@ const Footer = () => {
 							<div>
 								<div className="leading-[28px]">
 									<span className="font-semibold">Điện thoại: </span>
-									<a href="to:0971516201">097 151 6201</a>
+									<a href="tel:0971516201">097 151 6201</a>
 									&nbsp;-&nbsp;
-									<a href="to:0971516201">097 151 6201</a>
+									<a href="tel:0971516201">097 151 6201</a>
 								</div>
 								<div className="leading-[28px]">
 									<span className="font-semibold">Gmail: </span>

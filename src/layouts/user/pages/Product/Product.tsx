@@ -12,28 +12,6 @@ const Product = () => {
 				<div className="products-wrapper flex gap-4">
 					<div className="product-filter w-[20%] rounder-2xl ">
 						<div className="filter-container">
-							{/* <div>
-								<div className="filter-header">
-									<span>
-										<FilterListIcon />
-									</span>
-									<span className="filter-header-title">Bộ lọc tìm kiếm</span>
-								</div>
-								<div className="sep"></div>
-								<div className="filter-content">
-									<div className="">
-										<div className="">
-											Mức giá
-										</div>
-
-										<div>
-											<div>
-											</div>
-											<div></div>
-										</div>
-									</div>
-								</div>
-							</div> */}
 							<div className="w-[260px] rounded-2xl bg-[#BF6B57] text-white p-4 shadow-md">
 								{/* Header */}
 								<div className="flex items-center gap-2 mb-3">
@@ -45,7 +23,7 @@ const Product = () => {
 
 								{/* Mức giá */}
 								<div className="mb-5">
-									<h4 className="text-[13px] font-bold uppercase mb-2 opacity-95">
+									<h4 className="text-[13px] font-bold uppercase pb-2 opacity-95">
 										Mức giá
 									</h4>
 									<ul className="space-y-2 text-[14px]">
@@ -97,7 +75,7 @@ const Product = () => {
 												max="2000000"
 												step="100000"
 												defaultValue="200000"
-												className="absolute w-full appearance-none bg-transparent pointer-events-none"
+												className="absolute w-full appearance-none bg-transparent pointer-events-none top-[5px]"
 												id="range-min"
 												style={{ zIndex: 3 }}
 											/>
@@ -107,7 +85,7 @@ const Product = () => {
 												max="2000000"
 												step="100000"
 												defaultValue="1200000"
-												className="absolute w-full appearance-none bg-transparent pointer-events-none"
+												className="absolute w-full appearance-none bg-transparent pointer-events-none top-[5px] right-[-35px]"
 												id="range-max"
 												style={{ zIndex: 2 }}
 											/>
@@ -122,7 +100,7 @@ const Product = () => {
 
 								{/* Màu sắc */}
 								<div>
-									<h4 className="text-[13px] font-bold uppercase mb-2 opacity-95">
+									<h4 className="text-[13px] font-bold uppercase pb-2 opacity-95">
 										Màu sắc
 									</h4>
 									<ul className="space-y-2 text-[14px]">
@@ -160,24 +138,18 @@ const Product = () => {
 							</div>
 						</div>
 						<div className="product-items grid grid-cols-3 gap-[2em] justify-items-center mb-8">
-							{[1,1,1,1,1,1,1,1,1,1,1,1].map((item) => (
+							{[1, 1, 1, 1, 1, 1].map((item) => (
 								<CardItem item={item}></CardItem>
 							))}
 						</div>
 						<Pagination
 							className="flex justify-center"
 							size="large"
-							count={10}
+							count={1}
 						></Pagination>
 					</div>
 				</div>
 			</div>
-			{/* <div className="flex justify-center gap-10 flex-wrap">
-				{[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map((item) => (
-					<CardItem item={item}></CardItem>
-				))}
-			</div>
-			<Pagination className="flex justify-center" size="large" count={10}></Pagination> */}
 		</BaseLayout>
 	);
 };

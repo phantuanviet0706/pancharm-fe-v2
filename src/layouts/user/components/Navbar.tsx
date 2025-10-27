@@ -1,5 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Avatar, Box, Button, IconButton, Link } from "@mui/material";
+import {
+	Avatar,
+	Box,
+	Button,
+	Dialog,
+	DialogContent,
+	DialogTitle,
+	IconButton,
+	Link,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -9,6 +18,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import Icon from "../../../components/Icon";
 import SideBar from "./SideBar";
 import UserNav from "../../../components/UserNav";
+import Cart from "../pages/Cart/Cart";
 
 const HEADER_ITEMS = [
 	{
@@ -26,10 +36,10 @@ const HEADER_ITEMS = [
 		href: "mailto:vietphan565@gmail.com",
 	},
 	{
-		title: "Address",
+		title: "Địa chỉ",
 		className: "address-contact relative",
 		icon: <LocationOnIcon />,
-		content: "47 Nguyen Tuan, Thanh Xuan, Ha Noi",
+		content: "47 Nguyễn Tuân, Thanh Xuân, Hà Nội",
 		icon_right: true,
 	},
 ];
@@ -70,6 +80,13 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 	const [openProfile, setOpenProfile] = useState(false);
 	const profileRef = useRef<HTMLDivElement | null>(null);
 
+	const [openCart, setOpenCart] = useState(false);
+	const handleCloseCart = (_e?: object, reason?: "backdropClick" | "escapeKeyDown") => {
+		if (reason === "backdropClick" || reason === "escapeKeyDown") {
+			setOpenCart(false);
+		}
+	};
+
 	useEffect(() => {
 		const onClick = (e: MouseEvent) => {
 			if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
@@ -90,7 +107,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 	const suffix = location.pathname;
 	PROFILE_SETTINGS.forEach((item) => {
 		const pattern = new RegExp(`(${item?.key})`, "i");
-		if (!pattern.test(suffix || '')) return;
+		if (!pattern.test(suffix || "")) return;
 		item.active = true;
 	});
 
@@ -178,7 +195,11 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 							<SearchIcon />
 						</IconButton>
 
-						<IconButton sx={{ color: "var(--color-card-bg)" }} aria-label="Giỏ hàng">
+						<IconButton
+							sx={{ color: "var(--color-card-bg)" }}
+							aria-label="Giỏ hàng"
+							onClick={() => setOpenCart(true)}
+						>
 							<ShoppingCartIcon />
 						</IconButton>
 
@@ -234,6 +255,36 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 					</div>
 				</div>
 			</Box>
+
+			{/* Dialog Cart */}
+			<Dialog
+				open={openCart}
+				onClose={handleCloseCart}
+				fullWidth
+				maxWidth="sm"
+				PaperProps={{
+					sx: {
+						border: "5px solid var(--color-card-thick)",
+						borderRadius: "0px",
+						backgroundColor: "var(--color-cream-bg)",
+						boxShadow: "0 4px 24px rgba(0,0,0,0.1)",
+						color: "var(--color-card-bg)",
+						textAlign: "center",
+					},
+				}}
+			>
+				<DialogTitle
+					sx={{
+						textTransform: "uppercase",
+						fontWeight: 600
+					}}
+				>
+					Giỏ hàng của bạn
+				</DialogTitle>
+				<DialogContent>
+					<Cart></Cart>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 };

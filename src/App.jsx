@@ -22,6 +22,7 @@ import ForgotPage from "./layouts/common/ForgotPage";
 import ChangePasswordPage from "./layouts/common/ChangePasswordPage";
 import Profile from "./layouts/user/pages/User/Profile";
 import UserInfo from "./layouts/user/pages/User/UserInfo";
+import Collection from "./layouts/user/pages/Collection/Collection";
 
 function App() {
 	const SAMPLE_DATA = [
@@ -67,6 +68,10 @@ function App() {
 					<Route path="/profile">
 						<Route index element={<Profile />}></Route>
 						<Route path="info" element={<UserInfo />}></Route>
+					</Route>
+
+					<Route path="/collections">
+						<Route index element={<Collection />}></Route>
 					</Route>
 
 					{SAMPLE_DATA.map((item, index) => (

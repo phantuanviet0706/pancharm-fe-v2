@@ -24,39 +24,34 @@ const OrderItem: React.FC<OrderItemProps> = ({
 }) => {
 	return (
 		<div
-			className={`flex items-center justify-between gap-4 select-none ${className}`}
+			className={`flex items-center justify-between gap-4 select-none w-[100%] ${className}`}
 			role={onClick ? "button" : undefined}
 			onClick={onClick}
 		>
-			<div className="flex items-center gap-4 min-w-0">
+			<div className="flex items-center gap-4">
 				<div className="relative shrink-0">
-					<div className="w-[82px] h-[82px] rounded-[18px] border border-white/45 overflow-hidden p-[5px]">
+					<div className="w-[82px] h-[82px] border border-white/45 overflow-hidden">
 						<img
 							src={imageUrl}
 							alt={title}
-							className="w-full h-full object-cover rounded-[14px] bg-black"
+							className="w-full h-full object-cover bg-black"
 						/>
 					</div>
+				</div>
 
-					<span
-						className="
-                            absolute -top-2 -right-2 rounded-lg
-                            bg-[#8F8F93] text-[var(--color-card-bg)] text-[13px] leading-none
-                            px-[9px] py-[6px] border border-white/90 shadow-sm
-                        "
+				<div className="">
+					<div
+						className="item-title font-semibold text-[18px] leading-4.5 line-clamp-1 overflow-hidden 
+							text-ellipsis hover:cursor-help"
+						title={title}
 					>
-						{quantity}
-					</span>
+						{title}
+					</div>
+					<div className="item-price font-semibold text-[20px]">
+						<MoneyDisplay price={price}></MoneyDisplay>
+					</div>
+					<div className="item-quantity text-[12px]">Số lượng: {quantity}</div>
 				</div>
-
-				<div className="min-w-0 text-[var(--color-card-bg)]">
-					<div className="font-medium text-[18px] leading-6 truncate">{title}</div>
-					{subTitle && <div className="text-[15px] mt-1 truncate">{subTitle}</div>}
-				</div>
-			</div>
-
-			<div className="shrink-0 flex items-baseline gap-1">
-				<MoneyDisplay price={price}></MoneyDisplay>
 			</div>
 		</div>
 	);

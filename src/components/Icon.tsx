@@ -118,8 +118,8 @@ const icons = {
 	facebook: (p: any) => (
 		<svg
 			viewBox="0 0 24 24"
-			width="24"
-			height="24"
+			width="26"
+			height="26"
 			aria-hidden="true"
 			{...p}
 			fill={p.color ?? "currentColor"}

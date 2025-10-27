@@ -46,21 +46,17 @@ const CardItem = ({ item }: CardItemProps) => {
 				}}
 			>
 				<div className="w-full h-[280px] object-cover object-top">
-					<img
-						className=""
-						src="https://helios.vn/cdn/shop/files/ontario-lotus-helios-black-silver_3_1296x.jpg?v=1754845293"
-						alt=""
-					/>
+					<img className="" src="public/product/P02.jpg" alt="" />
 				</div>
 				<div className="p-2 text-center mb-2 text-[var(--color-card-bg)] group-hover:text-[var(--color-cream-bg)] pt-0 mt-2 transition-colors duration-300">
 					<div className="p-2 pt-0">
 						<p className="text-sm font-semibold uppercase">
-							Vòng tay thiên vi lắc bạc ngọc bích xanh
+							Vòng tay đá phong thủy dây lắc bạc cao cấp
 						</p>
 					</div>
 					<div className="flex justify-center px-2">
 						<p className="flex text-xl font-bold pl-1">
-							1,000,000
+							2,000,000
 							<span className="">đ</span>
 						</p>
 					</div>

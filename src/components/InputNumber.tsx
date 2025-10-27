@@ -8,10 +8,11 @@ type Props = {
 	initial?: number;
 	onChange?: (value: number) => void;
 	className?: string;
-	size?: "sm" | "md" | "lg";
+	size?: "sm" | "md" | "lg" | "xs";
 };
 
 const SIZES = {
+	xs: { h: "h-6", wBtn: "w-6", text: "text-xs" },
 	sm: { h: "h-8", wBtn: "w-8", text: "text-sm" },
 	md: { h: "h-10", wBtn: "w-10", text: "text-base" },
 	lg: { h: "h-12", wBtn: "w-12", text: "text-lg" },

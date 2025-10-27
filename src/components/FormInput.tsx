@@ -13,7 +13,9 @@ export interface FormInputProps {
 		| "radio"
 		| "color"
 		| "file"
-		| "hidden";
+		| "hidden"
+		| "select"
+		| "textarea";
 	name?: string;
 	value?: any;
 	placeholder?: string;
@@ -21,9 +23,10 @@ export interface FormInputProps {
 	disabled?: boolean;
 	onChange?: (value: any) => void;
 	className?: string;
-	options?: { label: string; value: string | number }[];
+	options?: { id: string; name: string; value?: string | number; checked?: boolean }[];
 	fileMultiple?: boolean;
 	accept?: string;
+	isRounded?: boolean;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -39,24 +42,24 @@ const FormInput: React.FC<FormInputProps> = ({
 	options,
 	fileMultiple = false,
 	accept,
+	isRounded = false,
 }) => {
-	/** Base styles */
+	/** Base styles (fallback) */
 	const baseStyle =
 		"w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 bg-white shadow-sm " +
 		"focus:outline-none focus:ring-2 focus:ring-[var(--color-card-bg)] transition " +
-		"disabled:bg-gray-100 disabled:cursor-not-allowed";
+		"disabled:bg-gray-100 disabled:cursor-not-allowed ";
 
-	/** Pill style giống ảnh: bo tròn full + nền brand + chữ trắng */
 	const pillStyle =
-		"w-full rounded-full px-5 py-3 bg-[var(--color-card-bg)] text-white " +
-		"placeholder-white/80 border border-[color:var(--color-card-bg)] shadow-sm " +
-		"focus:outline-none focus:ring-2 focus:ring-white/40 disabled:opacity-60 h-[40px]";
+		`w-full ${isRounded ? "rounded-full" : ""} px-5 h-[40px] bg-[var(--color-cream-soft)] text-[var(--color-card-bg)] ` +
+		"placeholder-[var(--color-card-bg)]/100 border border-[color:var(--color-card-bg)] shadow-sm " +
+		"focus:outline-none focus:ring-2 focus:ring-white/40 disabled:opacity-60 " +
+		"focus:bg-[var(--color-card-bg)] focus:placeholder-[var(--color-cream-bg)] focus:text-white";
 
 	// ====== Internal states ======
 	// Cho text/password: nếu không truyền onChange thì dùng internal state để gõ được
 	const [internalValue, setInternalValue] = useState<string>(value ?? "");
 	useEffect(() => {
-		// Đồng bộ khi prop value thay đổi từ bên ngoài
 		setInternalValue(value ?? "");
 	}, [value]);
 
@@ -79,7 +82,7 @@ const FormInput: React.FC<FormInputProps> = ({
 
 		// Cho phép số, dấu chấm, dấu phẩy
 		raw = raw.replace(/[^\d.,]/g, "");
-		raw = raw.replace(/,/g, ""); // bỏ phẩy cũ trước khi format
+		raw = raw.replace(/,/g, ""); // bỏ phẩy cũ
 
 		// Nếu có nhiều dấu chấm -> chỉ giữ dấu đầu tiên
 		const parts = raw.split(".");
@@ -98,29 +101,47 @@ const FormInput: React.FC<FormInputProps> = ({
 		onChange?.(isNaN(numericValue) ? null : numericValue);
 	}
 
-	// Handlers cho text/password: hỗ trợ cả controlled & uncontrolled
+	// Handlers cho text/password
 	const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const v = e.target.value;
 		if (onChange) onChange(v);
 		else setInternalValue(v);
 	};
 
+	const renderFloatingLabel = () =>
+		label ? (
+			<label
+				htmlFor={name}
+				className={
+					"pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-[var(--color-card-bg)]/100 " +
+					"transition-opacity duration-150 opacity-0 " +
+					"peer-placeholder-shown:opacity-100 " +
+					"peer-focus:opacity-0 focus:text[var(--color-cream-bg)]"
+				}
+			>
+				{label}
+			</label>
+		) : null;
+
 	const renderInput = () => {
 		switch (type) {
 			case "int":
 			case "float":
 				return (
-					<input
-						type="text"
-						inputMode="decimal"
-						value={displayValue}
-						onChange={handleNumberInput}
-						placeholder={placeholder}
-						required={required}
-						disabled={disabled}
-						className={baseStyle}
-						id={name}
-					/>
+					<div className="relative">
+						<input
+							type="text"
+							inputMode="decimal"
+							value={displayValue}
+							onChange={handleNumberInput}
+							placeholder={label}
+							required={required}
+							disabled={disabled}
+							className={`${pillStyle} peer placeholder-transparent`}
+							id={name}
+						/>
+						{renderFloatingLabel()}
+					</div>
 				);
 
 			case "text":
@@ -133,26 +154,13 @@ const FormInput: React.FC<FormInputProps> = ({
 							onChange={handleTextChange}
 							required={required}
 							disabled={disabled}
-							placeholder=" "
+							placeholder={label}
 							className={`${pillStyle} peer placeholder-transparent`}
 						/>
-						{label && (
-							<label
-								htmlFor={name}
-								className={
-									"pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-white/80 " +
-									"transition-opacity duration-150 opacity-0 " +
-									"peer-placeholder-shown:opacity-100 " +
-									"peer-focus:opacity-0"
-								}
-							>
-								{label}
-							</label>
-						)}
+						{renderFloatingLabel()}
 					</div>
 				);
 
-			/** PASSWORD -> pill + toggle 👁️, label bên trong tương tự */
 			case "password":
 				return (
 					<div className="relative">
@@ -167,20 +175,7 @@ const FormInput: React.FC<FormInputProps> = ({
 							className={`${pillStyle} peer placeholder-transparent pr-12`}
 							autoComplete="current-password"
 						/>
-
-						{label && (
-							<label
-								htmlFor={name}
-								className={
-									"pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-white/80 " +
-									"transition-opacity duration-150 opacity-0 " +
-									"peer-placeholder-shown:opacity-100 " +
-									"peer-focus:opacity-0"
-								}
-							>
-								{label}
-							</label>
-						)}
+						{renderFloatingLabel()}
 
 						<button
 							type="button"
@@ -204,41 +199,63 @@ const FormInput: React.FC<FormInputProps> = ({
 
 			case "date":
 				return (
-					<input
-						type="date"
-						id={name}
-						value={value ?? ""}
-						onChange={(e) => onChange?.(e.target.value)}
-						required={required}
-						disabled={disabled}
-						className={baseStyle}
-					/>
+					<div className="relative">
+						<input
+							type="date"
+							id={name}
+							value={value ?? ""}
+							onChange={(e) => onChange?.(e.target.value)}
+							required={required}
+							disabled={disabled}
+							placeholder={label}
+							className={`${pillStyle} peer placeholder-transparent [color-scheme:dark]`}
+						/>
+						{renderFloatingLabel()}
+					</div>
 				);
 
 			case "datetime":
+				const [internalDateTime, setInternalDateTime] = useState(value ?? "");
+
+				useEffect(() => {
+					if (value !== undefined && value !== internalDateTime) {
+						setInternalDateTime(value);
+					}
+				}, [value]);
+
 				return (
-					<input
-						type="datetime-local"
-						id={name}
-						value={value ?? ""}
-						onChange={(e) => onChange?.(e.target.value)}
-						required={required}
-						disabled={disabled}
-						className={baseStyle}
-					/>
+					<div className="relative">
+						<input
+							type="datetime-local"
+							id={name}
+							value={internalDateTime}
+							onChange={(e) => {
+								const newVal = e.target.value;
+								setInternalDateTime(newVal);
+								onChange?.(newVal);
+							}}
+							required={required}
+							disabled={disabled}
+							placeholder={label}
+							className={`${pillStyle} peer placeholder-transparent [color-scheme:dark]`}
+						/>
+						{renderFloatingLabel()}
+					</div>
 				);
 
 			case "checkbox":
+				const [checked, setChecked] = useState(false);
+
 				return (
 					<label className="inline-flex items-center gap-2 cursor-pointer">
 						<input
 							type="checkbox"
-							checked={!!value}
-							onChange={(e) => onChange?.(e.target.checked)}
-							disabled={disabled}
+							checked={checked}
+							onChange={(e) => setChecked(e.target.checked)}
 							className="accent-[var(--color-card-bg)] w-5 h-5"
+							name={name}
 						/>
-						<span className="text-gray-800">{label}</span>
+						<span className="text-[var(--color-card-bg)]">{label}</span>
 					</label>
 				);
 
@@ -249,11 +266,11 @@ const FormInput: React.FC<FormInputProps> = ({
 							<label
 								key={String(opt.value)}
 								className={`flex items-center gap-2 cursor-pointer rounded-md border px-3 py-2
-                ${
-					value === opt.value
-						? "border-[var(--color-card-bg)] bg-[color:var(--color-cream-soft)]/40"
-						: "border-gray-300"
-				}`}
+								${
+									value === opt.value
+										? "border-[var(--color-card-bg)] bg-[color:var(--color-cream-soft)]/40"
+										: "border-gray-300"
+								}`}
 							>
 								<input
 									type="radio"
@@ -294,25 +311,89 @@ const FormInput: React.FC<FormInputProps> = ({
 					/>
 				);
 
-			default:
+			case "select":
 				return (
-					<input
-						type="text"
-						id={name}
-						value={value ?? ""}
-						onChange={(e) => onChange?.(e.target.value)}
-						placeholder={placeholder}
-						required={required}
-						disabled={disabled}
-						className={baseStyle}
-					/>
+					<div className="select-opts">
+						<div className="opts-wrapper">
+							{options?.map((item) => (
+								<>
+									<div className="opts-item mb-2">
+										<label
+											key={String(item.value)}
+											className={`flex items-center gap-2 cursor-pointer border px-3 py-2
+											${
+												value === item.value
+													? "border-[var(--color-card-bg)] bg-[color:var(--color-cream-soft)]/40"
+													: "border-gray-300"
+											}`}
+										>
+											<input
+												type="radio"
+												name={name}
+												value={String(item.value)}
+												checked={item?.checked}
+												onChange={() => onChange?.(item.value)}
+												disabled={disabled}
+												className="accent-[var(--color-card-bg)] w-4 h-4"
+											></input>
+											<span className="text-gray-800">{item.name}</span>
+										</label>
+									</div>
+								</>
+							))}
+						</div>
+					</div>
+				);
+
+			case "textarea":
+				return (
+					<div className="relative">
+						<textarea
+							id={name}
+							value={onChange ? (value ?? "") : internalValue}
+							onChange={handleTextChange}
+							required={required}
+							disabled={disabled}
+							placeholder={label}
+							rows={4} // đủ cao như ảnh
+							className={`w-full min-h-[120px] rounded-md border border-[var(--color-card-bg)] bg-[var(--color-cream-bg)] text-[var(--color-card-bg)] px-4 py-3 outline-none placeholder:text-[var(--color-card-bg)]/60 focus:border-[var(--color-card-bg)] focus:ring-0 resize-none`}
+						/>
+					</div>
+				);
+
+			default:
+				// fallback: cũng dùng pill style cho đồng bộ layout
+				return (
+					<div className="relative">
+						<input
+							type="text"
+							id={name}
+							value={value ?? ""}
+							onChange={(e) => onChange?.(e.target.value)}
+							placeholder=" "
+							required={required}
+							disabled={disabled}
+							className={`${pillStyle} peer placeholder-transparent`}
+						/>
+						{renderFloatingLabel()}
+					</div>
 				);
 		}
 	};
 
-	/** Với text/password ta đưa label vào trong input, nên ẩn label bên ngoài */
+	/** Với text/password/int/float/date/datetime dùng label nổi bên trong input => ẩn label ngoài */
 	const showExternalLabel =
-		label && type !== "checkbox" && type !== "hidden" && type !== "text" && type !== "password";
+		label &&
+		type !== "checkbox" &&
+		type !== "hidden" &&
+		type !== "text" &&
+		type !== "password" &&
+		type !== "int" &&
+		type !== "float" &&
+		type !== "date" &&
+		type !== "datetime" &&
+		type !== "select" &&
+		type !== "textarea";
 
 	return (
 		<div className={`flex flex-col gap-2 mb-4 ${className}`}>
