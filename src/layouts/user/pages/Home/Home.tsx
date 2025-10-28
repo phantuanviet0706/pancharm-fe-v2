@@ -10,7 +10,7 @@ const Home = () => {
 		<>
 			<BaseLayout>
 				<div className="grid grid-cols-1 gap-6 text-[var(--color-card-bg)]">
-					<Video src="/home/vid1.mp4">
+					<Video src="https://pancharm.s3.ap-northeast-1.amazonaws.com/video/Bao+l%C3%A2u+r%E1%BB%93i+ch%C6%B0a+thanh+t%E1%BA%A9y+%C4%91%C3%A1+10102025.mp4">
 						<div className="absolute inset-0 flex flex-col items-center justify-end bottom-10 gap-6 text-center z-10">
 							{/* <h1 className="text-white text-4xl md:text-5xl font-extrabold tracking-wide drop-shadow-lg">
 								CÂU CHUYỆN THƯƠNG HIỆU
