@@ -23,6 +23,7 @@ import ChangePasswordPage from "./layouts/common/ChangePasswordPage";
 import Profile from "./layouts/user/pages/User/Profile";
 import UserInfo from "./layouts/user/pages/User/UserInfo";
 import Collection from "./layouts/user/pages/Collection/Collection";
+import Other from "./layouts/admin/pages/Other/Other";
 
 function App() {
 	const SAMPLE_DATA = [
@@ -86,6 +87,7 @@ function App() {
 					<Route path="/admin">
 						<Route index element={<AdminHome />} />
 						<Route path="users" element={<User />} />
+						<Route path="others" element={<Other />}></Route>
 					</Route>
 
 					{/* Common Routes */}

@@ -1,0 +1,111 @@
+/* ====== Toolbar look & feel ====== */
+.pc-quill__root .ql-toolbar {
+  background: var(--color-cream-bg);
+  border: 1px solid #e4c6b9;
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  padding: 8px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  position: sticky; /* optional nếu muốn dính phía trên khung editor */
+  top: 0;
+  z-index: 2;
+}
+
+.pc-quill__root .ql-container {
+  border: 1px solid #e4c6b9;
+  border-radius: 0 0 12px 12px;
+  min-height: 180px;
+}
+
+/* Nhóm nút (formats) có vạch phân tách nhẹ */
+.pc-quill__root .ql-toolbar .ql-formats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 8px;
+  margin-right: 2px;
+  border-right: 1px dashed #e9d6cd;
+}
+.pc-quill__root .ql-toolbar .ql-formats:last-child {
+  border-right: 0;
+  margin-right: 0;
+  padding-right: 0;
+}
+
+/* Nút & dropdown có cùng kích thước, bo tròn */
+.pc-quill__root .ql-toolbar button,
+.pc-quill__root .ql-toolbar .ql-picker {
+  height: 34px;
+  min-width: 34px;
+  border-radius: 10px;
+  transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+
+/* Màu icon */
+.pc-quill__root .ql-stroke { stroke: var(--color-card-bg); }
+.pc-quill__root .ql-fill   { fill:   var(--color-card-bg); }
+
+/* Hover/active */
+.pc-quill__root .ql-toolbar button:hover,
+.pc-quill__root .ql-toolbar .ql-picker-label:hover {
+  background: rgba(180, 92, 78, 0.08); /* card-bg alpha */
+}
+.pc-quill__root .ql-toolbar .ql-active,
+.pc-quill__root .ql-toolbar .ql-picker.ql-expanded .ql-picker-label {
+  background: rgba(180, 92, 78, 0.14);
+  box-shadow: 0 0 0 1px rgba(180, 92, 78, 0.22) inset;
+}
+.pc-quill__root .ql-toolbar .ql-active .ql-stroke,
+.pc-quill__root .ql-toolbar .ql-active .ql-fill {
+  stroke: var(--color-card-bg);
+  fill:   var(--color-card-bg);
+}
+
+/* Dropdown text & panel */
+.pc-quill__root .ql-picker-label,
+.pc-quill__root .ql-picker-item {
+  color: var(--color-card-bg);
+}
+.pc-quill__root .ql-picker-options {
+  border-radius: 10px;
+  border-color: #e4c6b9;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.12);
+  background: #fff;
+}
+
+/* Color picker, background picker hiển thị grid nhỏ xinh */
+.pc-quill__root .ql-color-picker .ql-picker-options,
+.pc-quill__root .ql-background .ql-picker-options {
+  padding: 8px;
+  gap: 6px;
+}
+
+/* Editor text */
+.pc-quill__root .ql-editor {
+  padding: 12px 14px 16px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #442f2a;
+}
+.pc-quill__root .ql-editor.ql-blank::before {
+  color: #bfa6a0;
+  opacity: 1;
+}
+
+/* Focus ring đồng bộ input khác */
+.pc-quill__root:focus-within .ql-toolbar,
+.pc-quill__root:focus-within .ql-container {
+  border-color: var(--color-card-bg);
+  box-shadow: 0 0 0 3px rgba(180, 92, 78, 0.20);
+}
+
+/* ====== Responsive ====== */
+@media (max-width: 768px) {
+  .pc-quill__root .ql-toolbar { gap: 6px; padding: 6px; }
+  .pc-quill__root .ql-toolbar .ql-formats { border-right: 0; }
+  .pc-quill__root .ql-toolbar button,
+  .pc-quill__root .ql-toolbar .ql-picker { height: 32px; min-width: 32px; }
+  .pc-quill__root .ql-editor { min-height: 140px; }
+}

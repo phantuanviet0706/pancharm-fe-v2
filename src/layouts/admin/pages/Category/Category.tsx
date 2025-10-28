@@ -5,7 +5,10 @@ const Category = () => {
 	return (
 		<>
 			<BaseLayout>
-                <div></div>
+                <div>
+					<div></div>
+					<div></div>
+				</div>
             </BaseLayout>
 		</>
 	);

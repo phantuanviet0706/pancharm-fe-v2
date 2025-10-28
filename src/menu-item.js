@@ -76,7 +76,7 @@ const menuItems = {
 					id: "custom_footer",
 					title: "Danh mục khác",
 					type: "item",
-					url: "/admin/custom-footer",
+					url: "/admin/others",
 					icon: "widgets"
 				}
 			]

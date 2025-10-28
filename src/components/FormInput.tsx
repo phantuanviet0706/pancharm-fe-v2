@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import ReactQuill from "react-quill";
 
 export interface FormInputProps {
 	label?: string;
@@ -15,7 +16,8 @@ export interface FormInputProps {
 		| "file"
 		| "hidden"
 		| "select"
-		| "textarea";
+		| "textarea"
+		| "editor";
 	name?: string;
 	value?: any;
 	placeholder?: string;
@@ -357,6 +359,44 @@ const FormInput: React.FC<FormInputProps> = ({
 							placeholder={label}
 							rows={4} // đủ cao như ảnh
 							className={`w-full min-h-[120px] rounded-md border border-[var(--color-card-bg)] bg-[var(--color-cream-bg)] text-[var(--color-card-bg)] px-4 py-3 outline-none placeholder:text-[var(--color-card-bg)]/60 focus:border-[var(--color-card-bg)] focus:ring-0 resize-none`}
+						/>
+					</div>
+				);
+
+			case "editor":
+				const toolbarOptions = [
+					["bold", "italic", "underline", "strike"], // toggled buttons
+					["blockquote", "code-block"],
+					["link", "image", "video", "formula"],
+
+					[{ header: 1 }, { header: 2 }], // custom button values
+					[{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
+					[{ script: "sub" }, { script: "super" }], // superscript/subscript
+					[{ indent: "-1" }, { indent: "+1" }], // outdent/indent
+					[{ direction: "rtl" }], // text direction
+
+					[{ size: ["small", false, "large", "huge"] }], // custom dropdown
+					[{ header: [1, 2, 3, 4, 5, 6, false] }],
+
+					[{ color: [] }, { background: [] }], // dropdown with defaults from theme
+					[{ font: [] }],
+					[{ align: [] }],
+
+					["clean"], // remove formatting button
+				];
+				const module = {
+					toolbar: toolbarOptions,
+				};
+
+				return (
+					<div className="relative">
+						<ReactQuill
+							modules={module}
+							theme="snow"
+							value={value || ""}
+							onChange={onChange}
+							placeholder={placeholder}
+							className="pc-quill__root"
 						/>
 					</div>
 				);
