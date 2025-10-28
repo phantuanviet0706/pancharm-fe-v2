@@ -18,7 +18,7 @@ export interface NavItemProps {
 
 const NavItem = ({ item }: NavItemProps) => {
 	return [
-		<div className="py-[13px]">
+		<div className="py-2">
 			<Link to={item.url} className="flex gap-4">
 				<div className="">
 					<span className="material-icons-two-tone text-[24px]">
