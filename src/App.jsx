@@ -9,21 +9,27 @@ import UserHome from "./layouts/user/pages/Home/Home";
 import Product from "./layouts/user/pages/Product/Product";
 import ProductDetail from "./layouts/user/pages/Product/ProductDetail";
 import DynamicPage from "./layouts/user/pages/DynamicPage/DynamicPage";
+import UserCollection from "./layouts/user/pages/Collection/Collection";
+import Profile from "./layouts/user/pages/User/Profile";
+import UserInfo from "./layouts/user/pages/User/UserInfo";
 import Order from "./layouts/user/pages/Order/Order";
 
-// Import Admin Routes
-import AdminHome from "./layouts/admin/pages/Home/Home";
-import Category from "./layouts/admin/pages/Category/Category";
+// Import Common Routes
 import NotFound from "./layouts/common/NotFound";
-import User from "./layouts/admin/pages/User/User";
 import LoginPage from "./layouts/common/LoginPage";
 import RegisterPage from "./layouts/common/RegisterPage";
 import ForgotPage from "./layouts/common/ForgotPage";
 import ChangePasswordPage from "./layouts/common/ChangePasswordPage";
-import Profile from "./layouts/user/pages/User/Profile";
-import UserInfo from "./layouts/user/pages/User/UserInfo";
-import Collection from "./layouts/user/pages/Collection/Collection";
+
+// Import Admin Routes
+import AdminHome from "./layouts/admin/pages/Home/Home";
+import AdminCategory from "./layouts/admin/pages/Category/Category";
+import User from "./layouts/admin/pages/User/User";
 import Other from "./layouts/admin/pages/Other/Other";
+import Company from "./layouts/admin/pages/Company/Company";
+import CompanyInfo from "./layouts/admin/pages/Company/CompanyInfo/CompanyInfo";
+import AdminCollection from "./layouts/admin/pages/Collection/Collection";
+import AdminProduct from "./layouts/admin/pages/Product/Product";
 
 function App() {
 	const SAMPLE_DATA = [
@@ -72,7 +78,7 @@ function App() {
 					</Route>
 
 					<Route path="/collections">
-						<Route index element={<Collection />}></Route>
+						<Route index element={<UserCollection />}></Route>
 					</Route>
 
 					{SAMPLE_DATA.map((item, index) => (
@@ -88,6 +94,13 @@ function App() {
 						<Route index element={<AdminHome />} />
 						<Route path="users" element={<User />} />
 						<Route path="others" element={<Other />}></Route>
+						<Route path="company">
+							<Route index element={<Company />}></Route>
+							<Route path="info" element={<CompanyInfo />}></Route>
+						</Route>
+						<Route path="categories" element={<AdminCategory />}></Route>
+						<Route path="collections" element={<AdminCollection />}></Route>
+						<Route path="products" element={<AdminProduct />}></Route>
 					</Route>
 
 					{/* Common Routes */}

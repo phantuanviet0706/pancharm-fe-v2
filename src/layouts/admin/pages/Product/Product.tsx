@@ -7,27 +7,13 @@ import GenericTable from "../../../../components/GenericTable";
 import ActionMenu from "../../../../components/ActionMenu";
 
 const ROWS = [
-	{ id: 1, name: "Trang sức nam", slug: "CAT-1" },
-	{ id: 2, name: "Trang sức nữ", slug: "CAT-2" },
-	{ id: 3, name: "Dây chuyền", slug: "CAT-3" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
+	{ id: 1, name: "Vòng tay 1", slug: "PRO-1", quantity: 1, unitPrice: 200000, status: "ACTIVE" },
+	{ id: 2, name: "Vòng tay 2", slug: "PRO-2", quantity: 1, unitPrice: 200000, status: "ACTIVE" },
+	{ id: 3, name: "Vòng tay 3", slug: "PRO-3", quantity: 1, unitPrice: 200000, status: "ACTIVE" },
+	{ id: 4, name: "Vòng tay 4", slug: "PRO-4", quantity: 1, unitPrice: 200000, status: "ACTIVE" },
 ];
 
-const Category = () => {
+const Product = () => {
 	return (
 		<>
 			<BaseLayout
@@ -59,7 +45,7 @@ const Category = () => {
 					</div>
 				}
 			>
-				<CommonLayout title="Thông tin Danh mục" width={60}>
+				<CommonLayout title="Thông tin Sản phẩm" width={60}>
 					<div className="category-list">
 						<GenericTable
 							data={ROWS}
@@ -69,9 +55,14 @@ const Category = () => {
 								{
 									key: "name",
 									label: "Tên",
-									// onClick: (row) => onDetail(row?.id ? row.id : 0),
+									onClick: (row) => {
+										// onDetail(row?.id ? row.id : 0)
+									},
 								},
 								{ key: "slug", label: "Mã" },
+								{ key: "quantity", label: "Số lượng" },
+								{ key: "unitPrice", label: "Đơn giá" },
+								{ key: "status", label: "Trạng thái" },
 								{
 									key: "actions",
 									label: "Thao tác",
@@ -82,13 +73,13 @@ const Category = () => {
 										<ActionMenu
 											actions={[
 												{
-													label: "Edit",
+													label: "Sửa",
 													onClick: () => {
 														// onEdit(row)
 													},
 												},
 												{
-													label: "Delete",
+													label: "Xóa",
 													onClick: () => {
 														// onDelete(row?.id ? row.id : 0)
 													},
@@ -99,7 +90,7 @@ const Category = () => {
 									),
 								},
 							]}
-						/>
+						></GenericTable>
 					</div>
 				</CommonLayout>
 			</BaseLayout>
@@ -107,4 +98,4 @@ const Category = () => {
 	);
 };
 
-export default Category;
+export default Product;

@@ -7,27 +7,13 @@ import GenericTable from "../../../../components/GenericTable";
 import ActionMenu from "../../../../components/ActionMenu";
 
 const ROWS = [
-	{ id: 1, name: "Trang sức nam", slug: "CAT-1" },
-	{ id: 2, name: "Trang sức nữ", slug: "CAT-2" },
-	{ id: 3, name: "Dây chuyền", slug: "CAT-3" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
+	{ id: 1, name: "Vòng đá phong thủy", slug: "COLLECTION-1" },
+	{ id: 2, name: "Thiên vi", slug: "COLLECTION-2" },
+	{ id: 3, name: "Trà an", slug: "COLLECTION-3" },
+	{ id: 4, name: "Diên đá", slug: "COLLECTION-4" },
 ];
 
-const Category = () => {
+const Collection = () => {
 	return (
 		<>
 			<BaseLayout
@@ -59,7 +45,7 @@ const Category = () => {
 					</div>
 				}
 			>
-				<CommonLayout title="Thông tin Danh mục" width={60}>
+				<CommonLayout title="Thông tin Bộ sưu tập" width={60}>
 					<div className="category-list">
 						<GenericTable
 							data={ROWS}
@@ -107,4 +93,4 @@ const Category = () => {
 	);
 };
 
-export default Category;
+export default Collection;
