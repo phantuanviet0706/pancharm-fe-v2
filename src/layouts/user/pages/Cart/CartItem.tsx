@@ -20,7 +20,7 @@ const CartItem = () => {
 				<div className="cart-item-img w-[80px] h-[80px]">
 					<img
 						className="w-[80px] h-[80px]"
-						src="public/cart/DSC02707.jpeg"
+						src="/cart/DSC02707.jpeg"
 						alt="Cart Item"
 					/>
 				</div>

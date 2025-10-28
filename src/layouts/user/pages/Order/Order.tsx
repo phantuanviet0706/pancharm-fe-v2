@@ -69,7 +69,7 @@ const Order = () => {
 						<div className="order-preview-wrapper w-[90%] h-[200px] overflow-y-auto thin-scrollbar pr-4 mb-4">
 							{[1, 1].map((item) => (
 								<OrderItem
-									imageUrl="public/cart/DSC02707.jpeg"
+									imageUrl="/cart/DSC02707.jpeg"
 									price={2000000}
 									quantity={1}
 									title="Vòng tay đá phong thủy cao cấp"

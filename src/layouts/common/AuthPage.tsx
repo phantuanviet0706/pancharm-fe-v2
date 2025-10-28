@@ -72,7 +72,7 @@ const AuthPage = ({ title, children, footer, position = "left", header = "" }: A
 				<div>
 					<img
 						className="object-cover w-full h-full"
-						src="public/auth/login.jpeg"
+						src="/auth/login.jpeg"
 						alt="banner"
 					/>
 				</div>
