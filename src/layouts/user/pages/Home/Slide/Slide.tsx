@@ -78,22 +78,6 @@ const Slide = () => {
 					<CardItem key={item} item={item} />
 				))}
 			</Slider>
-			<div className="w-full flex justify-center mt-4">
-				<Button
-					onClick={() => navigate("/products")}
-					sx={{
-						width: "150px",
-						border: "2px solid #e0e0e0",
-						borderRadius: "25px",
-						"&:hover": {
-							backgroundColor: "#125ea5",
-							color: "white",
-						},
-					}}
-				>
-					Xem tất cả
-				</Button>
-			</div>
 		</div>
 	);
 };

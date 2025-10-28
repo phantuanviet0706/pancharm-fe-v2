@@ -69,11 +69,13 @@ const AuthPage = ({ title, children, footer, position = "left", header = "" }: A
 	const navRightContent = (
 		<div className="w-1/2 hidden md:block">
 			<div className="sticky top-0 h-screen">
-				<img
-					className="object-cover w-full h-full"
-					src="https://images.pexels.com/photos/12732558/pexels-photo-12732558.jpeg"
-					alt="banner"
-				/>
+				<div>
+					<img
+						className="object-cover w-full h-full"
+						src="public/auth/login.jpeg"
+						alt="banner"
+					/>
+				</div>
 			</div>
 		</div>
 	);

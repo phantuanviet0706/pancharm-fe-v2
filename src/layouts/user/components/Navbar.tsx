@@ -45,12 +45,17 @@ const HEADER_ITEMS = [
 ];
 
 const MAIN_MENU = [
-	{ key: "bracelets", label: "VÒNG TAY", href: "/vong-tay" },
-	{ key: "gifts", label: "QUÀ TẶNG", href: "/qua-tang" },
-	{ key: "dien-da", label: "DIÊN ĐÁ", href: "/dien-da" },
-	{ key: "dien-ngoc", label: "DIÊN NGỌC", href: "/dien-ngoc" },
-	{ key: "thien-vi", label: "THIÊN VI", href: "/thien-vi" },
-	{ key: "tra-an", label: "TRẢ ÂN", href: "/tra-an" },
+	{ key: "collections", label: "BST Mới", href: "/collections" },
+	{ key: "categories", label: "Trang sức" },
+	{ key: "gifts", label: "Quà tặng", href: "/gifts" },
+	{ key: "others", label: "Phụ kiện phong thủy", href: "/others" },
+];
+
+const CATEGORY_OPTIONS = [
+	{ label: "Vòng tay nam", href: "/categories/bracelet-men" },
+	{ label: "Vòng tay nữ", href: "/categories/bracelet-women" },
+	{ label: "Dây chuyền", href: "/categories/necklace" },
+	{ label: "Nhẫn", href: "/categories/ring" },
 ];
 
 const PROFILE_SETTINGS = [
@@ -76,7 +81,7 @@ const PROFILE_SETTINGS = [
 	},
 ];
 
-const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
+const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => {
 	const [openProfile, setOpenProfile] = useState(false);
 	const profileRef = useRef<HTMLDivElement | null>(null);
 
@@ -86,6 +91,26 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 			setOpenCart(false);
 		}
 	};
+
+	const [openCategories, setOpenCategories] = useState(false);
+	const categoriesRef = useRef<HTMLDivElement | null>(null);
+
+	useEffect(() => {
+		const onDocClick = (e: MouseEvent) => {
+			if (categoriesRef.current && !categoriesRef.current.contains(e.target as Node)) {
+				setOpenCategories(false);
+			}
+		};
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === "Escape") setOpenCategories(false);
+		};
+		document.addEventListener("mousedown", onDocClick);
+		document.addEventListener("keydown", onKey);
+		return () => {
+			document.removeEventListener("mousedown", onDocClick);
+			document.removeEventListener("keydown", onKey);
+		};
+	}, []);
 
 	useEffect(() => {
 		const onClick = (e: MouseEvent) => {
@@ -163,7 +188,60 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 					{/* Mid Nav */}
 					<nav className="hidden md:flex items-center gap-2">
 						{MAIN_MENU.map((it) => {
-							const active = it.key === activeKey;
+							const suffix = location.pathname;
+							const pattern = new RegExp(`(${it?.key})`, "i");
+							const active = pattern.test(suffix);
+							if (it.key === "categories") {
+								return (
+									<div key={it.key} ref={categoriesRef} className="relative">
+										<button
+											type="button"
+											aria-haspopup="menu"
+											aria-expanded={openCategories}
+											onClick={() => setOpenCategories((v) => !v)}
+											className={[
+												"px-3 py-2 text-sm font-semibold tracking-wide rounded-full transition-colors",
+												openCategories
+													? "text-[var(--color-cream-bg)]"
+													: "text-[var(--color-card-bg)] hover:text-black",
+											].join(" ")}
+											style={{
+												backgroundColor: openCategories
+													? "var(--color-card-bg)"
+													: "transparent",
+											}}
+										>
+											{it.label}
+										</button>
+
+										{openCategories && (
+											<div
+												role="menu"
+												className="absolute left-full -translate-x-1/2 mt-2 w-48 rounded-2xl shadow-xl overflow-hidden"
+												style={{ backgroundColor: "var(--color-card-bg)" }}
+											>
+												<ul className="py-2">
+													{CATEGORY_OPTIONS.map((op) => (
+														<li key={op.href}>
+															<a
+																role="menuitem"
+																href={op.href}
+																className="block px-4 py-2 text-sm text-[var(--color-cream-bg)] hover:bg-[color:var(--color-cream-soft)]/15"
+																onClick={() =>
+																	setOpenCategories(false)
+																}
+															>
+																{op.label}
+															</a>
+														</li>
+													))}
+												</ul>
+											</div>
+										)}
+									</div>
+								);
+							}
+
 							return (
 								<a
 									key={it.key}
@@ -203,7 +281,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 							<ShoppingCartIcon />
 						</IconButton>
 
-						<div className="relative" ref={profileRef}>
+						{/* <div className="relative" ref={profileRef}>
 							<IconButton
 								sx={{ color: "var(--color-card-bg)" }}
 								aria-label="Tài khoản"
@@ -225,9 +303,9 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 									<UserNav settings={PROFILE_SETTINGS}></UserNav>
 								</div>
 							)}
-						</div>
+						</div> */}
 
-						{/* <div className="relative authentication-btn">
+						<div className="relative authentication-btn">
 							<Button
 								sx={{
 									backgroundColor: "var(--color-card-bg)",
@@ -235,7 +313,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 										backgroundColor: "var(--color-card-bg-hover)",
 									},
 									borderRadius: "24px",
-									paddingInline: "15px"
+									paddingInline: "15px",
 								}}
 							>
 								<Link
@@ -251,7 +329,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 									<div className="login-btn">Đăng nhập</div>
 								</Link>
 							</Button>
-						</div> */}
+						</div>
 					</div>
 				</div>
 			</Box>
@@ -276,7 +354,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "gifts" }) => {
 				<DialogTitle
 					sx={{
 						textTransform: "uppercase",
-						fontWeight: 600
+						fontWeight: 600,
 					}}
 				>
 					Giỏ hàng của bạn

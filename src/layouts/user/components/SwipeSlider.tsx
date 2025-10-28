@@ -8,7 +8,7 @@ import "swiper/css/pagination";
 const DEFAULT_SLIDES = [
 	{
 		kind: "image",
-		src: "https://images.unsplash.com/photo-1514894780887-121968d00567?q=80&w=1600&auto=format&fit=crop",
+		src: "/product/01.jpeg",
 		content: "New Arrivals",
 	},
 	{
@@ -21,22 +21,31 @@ const DEFAULT_SLIDES = [
 		muted: true,
 	},
 	{
-		src: "https://helios.vn/cdn/shop/files/ontario-lotus-helios-black-silver_3_1080x.jpg?v=1754845293",
+		src: "/product/02.jpeg",
 		content: "Best Sellers",
 	},
 	{
-		src: "https://helios.vn/cdn/shop/files/ontario-lotus-helios-black-silver_3_1080x.jpg?v=1754845293",
+		src: "/product/03.jpeg",
 		content: "Best Sellers",
 	},
 	{
-		src: "https://helios.vn/cdn/shop/files/ontario-lotus-helios-black-silver_3_1080x.jpg?v=1754845293",
-		content: "Best Sellers",
-	},
-	{
-		src: "https://helios.vn/cdn/shop/files/ontario-lotus-helios-black-silver_3_1080x.jpg?v=1754845293",
+		src: "/product/04.jpeg",
 		content: "Best Sellers",
 	},
 ];
+
+interface SwipeSlideProps {
+	slides?: { kind?: string; src: string; content?: string }[];
+	width?: string;
+	height?: string;
+	showThumbs?: boolean;
+	thumbsPerView?: number;
+	thumbsHeight?: number;
+	autoplay?: { delay: number; disableOnInteraction: boolean };
+	loop?: boolean;
+	className?: string;
+	hoverPause?: boolean;
+}
 
 export default function SwipeSlider({
 	slides = DEFAULT_SLIDES,
@@ -49,7 +58,7 @@ export default function SwipeSlider({
 	loop = true,
 	className = "",
 	hoverPause = true,
-}) {
+}: SwipeSlideProps) {
 	const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
 	const mainSwiperRef = useRef<any>(null);
 	const videoRefs = useRef<HTMLVideoElement[]>([]);
@@ -225,7 +234,7 @@ export default function SwipeSlider({
 							a11y={{ enabled: true }}
 							className="w-full h-full justify-center thin-scrollbar"
 							style={{
-								overflowX: "auto"
+								overflowX: "auto",
 							}}
 						>
 							{slides.map((s, i) => {

@@ -2,6 +2,13 @@ import React from "react";
 import Card from "./Card/Card";
 import BaseLayout from "../../components/BaseLayout";
 
+const COLECTION_OPTS = [
+	{ id: "bst_vong_da", name: "BST Vòng đá phong thủy", src: "public/collection/01.jpeg" },
+	{ id: "bst_vong_da", name: "BST Vòng đá phong thủy", src: "public/collection/02.JPG" },
+	{ id: "bst_vong_tra_an", name: "BST Vòng trà an", src: "public/collection/03.jpg" },
+	{ id: "bst_vong_da", name: "BST Vòng đá phong thủy", src: "public/collection/04.JPG" },
+];
+
 const Collection = () => {
 	return (
 		<BaseLayout>
@@ -9,10 +16,9 @@ const Collection = () => {
 				<div className="collection-wrapper">
 					<div className="collection-list flex justify-center">
 						<div className="grid grid-cols-2 gap-5">
-							{[1, 1, 1, 1].map((item) => (
+							{COLECTION_OPTS.map((item) => (
 								<Card
 									item={item}
-									src="https://helios.vn/cdn/shop/files/ontario-lotus-helios-black-silver_3_1296x.jpg?v=1754845293"
 								></Card>
 							))}
 						</div>

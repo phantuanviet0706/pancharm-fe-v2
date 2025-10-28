@@ -3,17 +3,16 @@ import React from "react";
 
 interface CardProps {
 	item: any;
-	src: string;
 	width?: number;
 	height?: number;
 }
 
-const Card = ({ item, src, width = 360, height = 400 }: CardProps) => {
+const Card = ({ item, width = 360, height = 350 }: CardProps) => {
 	return (
 		<div className="relative group overflow-hidden" style={{ width, height }}>
 			<Link href="/collections/detail" className="block h-full w-full">
 				<img
-					src={src}
+					src={item?.src}
 					alt="Card item"
 					className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
 				/>
