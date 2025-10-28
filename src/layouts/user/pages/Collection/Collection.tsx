@@ -3,10 +3,10 @@ import Card from "./Card/Card";
 import BaseLayout from "../../components/BaseLayout";
 
 const COLECTION_OPTS = [
-	{ id: "bst_vong_da", name: "BST Vòng đá phong thủy", src: "public/collection/01.jpeg" },
-	{ id: "bst_vong_da", name: "BST Vòng đá phong thủy", src: "public/collection/02.JPG" },
-	{ id: "bst_vong_tra_an", name: "BST Vòng trà an", src: "public/collection/03.jpg" },
-	{ id: "bst_vong_da", name: "BST Vòng đá phong thủy", src: "public/collection/04.JPG" },
+	{ id: "bst_vong_da", name: "BST Vòng đá phong thủy", src: "/collection/01.jpeg" },
+	{ id: "bst_vong_da", name: "BST Vòng đá phong thủy", src: "/collection/02.JPG" },
+	{ id: "bst_vong_tra_an", name: "BST Vòng trà an", src: "/collection/03.jpg" },
+	{ id: "bst_vong_da", name: "BST Vòng đá phong thủy", src: "/collection/04.JPG" },
 ];
 
 const Collection = () => {
