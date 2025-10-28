@@ -1,4 +1,4 @@
-import { Company, getCompany } from 'api/companyService';
+import { Company, getCompany } from '../api/companyService';
 import { useEffect, useState } from 'react';
 
 export function useCompany() {

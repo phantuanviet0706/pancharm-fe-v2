@@ -1,4 +1,4 @@
-import { Category, CategoryQuery, fetchData } from "api/categoryService";
+import { Category, CategoryQuery, fetchData } from "../api/categoryService";
 import { useEffect, useState } from "react";
 
 export function useCategories(query: CategoryQuery = {}) {

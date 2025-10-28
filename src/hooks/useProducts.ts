@@ -1,4 +1,4 @@
-import { fetchData, Product, ProductQuery } from 'api/productService';
+import { fetchData, Product, ProductQuery } from '../api/productService';
 import { useEffect, useState } from 'react';
 
 export function useProducts(query: ProductQuery = {}) {

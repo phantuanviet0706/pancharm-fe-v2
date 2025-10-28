@@ -1,4 +1,4 @@
-import { Collection, CollectionQuery, fetchData } from 'api/collectionService';
+import { Collection, CollectionQuery, fetchData } from '../api/collectionService';
 import { useEffect, useState } from 'react';
 
 export function useCollections(query: CollectionQuery = {}) {

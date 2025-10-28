@@ -1,4 +1,4 @@
-import { CompanyInfo, CompanyInfoQuery, fetchData } from 'api/companyInfoService';
+import { CompanyInfo, CompanyInfoQuery, fetchData } from '../api/companyInfoService';
 import { useEffect, useState } from 'react';
 
 export function useCompanyInfos(query: CompanyInfoQuery = {}) {

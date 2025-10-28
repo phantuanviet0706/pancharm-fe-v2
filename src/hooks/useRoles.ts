@@ -1,4 +1,4 @@
-import { fetchData, Role, RoleQuery } from 'api/roleService';
+import { fetchData, Role, RoleQuery } from '../api/roleService';
 import { useEffect, useState } from 'react';
 
 export function useRoles(query: RoleQuery = {}) {

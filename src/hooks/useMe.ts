@@ -1,4 +1,4 @@
-import { getMe, User } from 'api/userService';
+import { getMe, User } from '../api/userService';
 import { useEffect, useState } from 'react';
 
 export function useMe() {

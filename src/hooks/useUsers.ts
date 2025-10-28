@@ -1,4 +1,4 @@
-import { fetchData, User, UserQuery } from 'api/userService';
+import { fetchData, User, UserQuery } from '../api/userService';
 import { useEffect, useState } from 'react';
 
 export function useUsers(query: UserQuery = {}) {
