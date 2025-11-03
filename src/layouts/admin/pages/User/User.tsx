@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import BaseLayout from "../../components/BaseLayout";
-import { Form } from "react-router-dom";
 import CommonLayout from "../../components/CommonLayout";
-import GenericTable from "../../../../components/GenericTable";
-import ActionMenu from "../../../../components/ActionMenu";
+import Table from "./Table";
+import Form from "./Form";
+import { User as UserObject } from "../../../../api/userService";
+import { useUsers } from "../../../../hooks/useUsers";
 
 const ROWS = [
 	{
@@ -41,62 +42,53 @@ const ROWS = [
 ];
 
 const User = () => {
+	const [page, setPage] = useState(0);
+	const [searchText, setSearchText] = useState("");
+
+	const query = useMemo(() => ({ page, limit: 50, keyword: searchText }), [page, searchText]);
+
+	const { users, loading, error, setUsers, total, totalPages } = useUsers(query);
+
+	const [openForm, setOpenForm] = useState(false);
+	const [editData, setEditData] = useState<UserObject | null>(null);
+
+	const [detailOpen, setDetailOpen] = useState(false);
+
+	const onCloseForm = () => setOpenForm(false);
+
+	const handleCreate = async (data: Partial<UserObject>) => {};
+	const handleUpdate = async (data: UserObject) => {};
+	const handleDelete = async (id: number) => {};
+	const handleDetail = async (id: number) => {};
+
+	// if (loading) return <p>Loading ...</p>;
+	// if (error) return <p>Failed to load users</p>;
 	return (
 		<BaseLayout>
 			<CommonLayout title="Thông tin Người dùng" width={60}>
 				<div className="category-list">
-					<GenericTable
-						data={ROWS}
-						rowKey={(row) => (row?.id ? row.id : 0)}
-						columns={[
-							{
-								key: "avatar",
-								label: "Avatar",
-								render: (row) => {
-									return (
-										<img
-											className="user-avatar"
-											src={row?.avatar ? row.avatar : "/default-avatar.jpg"}
-											alt="Avatar"
-										></img>
-									);
-								},
-								width: "5rem",
-							},
-							{ key: "username", label: "Tên người dùng" },
-							{ key: "email", label: "Email" },
-							{ key: "phone", label: "Số điện thoại" },
-							{ key: "status", label: "Trạng thái" },
-							{
-								key: "actions",
-								label: "Thao tác",
-								align: "right",
-								width: "100px",
-								headerStyle: { marginRight: "10px" },
-								render: (row) => (
-									<ActionMenu
-										actions={[
-											{
-												label: "Edit",
-												onClick: () => {
-													// onEdit(row)
-												},
-											},
-											{
-												label: "Delete",
-												onClick: () => {
-													// onDelete(row?.id ? row.id : 0)
-												},
-												color: "red",
-											},
-										]}
-									/>
-								),
-							},
-						]}
-					></GenericTable>
+					<Table
+						users={ROWS}
+						onEdit={(perm) => {
+							setEditData(perm);
+							setOpenForm(true);
+						}}
+						onDelete={handleDelete}
+						onDetail={handleDetail}
+						page={page}
+						setPage={setPage}
+						totalPages={totalPages}
+					></Table>
 				</div>
 			</CommonLayout>
+			<Form
+				open={openForm}
+				onClose={onCloseForm}
+				onSubmit={(data) =>
+					editData ? handleUpdate({ ...editData, ...data }) : handleCreate(data)
+				}
+				data={editData}
+			></Form>
 		</BaseLayout>
 	);
 };

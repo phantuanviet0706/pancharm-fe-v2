@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import BaseLayout from "../../components/BaseLayout";
 import CommonLayout from "../../components/CommonLayout";
 import Icon from "../../../../components/Icon";
 import { Button } from "@mui/material";
-import GenericTable from "../../../../components/GenericTable";
-import ActionMenu from "../../../../components/ActionMenu";
+import Table from "./Table";
+import { Collection as CollectionObject } from "../../../../api/collectionService";
+import { useCollections } from "../../../../hooks/useCollections";
+import Form from "./Form";
 
 const ROWS = [
 	{ id: 1, name: "Vòng đá phong thủy", slug: "COLLECTION-1" },
@@ -14,6 +16,29 @@ const ROWS = [
 ];
 
 const Collection = () => {
+	const [page, setPage] = useState(0);
+	const [searchText, setSearchText] = useState("");
+
+	const query = useMemo(() => ({ page, limit: 50, keyword: searchText }), [page, searchText]);
+
+	const { collections, loading, error, setCollections, total, totalPages } =
+		useCollections(query);
+
+	const [openForm, setOpenForm] = useState(false);
+	const [editData, setEditData] = useState<CollectionObject | null>(null);
+
+	const [detailOpen, setDetailOpen] = useState(false);
+
+	const onCloseForm = () => setOpenForm(false);
+
+	const handleCreate = async (data: Partial<CollectionObject>) => {};
+	const handleUpdate = async (data: CollectionObject) => {};
+	const handleDelete = async (id: number) => {};
+	const handleDetail = async (id: number) => {};
+
+	// if (loading) return <p>Loading ...</p>;
+	// if (error) return <p>Failed to load categories</p>;
+
 	return (
 		<>
 			<BaseLayout
@@ -36,6 +61,10 @@ const Collection = () => {
 									transform: "translateY(-1px)",
 								},
 							}}
+							onClick={() => {
+								setEditData(null);
+								setOpenForm(true);
+							}}
 						>
 							<div className="side-btn-icon mr-[2px]">
 								<Icon name="add" />
@@ -47,47 +76,28 @@ const Collection = () => {
 			>
 				<CommonLayout title="Thông tin Bộ sưu tập" width={60}>
 					<div className="category-list">
-						<GenericTable
-							data={ROWS}
-							rowKey={(row) => (row?.id ? row.id : 0)}
-							columns={[
-								{ key: "id", label: "ID", width: "4vw" },
-								{
-									key: "name",
-									label: "Tên",
-									// onClick: (row) => onDetail(row?.id ? row.id : 0),
-								},
-								{ key: "slug", label: "Mã" },
-								{
-									key: "actions",
-									label: "Thao tác",
-									align: "right",
-									width: "100px",
-									headerStyle: { marginRight: "10px" },
-									render: (row) => (
-										<ActionMenu
-											actions={[
-												{
-													label: "Edit",
-													onClick: () => {
-														// onEdit(row)
-													},
-												},
-												{
-													label: "Delete",
-													onClick: () => {
-														// onDelete(row?.id ? row.id : 0)
-													},
-													color: "red",
-												},
-											]}
-										/>
-									),
-								},
-							]}
-						/>
+						<Table
+							collections={ROWS}
+							onEdit={(perm) => {
+								setEditData(perm);
+								setOpenForm(true);
+							}}
+							onDelete={handleDelete}
+							onDetail={handleDetail}
+							page={page}
+							totalPages={10}
+							setPage={setPage}
+						></Table>
 					</div>
 				</CommonLayout>
+				<Form
+					open={openForm}
+					onClose={onCloseForm}
+					onSubmit={(data) =>
+						editData ? handleUpdate({ ...editData, ...data }) : handleCreate(data)
+					}
+					data={editData}
+				></Form>
 			</BaseLayout>
 		</>
 	);

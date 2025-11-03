@@ -23,7 +23,7 @@ export default function GenericTable<T>({
 	data,
 	columns,
 	rowKey,
-	maxHeight = "66vh",
+	maxHeight = "62vh",
 	zebra = true,
 	compact = false,
 }: GenericTableProps<T>) {

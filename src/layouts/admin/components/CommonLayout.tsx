@@ -10,7 +10,12 @@ interface CommonLayoutProps {
 const CommonLayout = ({ title, children, className, width = 50 }: CommonLayoutProps) => {
 	return (
 		<div className={"relative my-10 " + className}>
-			<div className={`page-inner w-[${width}vw] bg-[#fff] mx-auto rounded-2xl`}>
+			<div
+				className={`page-inner bg-[#fff] mx-auto rounded-2xl`}
+				style={{
+					width: `${width}vw`,
+				}}
+			>
 				<div className="page-header">
 					<div
 						className="header-content mx-8 py-4 border-b-1 border-b-[#e0e0e0]

@@ -1,3 +1,4 @@
+import { Autocomplete, TextField } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
 import ReactQuill from "react-quill";
 
@@ -17,7 +18,8 @@ export interface FormInputProps {
 		| "hidden"
 		| "select"
 		| "textarea"
-		| "editor";
+		| "editor"
+		| "autocomplete";
 	name?: string;
 	value?: any;
 	placeholder?: string;
@@ -29,6 +31,17 @@ export interface FormInputProps {
 	fileMultiple?: boolean;
 	accept?: string;
 	isRounded?: boolean;
+
+	// Autocomplete
+	autocompleteOptions?: any[];
+	onSearch?: (keyword: string) => void;
+	loading?: boolean;
+	optionValueKey?: string; // default "id"
+	optionLabelKey?: string; // default "name"
+	getOptionLabel?: (o: any) => string;
+	isOptionEqualToValue?: (o: any, v: any) => boolean;
+	valueAs?: "id" | "object"; // default "id"
+	freeSolo?: boolean;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -45,71 +58,80 @@ const FormInput: React.FC<FormInputProps> = ({
 	fileMultiple = false,
 	accept,
 	isRounded = false,
-}) => {
-	/** Base styles (fallback) */
-	const baseStyle =
-		"w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-800 bg-white shadow-sm " +
-		"focus:outline-none focus:ring-2 focus:ring-[var(--color-card-bg)] transition " +
-		"disabled:bg-gray-100 disabled:cursor-not-allowed ";
 
+	// ---- Autocomplete props ----
+	autocompleteOptions = [],
+	onSearch,
+	loading,
+	optionValueKey = "id",
+	optionLabelKey = "name",
+	getOptionLabel,
+	isOptionEqualToValue,
+	valueAs = "id",
+	freeSolo = false,
+}) => {
+	// ====== Styles ======
 	const pillStyle =
-		`w-full ${isRounded ? "rounded-full" : ""} px-5 h-[40px] bg-[var(--color-cream-soft)] text-[var(--color-card-bg)] ` +
+		`w-full ${isRounded ? "rounded-full" : "rounded-lg"} px-5 h-[40px] bg-[var(--color-cream-soft)] text-[var(--color-card-bg)] ` +
 		"placeholder-[var(--color-card-bg)]/100 border border-[color:var(--color-card-bg)] shadow-sm " +
 		"focus:outline-none focus:ring-2 focus:ring-white/40 disabled:opacity-60 " +
 		"focus:bg-[var(--color-card-bg)] focus:placeholder-[var(--color-cream-bg)] focus:text-white";
 
-	// ====== Internal states ======
-	// Cho text/password: nếu không truyền onChange thì dùng internal state để gõ được
+	// ====== Text/password fallback ======
 	const [internalValue, setInternalValue] = useState<string>(value ?? "");
 	useEffect(() => {
 		setInternalValue(value ?? "");
 	}, [value]);
 
-	// Cho number formatting
+	// ====== Number formatting (int/float) ======
 	const [displayValue, setDisplayValue] = useState<string>(
-		value ? formatWithCommas(String(value)) : "",
+		value === 0 || value ? formatWithCommas(String(value)) : "",
 	);
 
-	const [showPassword, setShowPassword] = useState(false);
+	useEffect(() => {
+		if (type === "int" || type === "float") {
+			const raw = value === 0 || value ? String(value) : "";
+			setDisplayValue(formatWithCommas(raw));
+		}
+	}, [value, type]);
 
 	function formatWithCommas(val: string) {
 		if (!val) return "";
-		const [intPart, decPart] = val.split(".");
+		const [intPartRaw, decPart] = val.split(".");
+		const intPart = (intPartRaw || "").replace(/\D/g, "");
 		const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-		return decPart ? `${formattedInt}.${decPart}` : formattedInt;
+		return decPart !== undefined ? `${formattedInt}.${decPart}` : formattedInt;
 	}
 
-	function handleNumberInput(e: React.ChangeEvent<HTMLInputElement>) {
+	function handleNumberInput(e: React.ChangeEvent<HTMLInputElement>, allowDecimal: boolean) {
 		let raw = e.target.value;
 
-		// Cho phép số, dấu chấm, dấu phẩy
+		// Giữ lại số, dấu chấm, dấu phẩy
 		raw = raw.replace(/[^\d.,]/g, "");
-		raw = raw.replace(/,/g, ""); // bỏ phẩy cũ
+		raw = raw.replace(/,/g, "");
 
-		// Nếu có nhiều dấu chấm -> chỉ giữ dấu đầu tiên
-		const parts = raw.split(".");
-		if (parts.length > 2) {
-			raw = parts[0] + "." + parts.slice(1).join("");
+		if (!allowDecimal) {
+			raw = raw.replace(/[.]/g, "");
+		} else {
+			const parts = raw.split(".");
+			if (parts.length > 2) raw = parts[0] + "." + parts.slice(1).join("");
 		}
 
-		// Format phần nguyên bằng dấu phẩy hàng nghìn
 		let [intPart, decPart] = raw.split(".");
-		intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
+		intPart = (intPart || "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 		const formatted = decPart !== undefined ? `${intPart}.${decPart}` : intPart;
-		setDisplayValue(formatted);
 
-		const numericValue = parseFloat(raw);
-		onChange?.(isNaN(numericValue) ? null : numericValue);
+		setDisplayValue(formatted || "");
+
+		// --- PATCHED: Không ép về "0" khi rỗng ---
+		const numericValue = allowDecimal ? parseFloat(raw) : parseInt(raw, 10); /* PATCHED */
+		onChange?.(raw === "" || Number.isNaN(numericValue) ? null : numericValue); /* PATCHED */
 	}
 
-	// Handlers cho text/password
-	const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const v = e.target.value;
-		if (onChange) onChange(v);
-		else setInternalValue(v);
-	};
+	// ====== Password toggle ======
+	const [showPassword, setShowPassword] = useState(false);
 
+	// ====== Floating label ======
 	const renderFloatingLabel = () =>
 		label ? (
 			<label
@@ -118,16 +140,34 @@ const FormInput: React.FC<FormInputProps> = ({
 					"pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-[var(--color-card-bg)]/100 " +
 					"transition-opacity duration-150 opacity-0 " +
 					"peer-placeholder-shown:opacity-100 " +
-					"peer-focus:opacity-0 focus:text[var(--color-cream-bg)]"
+					"peer-focus:opacity-0 focus:text-[var(--color-cream-bg)]"
 				}
 			>
 				{label}
 			</label>
 		) : null;
 
+	// ====== Render inputs ======
 	const renderInput = () => {
 		switch (type) {
 			case "int":
+				return (
+					<div className="relative">
+						<input
+							type="text"
+							inputMode="numeric"
+							value={displayValue}
+							onChange={(e) => handleNumberInput(e, false)}
+							placeholder={label}
+							required={required}
+							disabled={disabled}
+							className={`${pillStyle} peer placeholder-transparent`}
+							id={name}
+						/>
+						{renderFloatingLabel()}
+					</div>
+				);
+
 			case "float":
 				return (
 					<div className="relative">
@@ -135,7 +175,7 @@ const FormInput: React.FC<FormInputProps> = ({
 							type="text"
 							inputMode="decimal"
 							value={displayValue}
-							onChange={handleNumberInput}
+							onChange={(e) => handleNumberInput(e, true)}
 							placeholder={label}
 							required={required}
 							disabled={disabled}
@@ -153,7 +193,11 @@ const FormInput: React.FC<FormInputProps> = ({
 							type="text"
 							id={name}
 							value={onChange ? (value ?? "") : internalValue}
-							onChange={handleTextChange}
+							onChange={(e) =>
+								onChange
+									? onChange(e.target.value)
+									: setInternalValue(e.target.value)
+							}
 							required={required}
 							disabled={disabled}
 							placeholder={label}
@@ -170,7 +214,11 @@ const FormInput: React.FC<FormInputProps> = ({
 							type={showPassword ? "text" : "password"}
 							id={name}
 							value={onChange ? (value ?? "") : internalValue}
-							onChange={handleTextChange}
+							onChange={(e) =>
+								onChange
+									? onChange(e.target.value)
+									: setInternalValue(e.target.value)
+							}
 							required={required}
 							disabled={disabled}
 							placeholder=" "
@@ -217,25 +265,13 @@ const FormInput: React.FC<FormInputProps> = ({
 				);
 
 			case "datetime":
-				const [internalDateTime, setInternalDateTime] = useState(value ?? "");
-
-				useEffect(() => {
-					if (value !== undefined && value !== internalDateTime) {
-						setInternalDateTime(value);
-					}
-				}, [value]);
-
 				return (
 					<div className="relative">
 						<input
 							type="datetime-local"
 							id={name}
-							value={internalDateTime}
-							onChange={(e) => {
-								const newVal = e.target.value;
-								setInternalDateTime(newVal);
-								onChange?.(newVal);
-							}}
+							value={value ?? ""}
+							onChange={(e) => onChange?.(e.target.value)}
 							required={required}
 							disabled={disabled}
 							placeholder={label}
@@ -246,16 +282,15 @@ const FormInput: React.FC<FormInputProps> = ({
 				);
 
 			case "checkbox":
-				const [checked, setChecked] = useState(false);
-
 				return (
 					<label className="inline-flex items-center gap-2 cursor-pointer">
 						<input
 							type="checkbox"
-							checked={checked}
-							onChange={(e) => setChecked(e.target.checked)}
+							checked={!!value}
+							onChange={(e) => onChange?.(e.target.checked)}
 							className="accent-[var(--color-card-bg)] w-5 h-5"
 							name={name}
+							disabled={disabled}
 						/>
 						<span className="text-[var(--color-card-bg)]">{label}</span>
 					</label>
@@ -268,11 +303,7 @@ const FormInput: React.FC<FormInputProps> = ({
 							<label
 								key={String(opt.value)}
 								className={`flex items-center gap-2 cursor-pointer rounded-md border px-3 py-2
-								${
-									value === opt.value
-										? "border-[var(--color-card-bg)] bg-[color:var(--color-cream-soft)]/40"
-										: "border-gray-300"
-								}`}
+                ${value === opt.value ? "border-[var(--color-card-bg)] bg-[color:var(--color-cream-soft)]/40" : "border-gray-300"}`}
 							>
 								<input
 									type="radio"
@@ -283,7 +314,9 @@ const FormInput: React.FC<FormInputProps> = ({
 									disabled={disabled}
 									className="accent-[var(--color-card-bg)] w-4 h-4"
 								/>
-								<span className="text-gray-800">{opt.label}</span>
+								<span className="text-gray-800">
+									{(opt as any).label ?? opt.name}
+								</span>
 							</label>
 						))}
 					</div>
@@ -294,7 +327,8 @@ const FormInput: React.FC<FormInputProps> = ({
 					<input
 						type="color"
 						name={name}
-						value={value ?? "#000000"}
+						// --- PATCHED: Không gán mặc định nếu chưa có ---
+						{...(value ? { value } : {})} /* PATCHED */
 						onChange={(e) => onChange?.(e.target.value)}
 						disabled={disabled}
 						className="w-12 h-10 cursor-pointer border border-gray-300 rounded-md"
@@ -318,30 +352,23 @@ const FormInput: React.FC<FormInputProps> = ({
 					<div className="select-opts">
 						<div className="opts-wrapper">
 							{options?.map((item) => (
-								<>
-									<div className="opts-item mb-2">
-										<label
-											key={String(item.value)}
-											className={`flex items-center gap-2 cursor-pointer border px-3 py-2
-											${
-												value === item.value
-													? "border-[var(--color-card-bg)] bg-[color:var(--color-cream-soft)]/40"
-													: "border-gray-300"
-											}`}
-										>
-											<input
-												type="radio"
-												name={name}
-												value={String(item.value)}
-												checked={item?.checked}
-												onChange={() => onChange?.(item.value)}
-												disabled={disabled}
-												className="accent-[var(--color-card-bg)] w-4 h-4"
-											></input>
-											<span className="text-gray-800">{item.name}</span>
-										</label>
-									</div>
-								</>
+								<div key={String(item.value)} className="opts-item mb-2">
+									<label
+										className={`flex items-center gap-2 cursor-pointer border px-3 py-2
+                    ${value === item.value ? "border-[var(--color-card-bg)] bg-[color:var(--color-cream-soft)]/40" : "border-gray-300"}`}
+									>
+										<input
+											type="radio"
+											name={name}
+											value={String(item.value)}
+											checked={value === item.value}
+											onChange={() => onChange?.(item.value)}
+											disabled={disabled}
+											className="accent-[var(--color-card-bg)] w-4 h-4"
+										/>
+										<span className="text-gray-800">{item.name}</span>
+									</label>
+								</div>
 							))}
 						</div>
 					</div>
@@ -353,41 +380,38 @@ const FormInput: React.FC<FormInputProps> = ({
 						<textarea
 							id={name}
 							value={onChange ? (value ?? "") : internalValue}
-							onChange={handleTextChange}
+							onChange={(e) =>
+								onChange
+									? onChange(e.target.value)
+									: setInternalValue(e.target.value)
+							}
 							required={required}
 							disabled={disabled}
 							placeholder={label}
-							rows={4} // đủ cao như ảnh
+							rows={4}
 							className={`w-full min-h-[120px] rounded-md border border-[var(--color-card-bg)] bg-[var(--color-cream-bg)] text-[var(--color-card-bg)] px-4 py-3 outline-none placeholder:text-[var(--color-card-bg)]/60 focus:border-[var(--color-card-bg)] focus:ring-0 resize-none`}
 						/>
 					</div>
 				);
 
-			case "editor":
+			case "editor": {
 				const toolbarOptions = [
-					["bold", "italic", "underline", "strike"], // toggled buttons
+					["bold", "italic", "underline", "strike"],
 					["blockquote", "code-block"],
 					["link", "image", "video", "formula"],
-
-					[{ header: 1 }, { header: 2 }], // custom button values
+					[{ header: 1 }, { header: 2 }],
 					[{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
-					[{ script: "sub" }, { script: "super" }], // superscript/subscript
-					[{ indent: "-1" }, { indent: "+1" }], // outdent/indent
-					[{ direction: "rtl" }], // text direction
-
-					[{ size: ["small", false, "large", "huge"] }], // custom dropdown
+					[{ script: "sub" }, { script: "super" }],
+					[{ indent: "-1" }, { indent: "+1" }],
+					[{ direction: "rtl" }],
+					[{ size: ["small", false, "large", "huge"] }],
 					[{ header: [1, 2, 3, 4, 5, 6, false] }],
-
-					[{ color: [] }, { background: [] }], // dropdown with defaults from theme
+					[{ color: [] }, { background: [] }],
 					[{ font: [] }],
 					[{ align: [] }],
-
-					["clean"], // remove formatting button
+					["clean"],
 				];
-				const module = {
-					toolbar: toolbarOptions,
-				};
-
+				const module = { toolbar: toolbarOptions };
 				return (
 					<div className="relative">
 						<ReactQuill
@@ -400,9 +424,74 @@ const FormInput: React.FC<FormInputProps> = ({
 						/>
 					</div>
 				);
+			}
+
+			case "autocomplete": {
+				const currentValue =
+					typeof value === "object" && value !== null
+						? value
+						: (autocompleteOptions.find((o: any) => o?.[optionValueKey] === value) ??
+							null);
+
+				const labelOf = (o: any) =>
+					getOptionLabel
+						? getOptionLabel(o)
+						: typeof o === "string"
+							? o
+							: (o?.[optionLabelKey] ?? "");
+
+				const equals = (o: any, v: any) =>
+					isOptionEqualToValue
+						? isOptionEqualToValue(o, v)
+						: (o?.[optionValueKey] ?? o) === (v?.[optionValueKey] ?? v);
+
+				return (
+					<Autocomplete
+						disablePortal
+						freeSolo={freeSolo}
+						options={autocompleteOptions}
+						value={currentValue}
+						onChange={(_, newVal: any) => {
+							if (!onChange) return;
+							if (!newVal) return onChange(null);
+							onChange(valueAs === "object" ? newVal : newVal[optionValueKey]);
+						}}
+						onInputChange={(_, inputVal, reason) => {
+							if (reason === "input" && onSearch) onSearch(inputVal);
+						}}
+						loading={!!loading}
+						getOptionLabel={(o) => labelOf(o)}
+						isOptionEqualToValue={equals}
+						renderInput={(params) => (
+							<TextField
+								{...params}
+								label={label}
+								placeholder={placeholder}
+								required={required}
+								disabled={disabled}
+								variant="outlined"
+								size="medium"
+								sx={{
+									"& .MuiOutlinedInput-root": {
+										borderRadius: "0.5rem",
+										background: "var(--color-bg-cream)",
+									},
+									"& .MuiInputLabel-root": { color: "var(--color-card-bg)" },
+									mt: 0.5,
+									"& .MuiAutocomplete-endAdornment svg": { color: "#5a4a42" },
+									"& input": {
+										fontFamily: "inherit",
+										fontSize: "0.95rem",
+										color: "#3b2f29",
+									},
+								}}
+							/>
+						)}
+					/>
+				);
+			}
 
 			default:
-				// fallback: cũng dùng pill style cho đồng bộ layout
 				return (
 					<div className="relative">
 						<input
@@ -421,24 +510,29 @@ const FormInput: React.FC<FormInputProps> = ({
 		}
 	};
 
-	/** Với text/password/int/float/date/datetime dùng label nổi bên trong input => ẩn label ngoài */
+	// Ẩn label ngoài với các input có label nổi bên trong
 	const showExternalLabel =
-		label &&
-		type !== "checkbox" &&
-		type !== "hidden" &&
-		type !== "text" &&
-		type !== "password" &&
-		type !== "int" &&
-		type !== "float" &&
-		type !== "date" &&
-		type !== "datetime" &&
-		type !== "select" &&
-		type !== "textarea";
+		// label &&
+		// ![
+		// 	"checkbox",
+		// 	"hidden",
+		// 	"text",
+		// 	"password",
+		// 	"int",
+		// 	"float",
+		// 	"select",
+		// 	"textarea",
+		// 	"autocomplete",
+		// ].includes(type);
+		true;
 
 	return (
 		<div className={`flex flex-col gap-2 mb-4 ${className}`}>
 			{showExternalLabel && (
-				<label htmlFor={name} className="text-sm font-medium text-gray-700 tracking-wide">
+				<label
+					htmlFor={name}
+					className="text-sm font-medium text-[var(--color-card-bg)] tracking-wide"
+				>
 					{label}
 					{required && <span className="text-red-500 ml-0.5">*</span>}
 				</label>
@@ -451,7 +545,6 @@ const FormInput: React.FC<FormInputProps> = ({
 export default FormInput;
 
 /* =========================== FilePicker =========================== */
-
 interface FilePickerProps {
 	multiple?: boolean;
 	accept?: string;
@@ -495,11 +588,7 @@ const FilePicker: React.FC<FilePickerProps> = ({ multiple, accept, disabled, onC
 				<div>
 					<span
 						className={`inline-flex items-center px-3 py-1.5 rounded-md text-sm font-semibold
-            ${
-				disabled
-					? "bg-gray-200 text-gray-500"
-					: "bg-[var(--color-card-bg)] text-white hover:bg-[var(--color-card-light)]"
-			}`}
+            ${disabled ? "bg-gray-200 text-gray-500" : "bg-[var(--color-card-bg)] text-white hover:bg-[var(--color-card-light)]"}`}
 					>
 						Chọn tệp
 					</span>

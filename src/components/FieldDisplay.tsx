@@ -28,7 +28,10 @@ const FieldDisplay = ({
 							{label}
 						</div>
 					</div>
-					<div className="field-value line-clamp-1 overflow-hidden text-ellipsis leading-[20px]">
+					<div
+						className="field-value line-clamp-1 overflow-hidden text-ellipsis leading-[20px]"
+						title={value?.toString()}
+					>
 						{value}
 					</div>
 				</div>
