@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Category, DEFAULT_CATEGORY } from "../../../../api/categoryService";
+import React, { useEffect, useRef, useState } from "react";
+import { Category, DEFAULT_CATEGORY, fetchData } from "../../../../api/categoryService";
 import GenericDialog from "../../../../components/GenericDialog";
 import FormInput from "../../../../components/FormInput";
 import { useFormHandler } from "../../../../hooks/useFormHandler";
@@ -24,6 +24,46 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) => {
 			parentName: form.parentName,
 		}),
 	);
+
+	const [catOpts, setCatOpts] = useState<any[]>([]);
+	const [loadingCats, setLoadingCats] = useState(false);
+	const searchTimerRef = useRef<number | null>(null);
+
+	const loadCategories = async (keyword = "") => {
+		setLoadingCats(true);
+		try {
+			const res = await fetchData(keyword ? { keyword } : {});
+			console.log(res)
+			setCatOpts((res?.result?.content ?? []).map((it: any) => ({ id: it.id, name: it.name })));
+		} catch (e) {
+			console.error(e);
+			setCatOpts([]);
+		} finally {
+			setLoadingCats(false);
+		}
+	};
+
+	const handleSearchCategory = (keyword: string) => {
+		if (searchTimerRef.current) window.clearTimeout(searchTimerRef.current);
+		searchTimerRef.current = window.setTimeout(() => {
+			loadCategories(keyword);
+		}, 350) as unknown as number;
+	};
+
+	// Mở dialog thì load danh sách ban đầu
+	useEffect(() => {
+		if (open) loadCategories();
+	}, [open]);
+
+	// Đảm bảo khi edit có parentId thì label hiển thị đúng dù option chưa nằm trong trang đầu
+	useEffect(() => {
+		if (!form.parentId) return;
+		const exist = catOpts.some((o) => o.id === form.parentId);
+		if (!exist) {
+			setCatOpts((prev) => [{ id: form.parentId, name: form.parentName || "" }, ...prev]);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [form.parentId, form.parentName]);
 
 	return (
 		<GenericDialog
@@ -59,24 +99,42 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) => {
 					label="Tên danh mục"
 					name="name"
 					value={form.name}
-				></FormInput>
+					onChange={(v) => setForm((f) => ({ ...f, name: v }))}
+				/>
 				<FormInput
 					type="text"
 					label="Mã danh mục"
 					name="slug"
 					value={form.slug}
-				></FormInput>
+					onChange={(v) => setForm((f) => ({ ...f, slug: v }))}
+				/>
 			</div>
+
 			<FormInput
 				type="autocomplete"
 				label="Danh mục cha"
 				name="category_id"
-				value={form.parentId}
-				autocompleteOptions={[
-					{ id: 1, name: "Danh mục cha 1" },
-					{ id: 2, name: "Danh mục con 1" },
-				]}
-			></FormInput>
+				value={
+					form.parentId
+						? { id: form.parentId, name: form.parentName || "" } // object để hiện đúng label khi edit
+						: null
+				}
+				autocompleteOptions={catOpts} // phải là array
+				loading={loadingCats}
+				onSearch={handleSearchCategory} // nếu search BE
+				valueAs="object" // hoặc valueAs="id" nếu bạn chỉ muốn id
+				optionValueKey="id"
+				optionLabelKey="name"
+				onChange={(selected) => {
+					if (!selected)
+						return setForm((f) => ({ ...f, parentId: null as any, parentName: "" }));
+					setForm((f) => ({
+						...f,
+						parentId: selected.id,
+						parentName: selected.name ?? "",
+					}));
+				}}
+			/>
 		</GenericDialog>
 	);
 };

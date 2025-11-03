@@ -278,7 +278,6 @@ const Icon: React.FC<IconProps> = ({ name, sx, className, size, color, strokeWid
 	const Comp = icons[name];
 	if (!Comp) return null;
 	const svgProps = useSvgCommonProps({ sx, className, size, color, strokeWidth, ...rest });
-	console.log(svgProps);
 	return <Comp {...svgProps} />;
 };
 

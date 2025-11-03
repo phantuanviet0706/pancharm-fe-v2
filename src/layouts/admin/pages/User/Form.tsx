@@ -9,7 +9,7 @@ interface FormProps {
 	open: boolean;
 	onClose: () => void;
 	onSubmit: (data: any) => Promise<{ code: number; message: string }>;
-	data?: User;
+	data?: User | null;
 	onSuccess?: (code: number, message: string) => void;
 }
 
@@ -79,7 +79,7 @@ function formCreate(form: Partial<User>) {
 				label="Email"
 				name="email"
 				value={form.email}
-				disabled
+				disabled={form.email ? true : false}
 			></FormInput>
 			<FormInput
 				type="text"

@@ -16,6 +16,13 @@ export default defineConfig({
 		},
 		historyApiFallback: true,
 		watch: { usePolling: false },
+		proxy: {
+			"/pancharm": {
+				target: "http://localhost:8080",
+				changeOrigin: true,
+				secure: false,
+			}
+		}
 	},
 	optimizeDeps: {
 		entries: ["./index.html"],

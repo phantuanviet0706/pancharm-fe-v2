@@ -17,13 +17,11 @@ export interface NavItemProps {
 }
 
 const NavItem = ({ item }: NavItemProps) => {
-	return [
+	return (
 		<div className="py-2">
 			<Link to={item.url} className="flex gap-4">
 				<div className="">
-					<span className="material-icons-two-tone text-[24px]">
-						{item.icon}
-					</span>
+					<span className="material-icons-two-tone text-[24px]">{item.icon}</span>
 				</div>
 				<div
 					className="text-[15px] text-[var(--color-brand-bg)]
@@ -32,8 +30,8 @@ const NavItem = ({ item }: NavItemProps) => {
 					{item.title}
 				</div>
 			</Link>
-		</div>,
-	];
+		</div>
+	);
 };
 
 export default NavItem;

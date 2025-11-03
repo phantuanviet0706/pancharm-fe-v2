@@ -9,7 +9,7 @@ interface FormProps {
 	open: boolean;
 	onClose: () => void;
 	onSubmit: (data: any) => Promise<{ code: number; message: string }>;
-	data?: Company;
+	data?: Company | null;
 	onSuccess?: (code: number, message: string) => void;
 }
 
@@ -53,9 +53,14 @@ const CompanyForm = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) =>
 			]}
 		>
 			<FormInput type="text" label="Tên công ty" name="name" value={form.name}></FormInput>
-			<FormInput type="text" label="Mã số thuế" name="avatar" value={form.avatar}></FormInput>
+			<FormInput type="text" label="Mã số thuế" name="tax_code" value={form.taxcode}></FormInput>
 			<FormInput type="text" label="Địa chỉ" name="address" value={form.address}></FormInput>
-			<FormInput type="file" label="Thông tin chuyển khoản" name="bank_attachment" value={form.bankAttachment}></FormInput>
+			<FormInput
+				type="file"
+				label="Thông tin chuyển khoản"
+				name="bank_attachment"
+				value={form.bankAttachment}
+			></FormInput>
 		</GenericDialog>
 	);
 };

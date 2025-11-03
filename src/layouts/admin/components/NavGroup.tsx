@@ -26,8 +26,8 @@ const NavGroup = ({ item }: NavGroupProps) => {
 			</div>
 
 			<div className="nav-group-content">
-				{item?.children?.map((item) => (
-					<NavItem key={item.id} item={item} />
+				{item.children?.filter(Boolean).map((child) => (
+					<NavItem key={`${item.id}:${child.id}`} item={child} />
 				))}
 			</div>
 		</div>

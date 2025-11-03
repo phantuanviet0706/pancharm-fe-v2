@@ -1,5 +1,5 @@
 import { Autocomplete, TextField } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import ReactQuill from "react-quill";
 
 export interface FormInputProps {
@@ -147,6 +147,64 @@ const FormInput: React.FC<FormInputProps> = ({
 			</label>
 		) : null;
 
+	// ====== Date / Datetime helpers (NEW) ======
+	const isFullDate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s);
+	const isFullDateTime = (s: string) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(s);
+	const isValidDate = (s: string) => {
+		if (!isFullDate(s)) return false;
+		const [y, m, d] = s.split("-").map(Number);
+		const dt = new Date(y, m - 1, d);
+		return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
+	};
+	const normalizeDateValue = (v: any) => {
+		if (!v) return "";
+		if (v instanceof Date && !isNaN(v.getTime())) return v.toISOString().slice(0, 10);
+		const s = String(v);
+		return isFullDate(s) ? s : "";
+	};
+	const toLocalDatetime = (d: Date) => {
+		const off = d.getTimezoneOffset();
+		const local = new Date(d.getTime() - off * 60000);
+		return local.toISOString().slice(0, 16);
+	};
+	const normalizeDatetimeLocal = (v: any) => {
+		if (!v) return "";
+		if (v instanceof Date && !isNaN(v.getTime())) return toLocalDatetime(v);
+		const s = String(v);
+		return isFullDateTime(s) ? s : "";
+	};
+
+	// ====== Date buffers ======
+	const [dateBuf, setDateBuf] = useState<string>(
+		type === "date" ? normalizeDateValue(value) : "",
+	);
+	const [dateFocused, setDateFocused] = useState(false);
+	const lastCommittedDateRef = useRef<string>(normalizeDateValue(value));
+
+	useEffect(() => {
+		if (type !== "date") return;
+		// chỉ sync khi không focus và props thực sự khác giá trị đã commit
+		const next = normalizeDateValue(value);
+		if (!dateFocused && next !== lastCommittedDateRef.current) {
+			setDateBuf(next);
+		}
+	}, [type, value, dateFocused]);
+
+	// ====== Datetime-local buffers ======
+	const [dtBuf, setDtBuf] = useState<string>(
+		type === "datetime" ? normalizeDatetimeLocal(value) : "",
+	);
+	const [dtFocused, setDtFocused] = useState(false);
+	const lastCommittedDtRef = useRef<string>(normalizeDatetimeLocal(value));
+
+	useEffect(() => {
+		if (type !== "datetime") return;
+		const next = normalizeDatetimeLocal(value);
+		if (!dtFocused && next !== lastCommittedDtRef.current) {
+			setDtBuf(next);
+		}
+	}, [type, value, dtFocused]);
+
 	// ====== Render inputs ======
 	const renderInput = () => {
 		switch (type) {
@@ -253,11 +311,26 @@ const FormInput: React.FC<FormInputProps> = ({
 						<input
 							type="date"
 							id={name}
-							value={value ?? ""}
-							onChange={(e) => onChange?.(e.target.value)}
+							value={dateBuf}
+							onFocus={() => setDateFocused(true)}
+							onBlur={() => {
+								setDateFocused(false);
+								// Chỉ emit khi đầy đủ & hợp lệ; nếu không thì KHÔNG đụng state phía trên
+								if (isValidDate(dateBuf)) onChange?.(dateBuf);
+								else if (!dateBuf) onChange?.(""); // cho phép xoá sạch
+							}}
+							onChange={(e) => {
+								const s = e.target.value; // có thể là rỗng trong lúc gõ
+								setDateBuf(s); // luôn update buffer để không bị reset
+								// Emit ngay khi đủ chuẩn & hợp lệ để parent nhận được kịp thời
+								if (isValidDate(s)) onChange?.(s);
+							}}
+							inputMode="numeric"
+							pattern="\d{4}-\d{2}-\d{2}"
 							required={required}
 							disabled={disabled}
 							placeholder={label}
+							autoComplete="off"
 							className={`${pillStyle} peer placeholder-transparent [color-scheme:dark]`}
 						/>
 						{renderFloatingLabel()}
@@ -270,11 +343,22 @@ const FormInput: React.FC<FormInputProps> = ({
 						<input
 							type="datetime-local"
 							id={name}
-							value={value ?? ""}
-							onChange={(e) => onChange?.(e.target.value)}
+							value={dtBuf}
+							onFocus={() => setDtFocused(true)}
+							onBlur={() => {
+								setDtFocused(false);
+								if (isFullDateTime(dtBuf)) onChange?.(dtBuf);
+								else if (!dtBuf) onChange?.("");
+							}}
+							onChange={(e) => {
+								const s = e.target.value;
+								setDtBuf(s);
+								if (isFullDateTime(s)) onChange?.(s);
+							}}
 							required={required}
 							disabled={disabled}
 							placeholder={label}
+							autoComplete="off"
 							className={`${pillStyle} peer placeholder-transparent [color-scheme:dark]`}
 						/>
 						{renderFloatingLabel()}
@@ -341,8 +425,15 @@ const FormInput: React.FC<FormInputProps> = ({
 						multiple={fileMultiple}
 						accept={accept}
 						disabled={disabled}
+						value={value}
 						onChange={(files) =>
-							onChange?.(fileMultiple ? files : (files?.[0] ?? null))
+							onChange?.(
+								fileMultiple
+									? files
+									: Array.isArray(files)
+										? (files[0] ?? null)
+										: files,
+							)
 						}
 					/>
 				);
@@ -427,19 +518,25 @@ const FormInput: React.FC<FormInputProps> = ({
 			}
 
 			case "autocomplete": {
+				// 1) Bảo đảm options là array
+				const safeOptions = Array.isArray(autocompleteOptions) ? autocompleteOptions : [];
+
+				// 2) Value hiện tại: chấp nhận id hoặc object
 				const currentValue =
 					typeof value === "object" && value !== null
 						? value
-						: (autocompleteOptions.find((o: any) => o?.[optionValueKey] === value) ??
-							null);
+						: (safeOptions.find((o: any) => o?.[optionValueKey] === value) ?? null);
 
-				const labelOf = (o: any) =>
-					getOptionLabel
-						? getOptionLabel(o)
-						: typeof o === "string"
-							? o
-							: (o?.[optionLabelKey] ?? "");
+				// 3) Lấy nhãn an toàn (fallback nhiều key)
+				const labelOf = (o: any) => {
+					if (getOptionLabel) return getOptionLabel(o);
+					if (typeof o === "string") return o;
+					if (!o || typeof o !== "object") return "";
+					const lbl = o?.[optionLabelKey] ?? o?.name ?? o?.title ?? o?.label ?? ""; // fallback
+					return String(lbl ?? "");
+				};
 
+				// 4) So sánh option = value (cover cả id primitive)
 				const equals = (o: any, v: any) =>
 					isOptionEqualToValue
 						? isOptionEqualToValue(o, v)
@@ -447,14 +544,15 @@ const FormInput: React.FC<FormInputProps> = ({
 
 				return (
 					<Autocomplete
-						disablePortal
+						disablePortal={false}
 						freeSolo={freeSolo}
-						options={autocompleteOptions}
+						options={safeOptions}
 						value={currentValue}
+						filterOptions={(x) => x}
 						onChange={(_, newVal: any) => {
 							if (!onChange) return;
 							if (!newVal) return onChange(null);
-							onChange(valueAs === "object" ? newVal : newVal[optionValueKey]);
+							onChange(valueAs === "object" ? newVal : newVal?.[optionValueKey]);
 						}}
 						onInputChange={(_, inputVal, reason) => {
 							if (reason === "input" && onSearch) onSearch(inputVal);
@@ -462,6 +560,16 @@ const FormInput: React.FC<FormInputProps> = ({
 						loading={!!loading}
 						getOptionLabel={(o) => labelOf(o)}
 						isOptionEqualToValue={equals}
+						noOptionsText={loading ? "Đang tải..." : "Không có dữ liệu"}
+						slotProps={{
+							popper: { sx: { zIndex: 1700 } }, // MUI v5+
+							paper: { elevation: 4, sx: { maxHeight: 320 } }, // optional
+						}}
+						// componentsProps={{
+						//   popper: { style: { zIndex: 1700 } },
+						//   paper:  { elevation: 4, sx: { maxHeight: 320 } },
+						// }}
+
 						renderInput={(params) => (
 							<TextField
 								{...params}
@@ -510,21 +618,7 @@ const FormInput: React.FC<FormInputProps> = ({
 		}
 	};
 
-	// Ẩn label ngoài với các input có label nổi bên trong
-	const showExternalLabel =
-		// label &&
-		// ![
-		// 	"checkbox",
-		// 	"hidden",
-		// 	"text",
-		// 	"password",
-		// 	"int",
-		// 	"float",
-		// 	"select",
-		// 	"textarea",
-		// 	"autocomplete",
-		// ].includes(type);
-		true;
+	const showExternalLabel = true;
 
 	return (
 		<div className={`flex flex-col gap-2 mb-4 ${className}`}>
@@ -545,33 +639,176 @@ const FormInput: React.FC<FormInputProps> = ({
 export default FormInput;
 
 /* =========================== FilePicker =========================== */
+interface RemoteFile {
+	url: string;
+	name?: string;
+}
+
+type FilePickerValue = null | string | RemoteFile | Array<string | RemoteFile> | File | File[];
+
 interface FilePickerProps {
 	multiple?: boolean;
 	accept?: string;
 	disabled?: boolean;
-	onChange?: (files: File[] | null) => void;
+	value?: FilePickerValue;
+	onChange?: (v: File[] | File | RemoteFile[] | RemoteFile | null) => void;
 }
 
-const FilePicker: React.FC<FilePickerProps> = ({ multiple, accept, disabled, onChange }) => {
-	const [files, setFiles] = useState<File[]>([]);
+const isRemote = (v: any): v is RemoteFile =>
+	!!v && typeof v === "object" && typeof v.url === "string";
+const toRemote = (v: any): RemoteFile | null => {
+	if (!v) return null;
+	if (typeof v === "string") return { url: v };
+	if (isRemote(v)) return v;
+	return null;
+};
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const sel = Array.from(e.target.files ?? []);
-		setFiles(sel);
-		onChange?.(sel.length ? sel : null);
+const FilePicker: React.FC<FilePickerProps> = ({ multiple, accept, disabled, value, onChange }) => {
+	// Hai nguồn hiển thị: remote (URL có sẵn) và local (File vừa chọn)
+	const [remoteFiles, setRemoteFiles] = useState<RemoteFile[]>([]);
+	const [localFiles, setLocalFiles] = useState<File[]>([]);
+
+	// index của file ưu tiên trong danh sách đang hiển thị
+	const [primaryIndex, setPrimaryIndex] = useState<number | null>(null);
+
+	// Đồng bộ từ prop value vào state hiển thị
+	useEffect(() => {
+		setPrimaryIndex(null);
+
+		if (value instanceof File) {
+			setLocalFiles([value]);
+			setRemoteFiles([]);
+			setPrimaryIndex(0);
+			return;
+		}
+		if (Array.isArray(value) && value.length > 0 && value[0] instanceof File) {
+			setLocalFiles(value as File[]);
+			setRemoteFiles([]);
+			setPrimaryIndex(0);
+			return;
+		}
+
+		// Còn lại coi như remote (URL/object) hoặc null
+		const arr = Array.isArray(value) ? value : value ? [value] : [];
+		const remotes = arr.map((v) => toRemote(v)).filter(Boolean) as RemoteFile[];
+
+		setRemoteFiles(remotes);
+		setLocalFiles([]); // remote hiển thị thì clear local
+		if (remotes.length) setPrimaryIndex(0);
+	}, [value]);
+
+	const inputId = useMemo(() => `fp-${Math.random().toString(36).slice(2)}`, []);
+
+	// Phát dữ liệu ra ngoài theo API cũ, nhưng đưa file ưu tiên lên đầu mảng
+	const emitChange = () => {
+		if (!multiple) {
+			if (localFiles.length) onChange?.(localFiles[0]);
+			else if (remoteFiles.length) onChange?.(remoteFiles[0]);
+			else onChange?.(null);
+			return;
+		}
+
+		if (localFiles.length) {
+			let out = [...localFiles];
+			if (primaryIndex != null && out[primaryIndex]) {
+				const [pri] = out.splice(primaryIndex, 1);
+				out = [pri, ...out];
+			}
+			onChange?.(out);
+			return;
+		}
+
+		if (remoteFiles.length) {
+			let out = [...remoteFiles];
+			if (primaryIndex != null && out[primaryIndex]) {
+				const [pri] = out.splice(primaryIndex, 1);
+				out = [pri, ...out];
+			}
+			onChange?.(out);
+			return;
+		}
+
+		onChange?.(null);
 	};
 
-	const prettyCount = useMemo(() => {
-		if (!files.length) return "Chưa chọn tệp";
-		if (files.length === 1) return files[0].name;
-		return `${files.length} tệp đã chọn`;
-	}, [files]);
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const files = Array.from(e.target.files ?? []);
+		if (!files.length) return;
+
+		if (multiple) {
+			setLocalFiles(files);
+			setRemoteFiles([]);
+			setPrimaryIndex(files.length ? 0 : null);
+			onChange?.(files); // phát ngay để parent có data
+		} else {
+			const f = files[0];
+			setLocalFiles([f]);
+			setRemoteFiles([]);
+			setPrimaryIndex(0);
+			onChange?.(f);
+		}
+		e.currentTarget.value = ""; // cho phép chọn lại cùng tên
+	};
+
+	const clearAll = () => {
+		setLocalFiles([]);
+		setRemoteFiles([]);
+		setPrimaryIndex(null);
+		onChange?.(null);
+	};
+
+	const showingLocal = localFiles.length > 0;
+	const total = showingLocal ? localFiles.length : remoteFiles.length;
+
+	const makePrimary = (idx: number) => {
+		setPrimaryIndex(idx);
+		emitChange();
+	};
+	const unsetPrimary = () => {
+		setPrimaryIndex(null);
+		emitChange();
+	};
+
+	const removeAt = (idx: number) => {
+		if (showingLocal) {
+			const next = localFiles.filter((_, i) => i !== idx);
+			setLocalFiles(next);
+			if (primaryIndex != null) {
+				if (idx === primaryIndex) setPrimaryIndex(null);
+				else if (idx < primaryIndex) setPrimaryIndex(primaryIndex - 1);
+			}
+		} else {
+			const next = remoteFiles.filter((_, i) => i !== idx);
+			setRemoteFiles(next);
+			if (primaryIndex != null) {
+				if (idx === primaryIndex) setPrimaryIndex(null);
+				else if (idx < primaryIndex) setPrimaryIndex(primaryIndex - 1);
+			}
+		}
+		setTimeout(emitChange, 0);
+	};
+
+	const looksLikeImage = (urlOrName?: string) =>
+		!!urlOrName && /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(urlOrName);
+
+	const prettyMain = useMemo(() => {
+		if (localFiles.length)
+			return localFiles.length === 1
+				? localFiles[0].name
+				: `${localFiles.length} tệp đã chọn`;
+		if (remoteFiles.length)
+			return remoteFiles.length === 1
+				? (remoteFiles[0].name ?? remoteFiles[0].url.split("/").pop() ?? "Tệp hiện có")
+				: `${remoteFiles.length} tệp hiện có`;
+		return "Chưa chọn tệp";
+	}, [localFiles, remoteFiles]);
 
 	return (
 		<div className="w-full">
 			<label
+				htmlFor={inputId}
 				className={`flex items-center justify-between gap-3 border rounded-lg px-3 py-2 bg-white 
-        ${disabled ? "border-gray-200 bg-gray-50 cursor-not-allowed" : "border-gray-300"} `}
+        ${disabled ? "border-gray-200 bg-gray-50 cursor-not-allowed" : "border-gray-300 cursor-pointer"} `}
 			>
 				<div className="flex items-center gap-3 min-w-0">
 					<div className="shrink-0 w-9 h-9 rounded-md bg-[var(--color-card-bg)]/10 flex items-center justify-center">
@@ -582,36 +819,158 @@ const FilePicker: React.FC<FilePickerProps> = ({ multiple, accept, disabled, onC
 							/>
 						</svg>
 					</div>
-					<div className="truncate text-gray-700">{prettyCount}</div>
+					<div className="truncate text-gray-700">{prettyMain}</div>
 				</div>
 
-				<div>
+				<div className="flex items-center gap-2">
+					{localFiles.length || remoteFiles.length ? (
+						<button
+							type="button"
+							onClick={(e) => {
+								e.preventDefault();
+								if (!disabled) clearAll();
+							}}
+							className={`inline-flex items-center px-3 py-1.5 rounded-md text-sm font-semibold
+                ${disabled ? "bg-gray-200 text-gray-500 cursor-not-allowed" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+							disabled={disabled}
+						>
+							Xoá hết
+						</button>
+					) : null}
 					<span
 						className={`inline-flex items-center px-3 py-1.5 rounded-md text-sm font-semibold
-            ${disabled ? "bg-gray-200 text-gray-500" : "bg-[var(--color-card-bg)] text-white hover:bg-[var(--color-card-light)]"}`}
+              ${disabled ? "bg-gray-200 text-gray-500" : "bg-[var(--color-card-bg)] text-white hover:bg-[var(--color-card-light)]"}`}
 					>
-						Chọn tệp
+						Chọn
 					</span>
 				</div>
 
 				<input
+					id={inputId}
 					type="file"
 					multiple={multiple}
 					accept={accept}
 					disabled={disabled}
-					onChange={handleChange}
+					onChange={handleInputChange}
 					className="hidden"
 				/>
 			</label>
 
-			{files.length > 1 && (
-				<ul className="mt-2 space-y-1 max-h-40 overflow-auto pr-1">
-					{files.map((f, i) => (
-						<li key={i} className="flex items-center gap-2 text-sm text-gray-700">
-							<span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--color-card-bg)]" />
-							<span className="truncate">{f.name}</span>
-						</li>
-					))}
+			{(localFiles.length > 0 || remoteFiles.length > 0) && (
+				<ul className="mt-2 space-y-2 max-h-64 overflow-auto pr-1">
+					{(showingLocal ? localFiles : remoteFiles).map((item, idx) => {
+						const label = showingLocal
+							? (item as File).name
+							: ((item as RemoteFile).name ??
+								(item as RemoteFile).url.split("/").pop() ??
+								"Tệp");
+						const url = showingLocal ? "" : (item as RemoteFile).url;
+						const isImg = showingLocal
+							? looksLikeImage((item as File).name)
+							: looksLikeImage(url);
+						const isPrimary = primaryIndex === idx;
+						const hasPrimary = primaryIndex != null;
+
+						return (
+							<li
+								key={`${showingLocal ? "local" : "remote"}-${idx}`}
+								className="flex items-center gap-3 border rounded-md p-2"
+							>
+								{/* thumb */}
+								<div className="w-12 h-12 shrink-0 rounded bg-gray-50 border flex items-center justify-center overflow-hidden">
+									{isImg && url ? (
+										<img
+											src={url}
+											alt={label}
+											className="w-full h-full object-cover"
+										/>
+									) : (
+										<svg viewBox="0 0 24 24" className="w-6 h-6 text-gray-500">
+											<path
+												fill="currentColor"
+												d="M14 2H6a2 2 0 0 0-2 2v16l4-4h10a2 2 0 0 0 2-2V8z"
+											/>
+										</svg>
+									)}
+								</div>
+
+								{/* label + link */}
+								<div className="flex-1 min-w-0">
+									<div className="font-medium text-gray-800 truncate">
+										{label}
+										{isPrimary && (
+											<span className="ml-2 inline-flex items-center text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-300">
+												Ưu tiên
+											</span>
+										)}
+									</div>
+									{!showingLocal && url && (
+										<a
+											href={url}
+											target="_blank"
+											rel="noreferrer"
+											className="text-xs underline text-gray-600 truncate"
+											title={url}
+										>
+											Mở liên kết
+										</a>
+									)}
+								</div>
+
+								{/* actions */}
+								<div className="flex items-center gap-2">
+									{isPrimary ? (
+										<button
+											type="button"
+											onClick={() => {
+												unsetPrimary();
+											}}
+											disabled={disabled}
+											className={`text-sm px-3 py-1.5 rounded-md border
+                        ${
+							disabled
+								? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+								: "bg-yellow-50 text-yellow-800 border-yellow-200 hover:bg-yellow-100"
+						}`}
+										>
+											Bỏ chọn
+										</button>
+									) : (
+										<button
+											type="button"
+											onClick={() => {
+												makePrimary(idx);
+											}}
+											disabled={disabled || primaryIndex != null}
+											title={
+												primaryIndex != null
+													? "Đã có tệp ưu tiên"
+													: "Đặt làm ưu tiên"
+											}
+											className={`text-sm px-3 py-1.5 rounded-md border
+                        ${
+							disabled || primaryIndex != null
+								? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+								: "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+						}`}
+										>
+											Chọn làm mặc định
+										</button>
+									)}
+
+									<button
+										type="button"
+										onClick={() => removeAt(idx)}
+										disabled={disabled}
+										className={`text-sm px-3 py-1.5 rounded-md
+                      ${disabled ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-red-50 text-red-700 hover:bg-red-100"}`}
+									>
+										Xoá
+									</button>
+								</div>
+							</li>
+						);
+					})}
 				</ul>
 			)}
 		</div>

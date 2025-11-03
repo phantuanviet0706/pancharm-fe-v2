@@ -3,8 +3,15 @@ import BaseLayout from "../../components/BaseLayout";
 import CommonLayout from "../../components/CommonLayout";
 import Table from "./Table";
 import Form from "./Form";
-import { User as UserObject } from "../../../../api/userService";
+import {
+	createUser,
+	deleteUser,
+	getUser,
+	updateUser,
+	User as UserObject,
+} from "../../../../api/userService";
 import { useUsers } from "../../../../hooks/useUsers";
+import ErrorPage from "../../../common/ErrorPage";
 
 const ROWS = [
 	{
@@ -52,23 +59,77 @@ const User = () => {
 	const [openForm, setOpenForm] = useState(false);
 	const [editData, setEditData] = useState<UserObject | null>(null);
 
+	const [detailData, setDetailData] = useState<UserObject | null>(null);
 	const [detailOpen, setDetailOpen] = useState(false);
 
 	const onCloseForm = () => setOpenForm(false);
 
-	const handleCreate = async (data: Partial<UserObject>) => {};
-	const handleUpdate = async (data: UserObject) => {};
-	const handleDelete = async (id: number) => {};
-	const handleDetail = async (id: number) => {};
+	const handleCreate = async (data: Partial<UserObject>) => {
+		try {
+			const res = await createUser(data as Omit<UserObject, "id">);
+			if (res?.code === 1 && res?.result) {
+				setUsers([...users, res.result]);
+			}
+			return { code: res?.code, message: res?.message };
+		} catch (err: any) {
+			return {
+				code: -1,
+				message: err?.response?.data?.message || err.message,
+			};
+		}
+	};
+	const handleUpdate = async (data: UserObject) => {
+		if (!data.id) return { code: -1, message: "Missing ID for update" };
+		try {
+			const res = await updateUser(data.id, data);
+			if (res?.code === 1 && res?.result) {
+				setUsers(users.map((p) => (p.id === res.result.id ? res.result.id : p)));
+			}
+			return { code: res?.code, message: res?.message };
+		} catch (err: any) {
+			return {
+				code: -1,
+				message: err?.response?.data?.message || err.message,
+			};
+		}
+	};
+	const handleDelete = async (id: number) => {
+		try {
+			const res = await deleteUser(id);
+			if (res?.code === 1) {
+				setUsers(users.filter((p) => p.id !== id));
+			}
+			return { code: res?.code, message: res?.message };
+		} catch (err: any) {
+			return {
+				code: -1,
+				message: err?.response?.data?.message || err.message,
+			};
+		}
+	};
+	const handleDetail = async (id: number) => {
+		if (!id) return { code: -1, message: "Missing ID to get detail" };
+		try {
+			const res = await getUser(id);
+			if (res?.code === 1 && res?.result) {
+				setDetailData(res.result);
+				setDetailOpen(true);
+			}
+			return { code: res?.code, message: res?.message };
+		} catch (err: any) {
+			return {
+				code: -1,
+				message: err?.response?.data?.message || err.message,
+			};
+		}
+	};
 
-	// if (loading) return <p>Loading ...</p>;
-	// if (error) return <p>Failed to load users</p>;
-	return (
-		<BaseLayout>
+	let content = (
+		<div>
 			<CommonLayout title="Thông tin Người dùng" width={60}>
 				<div className="category-list">
 					<Table
-						users={ROWS}
+						users={users}
 						onEdit={(perm) => {
 							setEditData(perm);
 							setOpenForm(true);
@@ -89,8 +150,16 @@ const User = () => {
 				}
 				data={editData}
 			></Form>
-		</BaseLayout>
+		</div>
 	);
+
+	if (loading) {
+		content = <div className="my-10 mx-30">Đang tải thông tin người dùng...</div>;
+	}
+	if (error) {
+		content = <ErrorPage message="Không thể tải thông tin người dùng"></ErrorPage>;
+	}
+	return <BaseLayout>{content}</BaseLayout>;
 };
 
 export default User;
