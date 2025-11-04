@@ -1,15 +1,15 @@
-import PropTypes from 'prop-types';
-import { createContext, useReducer, useEffect } from 'react';
-import * as actionType from '../store/actions';
-import { CONFIG } from '../config/constant';
-import axios from 'axios';
+import PropTypes from "prop-types";
+import { createContext, useReducer, useEffect } from "react";
+import * as actionType from "../store/actions";
+import { CONFIG } from "../config/constant";
+import axios from "axios";
 
-const API_URL = `${import.meta.env.VITE_APP_URL}/config`;
+const API_URL = `${import.meta.env.VITE_APP_URL}`;
 
 const initialState = {
 	...CONFIG,
 	isOpen: [],
-	isTrigger: []
+	isTrigger: [],
 };
 
 const ConfigContext = createContext({});
@@ -24,20 +24,20 @@ function ConfigProvider({ children }) {
 			case actionType.INIT_CONFIG:
 				return {
 					...stateData,
-					...action.payload
+					...action.payload,
 				};
 			case actionType.COLLAPSE_MENU:
 				return {
 					...stateData,
-					collapseMenu: !stateData.collapseMenu
+					collapseMenu: !stateData.collapseMenu,
 				};
 			case actionType.COLLAPSE_HEADERMENU:
 				return {
 					...stateData,
-					collapseHeaderMenu: !stateData.collapseHeaderMenu
+					collapseHeaderMenu: !stateData.collapseHeaderMenu,
 				};
 			case actionType.COLLAPSE_TOGGLE:
-				if (action.menu.type === 'sub') {
+				if (action.menu.type === "sub") {
 					open = stateData.isOpen;
 					trigger = stateData.isTrigger;
 
@@ -57,7 +57,7 @@ function ConfigProvider({ children }) {
 				return {
 					...stateData,
 					isOpen: open,
-					isTrigger: trigger
+					isTrigger: trigger,
 				};
 			default:
 				return stateData;
@@ -65,26 +65,26 @@ function ConfigProvider({ children }) {
 	}, initialState);
 
 	useEffect(() => {
-		const cached = localStorage.getItem('APP_CONFIG');
+		const cached = localStorage.getItem("APP_CONFIG");
 		if (cached) {
 			try {
 				const parsed = JSON.parse(cached);
 				dispatch({ type: actionType.INIT_CONFIG, payload: parsed });
 				return;
 			} catch (e) {
-				console.warn('Invalid config cache, refetching...');
+				console.warn("Invalid config cache, refetching...");
 			}
 		}
 
 		axios
-			.get(API_URL)
+			.get(`${API_URL}/config`)
 			.then((res) => {
 				const configData = res?.data?.result || {};
-				localStorage.setItem('APP_CONFIG', JSON.stringify(configData));
+				localStorage.setItem("APP_CONFIG", JSON.stringify(configData));
 				dispatch({ type: actionType.INIT_CONFIG, payload: configData });
 			})
 			.catch((err) => {
-				console.error('Failed to fetch config:', err);
+				console.error("Failed to fetch config:", err);
 			});
 	}, []);
 

@@ -39,6 +39,6 @@ export const logout = async (data: AuthLogout) => {
 		localStorage.removeItem('token');
 		sessionStorage.removeItem('token');
 
-		window.location.assign('/pancharm/login');
+		window.location.assign('/');
 	}
 };

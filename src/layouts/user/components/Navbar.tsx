@@ -19,6 +19,10 @@ import Icon from "../../../components/Icon";
 import SideBar from "./SideBar";
 import UserNav from "../../../components/UserNav";
 import Cart from "../pages/Cart/Cart";
+import { useMe } from "../../../hooks/useMe";
+import { User } from "../../../api/userService";
+import { href } from "react-router-dom";
+import { logout } from "../../../api/authService";
 
 const HEADER_ITEMS = [
 	{
@@ -79,7 +83,26 @@ const PROFILE_SETTINGS = [
 		label: "Danh sách yêu thích",
 		href: "/wishlist",
 	},
+	{
+		key: "logout",
+		label: "Đăng xuất",
+		onClick: () => handleLogout(),
+	},
 ];
+
+const handleLogout = async () => {
+	try {
+		const token = localStorage.getItem("token") || sessionStorage.getItem("token") || "";
+		const res = await logout({ token });
+		if (res?.code !== 1) {
+			throw res?.message ?? "Logout Failed";
+		}
+		return;
+	} catch (err: any) {
+		console.error("Failed to logout:", err);
+		throw err;
+	}
+};
 
 const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => {
 	const [openProfile, setOpenProfile] = useState(false);
@@ -94,6 +117,66 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 
 	const [openCategories, setOpenCategories] = useState(false);
 	const categoriesRef = useRef<HTMLDivElement | null>(null);
+
+	let userProfileHtml = (
+		<>
+			<div className="relative authentication-btn">
+				<Button
+					sx={{
+						backgroundColor: "var(--color-card-bg)",
+						"&:hover": {
+							backgroundColor: "var(--color-card-bg-hover)",
+						},
+						borderRadius: "24px",
+						paddingInline: "15px",
+					}}
+				>
+					<Link
+						href="login"
+						sx={{
+							color: "var(--color-cream-bg)",
+							"&:hover": {
+								color: "var(--color-cream-bg-hover)",
+							},
+						}}
+						underline="none"
+					>
+						<div className="login-btn">Đăng nhập</div>
+					</Link>
+				</Button>
+			</div>
+		</>
+	);
+
+	const token = localStorage.getItem("token") || sessionStorage.getItem("token") || "";
+	if (token) {
+		const { me, setMe } = useMe();
+		userProfileHtml = (
+			<div className="relative" ref={profileRef}>
+				<IconButton
+					sx={{ color: "var(--color-card-bg)" }}
+					aria-label="Tài khoản"
+					aria-expanded={openProfile}
+					onClick={() => setOpenProfile((v) => !v)}
+				>
+					<Avatar
+						sx={{ width: 32, height: 32 }}
+						src={me?.avatar || "/default-avatar.png"}
+					/>
+				</IconButton>
+
+				{openProfile && (
+					<div
+						role="menu"
+						className="absolute right-0 mt-3 w-48 overflow-hidden rounded-xl shadow-xl"
+						style={{ backgroundColor: "var(--color-card-bg)" }}
+					>
+						<UserNav settings={PROFILE_SETTINGS}></UserNav>
+					</div>
+				)}
+			</div>
+		);
+	}
 
 	useEffect(() => {
 		const onDocClick = (e: MouseEvent) => {
@@ -281,55 +364,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 							<ShoppingCartIcon />
 						</IconButton>
 
-						{/* <div className="relative" ref={profileRef}>
-							<IconButton
-								sx={{ color: "var(--color-card-bg)" }}
-								aria-label="Tài khoản"
-								aria-expanded={openProfile}
-								onClick={() => setOpenProfile((v) => !v)}
-							>
-								<Avatar
-									sx={{ width: 32, height: 32 }}
-									src="https://cdn.pixabay.com/photo/2015/05/15/09/28/head-723540_640.jpg"
-								/>
-							</IconButton>
-
-							{openProfile && (
-								<div
-									role="menu"
-									className="absolute right-0 mt-3 w-48 overflow-hidden rounded-xl shadow-xl"
-									style={{ backgroundColor: "var(--color-card-bg)" }}
-								>
-									<UserNav settings={PROFILE_SETTINGS}></UserNav>
-								</div>
-							)}
-						</div> */}
-
-						<div className="relative authentication-btn">
-							<Button
-								sx={{
-									backgroundColor: "var(--color-card-bg)",
-									"&:hover": {
-										backgroundColor: "var(--color-card-bg-hover)",
-									},
-									borderRadius: "24px",
-									paddingInline: "15px",
-								}}
-							>
-								<Link
-									href="login"
-									sx={{
-										color: "var(--color-cream-bg)",
-										"&:hover": {
-											color: "var(--color-cream-bg-hover)",
-										},
-									}}
-									underline="none"
-								>
-									<div className="login-btn">Đăng nhập</div>
-								</Link>
-							</Button>
-						</div>
+						{userProfileHtml}
 					</div>
 				</div>
 			</Box>

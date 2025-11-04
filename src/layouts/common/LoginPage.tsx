@@ -1,11 +1,41 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import Icon from "../../components/Icon";
 import { Button, Link } from "@mui/material";
 import AuthPage from "./AuthPage";
 import FormInput from "../../components/FormInput";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { login } from "../../api/authService";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
+	const [rememberMe, setRememberMe] = useState(false);
+	const [username, setUsername] = useState("");
+	const [password, setPassword] = useState("");
+
+	const navigate = useNavigate();
+
+	const handleLogin = async () => {
+		try {
+			const res = await login({ username, password, remeber: rememberMe });
+			if (res?.code === 1 && res?.result) {
+				const result = res.result;
+				if (rememberMe) {
+					localStorage.setItem("token", result.token);
+				} else {
+					sessionStorage.setItem("token", result.token);
+				}
+
+				navigate("/");
+			}
+			return { code: res?.code, message: res?.message };
+		} catch (err: any) {
+			return {
+				code: -1,
+				message: err?.response?.data?.message || err.message,
+			};
+		}
+	};
+
 	return (
 		<>
 			<AuthPage
@@ -60,8 +90,18 @@ const LoginPage = () => {
 			>
 				<div className="nav-content-form">
 					<div className="nav-form">
-						<FormInput type="text" label="Tài khoản"></FormInput>
-						<FormInput type="password" label="Mật khẩu"></FormInput>
+						<FormInput
+							type="text"
+							label="Tài khoản"
+							value={username}
+							onChange={(e) => setUsername(e)}
+						></FormInput>
+						<FormInput
+							type="password"
+							label="Mật khẩu"
+							value={password}
+							onChange={(e) => setPassword(e)}
+						></FormInput>
 					</div>
 					<div className="nav-btn relative text-center">
 						<Button
@@ -74,6 +114,9 @@ const LoginPage = () => {
 									backgroundColor: "var(--color-card-bg-hover)",
 									color: "var(--color-cream-bg-hover)",
 								},
+							}}
+							onClick={() => {
+								handleLogin();
 							}}
 						>
 							<div className="submit-content">Đăng nhập</div>

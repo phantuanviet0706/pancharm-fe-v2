@@ -1,10 +1,10 @@
 import React from "react";
 
 export interface UserNavProps {
-    settings: Array<Object>;
+	settings: Array<Object>;
 }
 
-const UserNav = ({settings}: UserNavProps) => {
+const UserNav = ({ settings }: UserNavProps) => {
 	return (
 		<div className="p-3">
 			{settings.map((item, idx) => (
@@ -22,13 +22,12 @@ const UserNav = ({settings}: UserNavProps) => {
 									}
 								: {}
 						}
+						onClick={() => item?.onClick()}
 					>
 						{item?.label}
 					</a>
 
-					{idx != settings.length - 1 && (
-						<div className="my-1 h-[1px] bg-white/10" />
-					)}
+					{idx != settings.length - 1 && <div className="my-1 h-[1px] bg-white/10" />}
 				</>
 			))}
 		</div>
