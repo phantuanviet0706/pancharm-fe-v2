@@ -46,11 +46,11 @@ const Table = ({
 							<ActionMenu
 								actions={[
 									{
-										label: "Edit",
+										label: "Sửa",
 										onClick: () => onEdit(row),
 									},
 									{
-										label: "Delete",
+										label: "Xóa",
 										onClick: () => onDelete(row?.id ? row.id : 0),
 										color: "red",
 									},

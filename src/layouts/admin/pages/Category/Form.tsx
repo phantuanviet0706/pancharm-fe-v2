@@ -50,12 +50,10 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) => {
 		}, 350) as unknown as number;
 	};
 
-	// Mở dialog thì load danh sách ban đầu
 	useEffect(() => {
 		if (open) loadCategories();
 	}, [open]);
 
-	// Đảm bảo khi edit có parentId thì label hiển thị đúng dù option chưa nằm trong trang đầu
 	useEffect(() => {
 		if (!form.parentId) return;
 		const exist = catOpts.some((o) => o.id === form.parentId);

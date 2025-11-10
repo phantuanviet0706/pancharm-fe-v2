@@ -105,3 +105,13 @@ export const getMe = async () => {
 		throw error;
 	}
 };
+
+export const changePassword = async (payload: { password: string; confirmPassword: string }) => {
+	try {
+		const res = await axiosClient.post<User>(`${API_URL}/change-password`, payload);
+		return res.data;
+	} catch (error) {
+		console.error("Failed to change password:", error);
+		throw error;
+	}
+};

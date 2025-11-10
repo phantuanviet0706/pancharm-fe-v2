@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import ActionMenu from "../../../../components/ActionMenu";
 import GenericTable from "../../../../components/GenericTable";
+import GenericDialog from "../../../../components/GenericDialog";
 import { Collection } from "../../../../api/collectionService";
 import { Pagination } from "@mui/material";
 
@@ -12,6 +13,7 @@ interface TableProps {
 	totalPages: number;
 	page: number;
 	setPage: (page: number) => void;
+	onEditImages: (collection: Collection) => void;
 }
 
 const Table = ({
@@ -22,7 +24,30 @@ const Table = ({
 	totalPages,
 	page,
 	setPage,
+	onEditImages,
 }: TableProps) => {
+	// ==== Confirm delete state ====
+	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [pendingRow, setPendingRow] = useState<Collection | null>(null);
+
+	const askDelete = (row: Collection) => {
+		setPendingRow(row);
+		setConfirmOpen(true);
+	};
+
+	const handleConfirmDelete = async () => {
+		if (pendingRow?.id != null) {
+			await onDelete(pendingRow.id);
+		}
+		setConfirmOpen(false);
+		setPendingRow(null);
+	};
+
+	const handleCancelDelete = () => {
+		setConfirmOpen(false);
+		setPendingRow(null);
+	};
+
 	return (
 		<div>
 			<GenericTable
@@ -40,18 +65,22 @@ const Table = ({
 						key: "actions",
 						label: "Thao tác",
 						align: "right",
-						width: "100px",
+						width: "140px",
 						headerStyle: { marginRight: "10px" },
 						render: (row) => (
 							<ActionMenu
 								actions={[
 									{
-										label: "Edit",
+										label: "Sửa",
 										onClick: () => onEdit(row),
 									},
 									{
-										label: "Delete",
-										onClick: () => onDelete(row?.id ? row.id : 0),
+										label: "Chỉnh sửa hiển thị ảnh",
+										onClick: () => onEditImages(row),
+									},
+									{
+										label: "Xóa",
+										onClick: () => askDelete(row),
 										color: "red",
 									},
 								]}
@@ -60,7 +89,8 @@ const Table = ({
 					},
 				]}
 			/>
-			<div style={{ display: "flex", justifyContent: "center", marginTop: "16px" }}>
+
+			<div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
 				<Pagination
 					count={totalPages}
 					page={page + 1}
@@ -68,6 +98,41 @@ const Table = ({
 					color="primary"
 				/>
 			</div>
+
+			<GenericDialog
+				open={confirmOpen}
+				title="Xác nhận xóa"
+				onClose={handleCancelDelete}
+				actions={[
+					{
+						label: "Hủy",
+						variant: "outlined",
+						onClick: handleCancelDelete,
+						sx: {
+							width: "50%",
+							borderColor: "var(--color-card-bg)",
+							color: "var(--color-card-bg)",
+						},
+					},
+					{
+						label: "Xóa",
+						variant: "contained",
+						onClick: handleConfirmDelete,
+						sx: { width: "50%", backgroundColor: "#dc2626" },
+					},
+				]}
+			>
+				<div className="text-[14px] leading-6">
+					Bạn có chắc muốn xóa bộ sưu tập
+					{pendingRow?.name ? (
+						<>
+							{" "}
+							<b>{pendingRow.name}</b>
+						</>
+					) : null}
+					? Hành động này không thể hoàn tác.
+				</div>
+			</GenericDialog>
 		</div>
 	);
 };

@@ -5,9 +5,7 @@ import App from "./App.jsx";
 import { ConfigProvider } from "./contexts/ConfigProvider.js";
 
 createRoot(document.getElementById("root")).render(
-	<StrictMode>
-		<ConfigProvider>
-			<App />
-		</ConfigProvider>
-	</StrictMode>,
+	<ConfigProvider>
+		<App />
+	</ConfigProvider>,
 );

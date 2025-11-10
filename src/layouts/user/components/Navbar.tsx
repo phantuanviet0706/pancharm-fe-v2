@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
 	Avatar,
 	Box,
@@ -23,30 +23,7 @@ import { useMe } from "../../../hooks/useMe";
 import { User } from "../../../api/userService";
 import { href } from "react-router-dom";
 import { logout } from "../../../api/authService";
-
-const HEADER_ITEMS = [
-	{
-		title: "Hotline",
-		className: "phone-contact relative",
-		icon: <PhoneIcon />,
-		content: "097.151.6201",
-		href: "tel:0971516201",
-	},
-	{
-		title: "Email",
-		className: "email-contact absolute left-3/7",
-		icon: <EmailIcon />,
-		content: "vietphan565@gmail.com",
-		href: "mailto:vietphan565@gmail.com",
-	},
-	{
-		title: "Địa chỉ",
-		className: "address-contact relative",
-		icon: <LocationOnIcon />,
-		content: "47 Nguyễn Tuân, Thanh Xuân, Hà Nội",
-		icon_right: true,
-	},
-];
+import { ConfigContext } from "../../../contexts/ConfigProvider";
 
 const MAIN_MENU = [
 	{ key: "collections", label: "BST Mới", href: "/collections" },
@@ -64,25 +41,30 @@ const CATEGORY_OPTIONS = [
 
 const PROFILE_SETTINGS = [
 	{
-		key: "profile",
-		label: "Profile",
-		href: "/profile",
+		key: "admin",
+		label: "Đi đến trang quản trị",
+		href: "/admin",
 	},
+	// {
+	// 	key: "profile",
+	// 	label: "Profile",
+	// 	href: "/profile",
+	// },
 	{
 		key: "change-password",
 		label: "Đổi mật khẩu",
 		href: "/change-password",
 	},
-	{
-		key: "orders",
-		label: "Đặt Order",
-		href: "/orders",
-	},
-	{
-		key: "wishlist",
-		label: "Danh sách yêu thích",
-		href: "/wishlist",
-	},
+	// {
+	// 	key: "orders",
+	// 	label: "Đặt Order",
+	// 	href: "/orders",
+	// },
+	// {
+	// 	key: "wishlist",
+	// 	label: "Danh sách yêu thích",
+	// 	href: "/wishlist",
+	// },
 	{
 		key: "logout",
 		label: "Đăng xuất",
@@ -105,6 +87,36 @@ const handleLogout = async () => {
 };
 
 const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => {
+	const { state: APP_CONFIG } = useContext(ConfigContext);
+	const company = APP_CONFIG?.company || {};
+
+	const HEADER_ITEMS = [
+		{
+			title: "Hotline",
+			className: "phone-contact relative",
+			icon: <PhoneIcon />,
+			content: company?.phone,
+			href: `tel:${company?.phone}`,
+			display: company?.phone,
+		},
+		{
+			title: "Email",
+			className: "email-contact absolute left-3/7",
+			icon: <EmailIcon />,
+			content: company?.email,
+			href: `mailto:${company?.email}`,
+			display: company?.email,
+		},
+		{
+			title: "Địa chỉ",
+			className: "address-contact relative",
+			icon: <LocationOnIcon />,
+			content: company?.address,
+			icon_right: true,
+			display: company?.address,
+		},
+	];
+
 	const [openProfile, setOpenProfile] = useState(false);
 	const profileRef = useRef<HTMLDivElement | null>(null);
 
@@ -222,33 +234,45 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 	return (
 		<div className="sticky top-0 z-[1000] bg-[var(--color-cream-thick)] mb-0">
 			<div className="hidden lg:flex justify-between px-5 h-[30px] border-b font-normal text-base bg-[var(--color-card-bg)]">
-				{HEADER_ITEMS.map((item, idx) => (
-					<div key={idx} className={item.className + " top-0.5"}>
-						<div
-							className={
-								"flex items-center gap-1 " + (item.icon_right ? "icon-right" : "")
-							}
-						>
-							<div className="item-icons">{item.icon}</div>
-							{item.href ? (
-								<a
-									href={item.href}
-									className="flex items-center text-[var(--color-cream-bg)]"
+				{HEADER_ITEMS.map(
+					(item, idx) =>
+						item.display && (
+							<div key={idx} className={item.className + " top-0.5"}>
+								<div
+									className={
+										"flex items-center gap-1 " +
+										(item.icon_right ? "icon-right" : "")
+									}
 								>
-									<span className="item-title text-sm">{item.title}:</span>
-									<span className="text-sm">&nbsp;</span>
-									<span className="item-content text-sm">{item.content}</span>
-								</a>
-							) : (
-								<span className="flex items-center text-[var(--color-cream-bg)]">
-									<span className="item-title text-sm">{item.title}:</span>
-									<span className="text-sm">&nbsp;</span>
-									<span className="item-content text-sm">{item.content}</span>
-								</span>
-							)}
-						</div>
-					</div>
-				))}
+									<div className="item-icons">{item.icon}</div>
+									{item.href ? (
+										<a
+											href={item.href}
+											className="flex items-center text-[var(--color-cream-bg)]"
+										>
+											<span className="item-title text-sm">
+												{item.title}:
+											</span>
+											<span className="text-sm">&nbsp;</span>
+											<span className="item-content text-sm">
+												{item.content}
+											</span>
+										</a>
+									) : (
+										<span className="flex items-center text-[var(--color-cream-bg)]">
+											<span className="item-title text-sm">
+												{item.title}:
+											</span>
+											<span className="text-sm">&nbsp;</span>
+											<span className="item-content text-sm">
+												{item.content}
+											</span>
+										</span>
+									)}
+								</div>
+							</div>
+						),
+				)}
 			</div>
 
 			<Box component="nav" aria-label="Main navigation">

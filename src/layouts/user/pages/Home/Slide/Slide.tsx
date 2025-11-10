@@ -27,7 +27,11 @@ const NextArrow = ({ onClick }) => (
 	</button>
 );
 
-const Slide = () => {
+export interface SlideProps {
+	items?: Object[];
+}
+
+const Slide = ({ items = [1, 1, 1, 1, 1, 1] }: SlideProps) => {
 	const navigate = useNavigate();
 
 	const settings = {
@@ -74,8 +78,8 @@ const Slide = () => {
 	return (
 		<div className="py-5 px-16 mx-auto relative">
 			<Slider {...settings}>
-				{[1, 1, 1, 1, 1, 1].map((item) => (
-					<CardItem key={item} item={item} />
+				{items.map((item, idx) => (
+					<CardItem key={idx} item={item} />
 				))}
 			</Slider>
 		</div>

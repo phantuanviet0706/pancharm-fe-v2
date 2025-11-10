@@ -39,7 +39,7 @@ const Cart = () => {
 							}}
 						>
 							<Link
-								href="orders"
+								href="/orders"
 								underline="none"
 								sx={{
 									color: "var(--color-cream-bg)",
@@ -47,6 +47,7 @@ const Cart = () => {
 										color: "var(--color-cream-bg-hover)",
 									},
 								}}
+								
 							>
 								<div className="flex gap-2">
 									<span className="uppercase font-semibold leading-7">

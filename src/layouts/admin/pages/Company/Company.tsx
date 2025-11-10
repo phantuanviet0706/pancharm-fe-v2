@@ -26,15 +26,15 @@ const Company = () => {
 		try {
 			const res = await updateCompany(data);
 			if (res?.code === 1) {
-				let appData = localStorage.getItem("appData");
+				let appData = localStorage.getItem("APP_CONFIG");
 				if (appData) {
 					appData = JSON.parse(appData);
 					if (appData?.company) {
 						appData.company = res?.result;
-						localStorage.setItem("appData", JSON.stringify(appData));
+						localStorage.setItem("APP_CONFIG", JSON.stringify(appData));
 					}
 				}
-				window.location.reload();
+				// window.location.reload();
 			} else {
 			}
 			return {
@@ -60,9 +60,21 @@ const Company = () => {
 						inline
 					></FieldDisplay>
 					<FieldDisplay
+						label="Email"
+						value={data?.email || ""}
+						icon={<Icon name="email" />}
+						inline
+					></FieldDisplay>
+					<FieldDisplay
 						label="Mã số thuế"
 						value={data?.taxcode || ""}
 						icon={<Icon name="taxCode" />}
+						inline
+					></FieldDisplay>
+					<FieldDisplay
+						label="Số điện thoại"
+						value={data?.phone || ""}
+						icon={<Icon name="phone" />}
 						inline
 					></FieldDisplay>
 					<FieldDisplay

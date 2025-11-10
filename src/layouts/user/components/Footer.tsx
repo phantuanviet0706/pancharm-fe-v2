@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Iframe } from "./Iframe";
 import Icon from "../../../components/Icon";
 import SocialIcons from "../../../components/SocialIcons";
+import { ConfigContext } from "../../../contexts/ConfigProvider";
 
 const FOOTER_ITEM = [
 	{
@@ -53,6 +54,9 @@ const FOOTER_ITEM = [
 ];
 
 const Footer = () => {
+	const { state: APP_CONFIG } = useContext(ConfigContext);
+	const company = APP_CONFIG?.company || {};
+
 	const date = new Date();
 
 	return (
@@ -72,37 +76,35 @@ const Footer = () => {
 								/>
 							</div>
 							<h1 className="cursor-pointer text-lg md:text-2xl leading-[28px] uppercase text-[var(--color-cream-bg)]">
-								Pancharm
+								{company?.name}
 							</h1>
 						</div>
 						<div className="footer-item-content text-sm leading-relaxed text-[var(--color-cream-bg)]">
 							<div>
 								<div className="leading-[28px]">
 									<span className="font-semibold">Điện thoại: </span>
-									<a href="tel:0971516201">097 151 6201</a>
+									<a href={`tel:${company?.phone}`}>{company?.phone}</a>
 									&nbsp;-&nbsp;
-									<a href="tel:0971516201">097 151 6201</a>
+									<a href={`tel:${company?.phone}`}>{company?.phone}</a>
 								</div>
 								<div className="leading-[28px]">
 									<span className="font-semibold">Gmail: </span>
 									<span>
-										<a href="mailto:vietphan565@gmail.com">
-											vietphan565@gmail.com
-										</a>
+										<a href={`mailto:${company?.email}`}>{company?.email}</a>
 									</span>
 								</div>
 								<div className="leading-[28px]">
 									<span className="font-semibold">Địa chỉ: </span>
 									<span>
-										<a>92 Đặng Thùy Trâm, Phường Bình Lợi Trung, TP.HCM</a>
+										<a>{company?.address}</a>
 									</span>
 								</div>
-								<div className="leading-[28px]">
+								{/* <div className="leading-[28px]">
 									<span className="font-semibold">Giờ làm việc: </span>
 									<span>
 										<a>8h00 - 17h30</a>
 									</span>
-								</div>
+								</div> */}
 								<div className="leading-[28px]">
 									<SocialIcons></SocialIcons>
 								</div>

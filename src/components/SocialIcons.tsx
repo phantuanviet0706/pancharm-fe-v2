@@ -17,7 +17,7 @@ export default function SocialIcons() {
 			<div className="flex max-w-5xl gap-3">
 				{/* Facebook */}
 				<Tile
-					href="https://facebook.com"
+					href="https://m.facebook.com/pancharm.official/"
 					aria-label="Facebook"
 					target="_blank"
 					rel="noreferrer"
@@ -25,24 +25,9 @@ export default function SocialIcons() {
 					<Icon name="facebook" color="var(--color-card-bg)"></Icon>
 				</Tile>
 
-				{/* WhatsApp */}
-				<Tile href="https://wa.me/" aria-label="WhatsApp" target="_blank" rel="noreferrer">
-					<Icon name="whatsapp" color="var(--color-card-bg)"></Icon>
-				</Tile>
-
-				{/* YouTube */}
-				<Tile
-					href="https://youtube.com"
-					aria-label="YouTube"
-					target="_blank"
-					rel="noreferrer"
-				>
-					<Icon name="youtube" color="var(--color-card-bg)"></Icon>
-				</Tile>
-
 				{/* Instagram */}
 				<Tile
-					href="https://instagram.com"
+					href="https://www.instagram.com/pancharm_trangsucphongthuy?igsh=NzhocjNvbW0wbDh5"
 					aria-label="Instagram"
 					target="_blank"
 					rel="noreferrer"
@@ -50,15 +35,50 @@ export default function SocialIcons() {
 					<Icon name="instagram" color="var(--color-card-bg)"></Icon>
 				</Tile>
 
-				{/* Pinterest */}
+				{/* Tiktok */}
 				<Tile
+					href="https://www.tiktok.com/@pancharm.official?_r=1&_t=ZS-919QazH3e8V"
+					aria-label="Tiktok"
+					target="_blank"
+					rel="noreferrer"
+				>
+					<Icon name="tiktok" color="var(--color-card-bg)"></Icon>
+				</Tile>
+
+				{/* Threads */}
+				<Tile
+					href="https://www.threads.com/@pancharm_trangsucphongthuy"
+					aria-label="Thread"
+					target="_blank"
+					rel="noreferrer"
+				>
+					<Icon name="thread" color="var(--color-card-bg)"></Icon>
+				</Tile>
+
+				{/* WhatsApp */}
+				{/* <Tile href="https://wa.me/" aria-label="WhatsApp" target="_blank" rel="noreferrer">
+					<Icon name="whatsapp" color="var(--color-card-bg)"></Icon>
+				</Tile> */}
+
+				{/* YouTube */}
+				{/* <Tile
+					href="https://youtube.com"
+					aria-label="YouTube"
+					target="_blank"
+					rel="noreferrer"
+				>
+					<Icon name="youtube" color="var(--color-card-bg)"></Icon>
+				</Tile> */}
+
+				{/* Pinterest */}
+				{/* <Tile
 					href="https://pinterest.com"
 					aria-label="Pinterest"
 					target="_blank"
 					rel="noreferrer"
 				>
 					<Icon name="pinterest" color="var(--color-card-bg)"></Icon>
-				</Tile>
+				</Tile> */}
 			</div>
 		</div>
 	);

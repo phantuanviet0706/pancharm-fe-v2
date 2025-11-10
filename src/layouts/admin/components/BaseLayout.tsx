@@ -1,12 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Navbar from "./Navbar";
+import { useNavigate } from "react-router-dom";
 
 export interface BaseLayoutProps {
-	children: React.ReactNode;
+	children?: React.ReactNode;
 	headers?: React.ReactNode;
 }
 
 const BaseLayout = ({ children, headers }: BaseLayoutProps) => {
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+		if (!token) {
+			navigate("/");
+		}
+	}, [navigate]);
+
 	return (
 		<div className="admin-layout-container admin-panel">
 			<div

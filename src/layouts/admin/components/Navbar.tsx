@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 import navigation from "../../../menu-item";
 import NavGroup from "./NavGroup";
 import Icon from "../../../components/Icon";
 import { Link } from "react-router-dom";
 import { Box, Button } from "@mui/material";
+import { ConfigContext } from "../../../contexts/ConfigProvider";
 
 const Navbar = () => {
+	const { state: APP_CONFIG } = useContext(ConfigContext);
+	const company = APP_CONFIG?.company;
 	const [main, setMain] = useState({});
 	const [item, setItem] = useState({});
 
@@ -28,7 +31,7 @@ const Navbar = () => {
 					</div>
 					<div className="header-title text-[24px] leading-[32px]">
 						<span className="title uppercase font-semibold text-[var(--color-card-bg)]">
-							Pancharm
+							{company?.name}
 						</span>
 					</div>
 				</div>

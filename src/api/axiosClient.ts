@@ -23,7 +23,7 @@ axiosClient.interceptors.response.use(
 			localStorage.removeItem("token");
 			sessionStorage.removeItem("token");
 
-			window.location.href = "/pancharm/login";
+			window.location.href = "/login";
 		}
 		return Promise.reject(error);
 	},

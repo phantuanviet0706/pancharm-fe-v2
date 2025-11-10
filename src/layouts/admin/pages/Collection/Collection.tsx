@@ -4,40 +4,80 @@ import CommonLayout from "../../components/CommonLayout";
 import Icon from "../../../../components/Icon";
 import { Button } from "@mui/material";
 import Table from "./Table";
-import { Collection as CollectionObject } from "../../../../api/collectionService";
+import {
+	Collection as CollectionObject,
+	createCollection,
+	deleteCollection,
+	updateCollection,
+	updateCollectionImage,
+} from "../../../../api/collectionService";
 import { useCollections } from "../../../../hooks/useCollections";
 import Form from "./Form";
 
-const ROWS = [
-	{ id: 1, name: "Vòng đá phong thủy", slug: "COLLECTION-1" },
-	{ id: 2, name: "Thiên vi", slug: "COLLECTION-2" },
-	{ id: 3, name: "Trà an", slug: "COLLECTION-3" },
-	{ id: 4, name: "Diên đá", slug: "COLLECTION-4" },
-];
+type FormAction = "create" | "update" | "updateImages";
 
 const Collection = () => {
 	const [page, setPage] = useState(0);
 	const [searchText, setSearchText] = useState("");
 
 	const query = useMemo(() => ({ page, limit: 50, keyword: searchText }), [page, searchText]);
-
 	const { collections, loading, error, setCollections, total, totalPages } =
 		useCollections(query);
 
 	const [openForm, setOpenForm] = useState(false);
 	const [editData, setEditData] = useState<CollectionObject | null>(null);
-
-	const [detailOpen, setDetailOpen] = useState(false);
+	const [formAction, setFormAction] = useState<FormAction>("create");
 
 	const onCloseForm = () => setOpenForm(false);
 
-	const handleCreate = async (data: Partial<CollectionObject>) => {};
-	const handleUpdate = async (data: CollectionObject) => {};
-	const handleDelete = async (id: number) => {};
-	const handleDetail = async (id: number) => {};
+	const handleCreate = async (body: FormData) => {
+		try {
+			const res = await createCollection(body as any);
+			if (res?.code === 1 && res?.result) {
+				setCollections([...collections, res.result]);
+				window.location.reload();
+			}
+			return { code: res?.code, message: res?.message };
+		} catch (err: any) {
+			return { code: -1, message: err?.response?.data?.message || err.message };
+		}
+	};
 
-	// if (loading) return <p>Loading ...</p>;
-	// if (error) return <p>Failed to load categories</p>;
+	const handleUpdate = async (id: number, body: FormData) => {
+		try {
+			const res = await updateCollection(id, body as any);
+			if (res?.code === 1 && res?.result) {
+				setCollections(collections.map((p) => (p.id === res.result.id ? res.result : p)));
+				window.location.reload();
+			}
+			return { code: res?.code, message: res?.message };
+		} catch (err: any) {
+			return { code: -1, message: err?.response?.data?.message || err.message };
+		}
+	};
+
+	const handleDelete = async (id: number) => {
+		try {
+			const res = await deleteCollection(id);
+			if (res?.code === 1) window.location.reload();
+			return { code: res?.code, message: res?.message };
+		} catch (err: any) {
+			return { code: -1, message: err?.response?.data?.message || err.message };
+		}
+	};
+
+	const handleUpdateImage = async (id: number, body: FormData) => {
+		try {
+			const res = await updateCollectionImage(id, body as any);
+			if (res?.code === 1 && res?.result) {
+				setCollections(collections.map((p) => (p.id === res.result.id ? res.result : p)));
+				window.location.reload();
+			}
+			return { code: res?.code, message: res?.message };
+		} catch (err: any) {
+			return { code: -1, message: err?.response?.data?.message || err.message };
+		}
+	};
 
 	return (
 		<>
@@ -63,6 +103,7 @@ const Collection = () => {
 							}}
 							onClick={() => {
 								setEditData(null);
+								setFormAction("create");
 								setOpenForm(true);
 							}}
 						>
@@ -77,27 +118,44 @@ const Collection = () => {
 				<CommonLayout title="Thông tin Bộ sưu tập" width={60}>
 					<div className="category-list">
 						<Table
-							collections={ROWS}
-							onEdit={(perm) => {
-								setEditData(perm);
+							collections={collections}
+							onEdit={(row) => {
+								setEditData(row);
+								setFormAction("update");
 								setOpenForm(true);
 							}}
 							onDelete={handleDelete}
-							onDetail={handleDetail}
+							onDetail={() => {}}
 							page={page}
-							totalPages={10}
+							totalPages={totalPages}
 							setPage={setPage}
-						></Table>
+							onEditImages={(row) => {
+								setEditData(row);
+								setFormAction("updateImages");
+								setOpenForm(true);
+							}}
+						/>
 					</div>
 				</CommonLayout>
+
 				<Form
 					open={openForm}
 					onClose={onCloseForm}
-					onSubmit={(data) =>
-						editData ? handleUpdate({ ...editData, ...data }) : handleCreate(data)
-					}
-					data={editData}
-				></Form>
+					action={formAction}
+					data={editData || undefined}
+					onSubmit={(body) => {
+						switch (formAction) {
+							case "create":
+								return handleCreate(body as FormData);
+							case "update":
+								return handleUpdate(editData?.id!, body as FormData);
+							case "updateImages":
+								return handleUpdateImage(editData?.id!, body as FormData);
+							default:
+								return Promise.resolve({ code: -1, message: "Thiếu dữ liệu" });
+						}
+					}}
+				/>
 			</BaseLayout>
 		</>
 	);

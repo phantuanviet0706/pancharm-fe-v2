@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import CartDrawer from "./CartDrawer";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Link as RouterLink } from "react-router-dom";
+import { formatVND } from "../../../utils/helper";
 
 export interface CardItemProps {
 	item: Object;
@@ -11,24 +12,24 @@ export interface CardItemProps {
 const CardItem = ({ item }: CardItemProps) => {
 	const [openCart, setOpenCart] = useState(false);
 
-	const dummyItems = [
-		{
-			id: 1,
-			name: "Gorgon Helios Black Silver",
-			variant: "Size 7",
-			price: 3750000,
-			quantity: 1,
-			image: "https://helios.vn/cdn/shop/files/HE-GorgonBlackSilver_1.jpg?v=1695460210",
-		},
-		{
-			id: 2,
-			name: "Kim Ngưu Helios Black Silver",
-			variant: "Default Title",
-			price: 650000,
-			quantity: 1,
-			image: "https://helios.vn/cdn/shop/files/HE-KimNguu_1.jpg?v=1695451231",
-		},
-	];
+	// const dummyItems = [
+	// 	{
+	// 		id: 1,
+	// 		name: "Gorgon Helios Black Silver",
+	// 		variant: "Size 7",
+	// 		price: 3750000,
+	// 		quantity: 1,
+	// 		image: "https://helios.vn/cdn/shop/files/HE-GorgonBlackSilver_1.jpg?v=1695460210",
+	// 	},
+	// 	{
+	// 		id: 2,
+	// 		name: "Kim Ngưu Helios Black Silver",
+	// 		variant: "Default Title",
+	// 		price: 650000,
+	// 		quantity: 1,
+	// 		image: "https://helios.vn/cdn/shop/files/HE-KimNguu_1.jpg?v=1695451231",
+	// 	},
+	// ];
 
 	return (
 		<div
@@ -51,12 +52,12 @@ const CardItem = ({ item }: CardItemProps) => {
 				<div className="p-2 text-center mb-2 text-[var(--color-card-bg)] group-hover:text-[var(--color-cream-bg)] pt-0 mt-2 transition-colors duration-300">
 					<div className="p-2 pt-0">
 						<p className="text-sm font-semibold uppercase">
-							Vòng tay đá phong thủy dây lắc bạc cao cấp
+							{item?.name}
 						</p>
 					</div>
 					<div className="flex justify-center px-2">
-						<p className="flex text-xl font-bold pl-1">
-							2,000,000
+						<p className="flex text-xl font-bold pl-1 gap-1">
+							{formatVND(item?.unitPrice ?? 0)}
 							<span className="">đ</span>
 						</p>
 					</div>
@@ -71,13 +72,13 @@ const CardItem = ({ item }: CardItemProps) => {
 								group-hover:!bg-[var(--color-cream-bg)] group-hover:!text-[var(--color-card-bg)]
 								font-bold uppercase rounded-md h-[2em] px-4"
 						>
-							<div className="font-[14px]">Thêm vào giỏ hàng</div>
+							<div className="font-[14px]">Mua ngay</div>
 						</Button>
 					</div>
 				</div>
 			</MUILink>
 
-			<CartDrawer open={openCart} onClose={() => setOpenCart(false)} items={dummyItems} />
+			{/* <CartDrawer open={openCart} onClose={() => setOpenCart(false)} items={listItems} /> */}
 		</div>
 	);
 };

@@ -1,11 +1,16 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import SwipeSlider from "../../components/SwipeSlider";
 import Slide from "./Slide/Slide";
 import { Video } from "../../components/Video";
 import BaseLayout from "../../components/BaseLayout";
 import { Button, Link } from "@mui/material";
+import { useCollections } from "../../../../hooks/useCollections";
+import { useProducts } from "../../../../hooks/useProducts";
 
 const Home = () => {
+	const { collections } = useCollections(useMemo(() => ({ limit: 2, isDefault: 1 }), []));
+	const { products } = useProducts(useMemo(() => ({ limit: 10 }), []));
+
 	return (
 		<>
 			<BaseLayout>
@@ -133,30 +138,35 @@ const Home = () => {
 					</section>
 
 					<div className="text-center">
-						<div className="uppercase text-3xl">Sản phẩm bán chạy</div>
-						<Slide />
+						<div className="uppercase text-3xl">Sản phẩm</div>
+						<Slide items={products} />
 					</div>
 
 					<div className="grid gap-5">
 						<div className="uppercase text-3xl text-center">Bộ sưu tập</div>
 						<div className="home-page-collections">
 							<div className="flex gap-5 px-15 justify-center">
-								<div className="relative w-[30em] h-[30em]">
-									<a className="relative" href="#">
-										<img src="/collection/01.jpeg" />
-										<span className="absolute bottom-6 left-[50%] -translate-x-1/2 rounded-lg bg-black/50 px-4 py-2 text-white text-base md:text-md">
-											BST Vòng đá phong thủy
-										</span>
-									</a>
-								</div>
-								<div className="relative w-[30em] h-[30em]">
-									<a className="relative" href="#">
-										<img src="/collection/02.JPG" />
-										<span className="absolute bottom-6 left-[50%] -translate-x-1/2 rounded-lg bg-black/50 px-4 py-2 text-white text-base md:text-md">
-											BST Vòng trà an
-										</span>
-									</a>
-								</div>
+								{collections.map((item, idx) => {
+									const defaultImage = item.collectionImages?.find((img) => {
+										return img.isDefault == true ? img : null;
+									});
+
+									return (
+										<div className="relative w-[30em] h-[30em]" key={idx}>
+											<a className="relative" href="#">
+												<img
+													src={
+														defaultImage?.path ?? "/collection/01.jpeg"
+													}
+													className="w-[30em] h-[30em]"
+												/>
+												<span className="absolute bottom-6 left-[50%] -translate-x-1/2 rounded-lg bg-black/50 px-4 py-2 text-white text-base md:text-md">
+													{item.name}
+												</span>
+											</a>
+										</div>
+									);
+								})}
 							</div>
 						</div>
 					</div>

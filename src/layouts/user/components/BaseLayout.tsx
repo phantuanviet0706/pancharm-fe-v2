@@ -10,9 +10,7 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
 	return (
 		<div className="user-layout-container space-y-5 lg:space-y-10 relative">
 			<Navbar />
-			<div className="mt-10">
-				{children}
-			</div>
+			<div className="mt-10">{children}</div>
 			<Footer />
 		</div>
 	);

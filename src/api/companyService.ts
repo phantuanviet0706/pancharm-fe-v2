@@ -1,5 +1,5 @@
-import axiosClient from './axiosClient';
-import { CompanyInfo } from './companyInfoService';
+import axiosClient from "./axiosClient";
+import { CompanyInfo } from "./companyInfoService";
 
 const API_URL = `${import.meta.env.VITE_APP_URL}/company`;
 
@@ -8,7 +8,10 @@ export interface Company {
 	address?: string;
 	avatar?: string;
 	taxcode?: string;
+	phone?: string;
+	email?: string;
 	bankAttachment?: string;
+	bankAttachmentFile?: File;
 	config?: JSON;
 	companyInfos: CompanyInfo[];
 }
@@ -18,7 +21,7 @@ export const updateCompany = async (payload: FormData | Partial<Company>) => {
 		const res = await axiosClient.put(API_URL, payload);
 		return res.data;
 	} catch (error) {
-		console.error('Failed to update company:', error);
+		console.error("Failed to update company:", error);
 		throw error;
 	}
 };
@@ -28,7 +31,7 @@ export const getCompany = async () => {
 		const res = await axiosClient.get(API_URL);
 		return res.data;
 	} catch (error) {
-		console.error('Failed to get company:', error);
+		console.error("Failed to get company:", error);
 		throw error;
 	}
 };
