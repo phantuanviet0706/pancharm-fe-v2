@@ -17,7 +17,7 @@ export interface Collection {
 	createdAt?: Date;
 	updatedAt?: Date;
 	createdBy?: number;
-	defaultImageId?: number;
+	defaultImageId?: number | null;
 }
 
 export interface CollectionQuery extends BaseQuery {

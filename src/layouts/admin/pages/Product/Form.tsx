@@ -64,7 +64,7 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 		try {
 			const payload: Partial<Product> =
 				action === "updateImages"
-					? {}
+					? { id: form.id, defaultImageId }
 					: {
 							name: form.name,
 							slug: form.slug,

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 export interface DateInputProps {
 	name?: string;
-	value?: string | Date | null;
+	value?: string | Date | null; // nếu undefined => uncontrolled
 	onChange?: (v: string) => void; // '' khi clear
 	required?: boolean;
 	disabled?: boolean;
@@ -22,6 +22,7 @@ const isValidDate = (s: string) => {
 	return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
 };
 const normalizeDateValue = (v: any) => {
+	if (v === undefined) return undefined; // ⚠️ giữ nguyên undefined để biết uncontrolled
 	if (!v) return "";
 	if (v instanceof Date && !isNaN(v.getTime())) return v.toISOString().slice(0, 10);
 	const s = String(v);
@@ -47,23 +48,30 @@ const DateInput: React.FC<DateInputProps> = ({
 		"focus:outline-none focus:ring-2 focus:ring-white/40 disabled:opacity-60 " +
 		"focus:bg-[var(--color-card-bg)] focus:placeholder-[var(--color-cream-bg)] focus:text-white";
 
-	const [buf, setBuf] = useState<string>(normalizeDateValue(value));
-	const [focused, setFocused] = useState(false);
-	const lastCommittedRef = useRef<string>(normalizeDateValue(value));
+	const normalized = normalizeDateValue(value);
+	const isControlled = normalized !== undefined; // undefined => uncontrolled
 
-	// Sync prop -> buffer khi không focus
+	const [buf, setBuf] = useState<string>(isControlled ? (normalized as string) : "");
+
+	const [focused, setFocused] = useState(false);
+	const lastCommittedRef = useRef<string>(isControlled ? (normalized as string) : "");
+
 	useEffect(() => {
-		const next = normalizeDateValue(value);
-		if (!focused && next !== lastCommittedRef.current) {
+		if (!isControlled) return;
+		const next = normalizeDateValue(value) as string;
+		// chỉ sync khi KHÔNG focus và prop khác với buffer hiện tại
+		if (!focused && next !== buf) {
 			setBuf(next);
+			lastCommittedRef.current = next ?? "";
 		}
-	}, [value, focused]);
+	}, [isControlled, value, focused, buf]);
 
 	return (
 		<div className={`mb-4 ${className ?? ""}`}>
 			<div className="relative">
 				<input
 					type="date"
+					name={name}
 					id={name}
 					value={buf}
 					min={min}
@@ -78,20 +86,19 @@ const DateInput: React.FC<DateInputProps> = ({
 							lastCommittedRef.current = "";
 							onChange?.("");
 						} else {
-							// không commit giá trị invalid, revert lại
+							// invalid => revert lại buffer về giá trị đã commit gần nhất
 							setBuf(lastCommittedRef.current);
 						}
 					}}
 					onChange={(e) => {
-						const s = e.target.value;
+						const s = e.target.value; // input type="date" luôn là 'YYYY-MM-DD' hoặc ''
 						setBuf(s);
-						if (isValidDate(s)) {
+						if (isValidDate(s) || s === "") {
 							lastCommittedRef.current = s;
 							onChange?.(s);
 						}
 					}}
 					inputMode="numeric"
-					pattern="\d{4}-\d{2}-\d{2}"
 					required={required}
 					disabled={disabled}
 					placeholder={placeholder}

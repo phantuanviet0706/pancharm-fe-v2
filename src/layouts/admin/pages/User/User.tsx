@@ -13,40 +13,7 @@ import {
 import { useUsers } from "../../../../hooks/useUsers";
 import ErrorPage from "../../../common/ErrorPage";
 
-const ROWS = [
-	{
-		id: 1,
-		username: "Phan Tuấn Việt",
-		email: "vietphan@gmail.com",
-		phone: "0987654321",
-		avatar: "",
-		status: "ACTIVE",
-	},
-	{
-		id: 2,
-		username: "Trần Ngọc Hiếu",
-		email: "hieutran@gmail.com",
-		phone: "0987654321",
-		avatar: "",
-		status: "ACTIVE",
-	},
-	{
-		id: 3,
-		username: "Nguyễn Phương Nam",
-		email: "namnguyen@gmail.com",
-		phone: "0987654321",
-		avatar: "",
-		status: "ACTIVE",
-	},
-	{
-		id: 4,
-		username: "Dương HỒng Hải",
-		email: "haiduong@gmail.com",
-		phone: "0987654321",
-		avatar: "",
-		status: "ACTIVE",
-	},
-];
+type FormAction = "create" | "update";
 
 const User = () => {
 	const [page, setPage] = useState(0);
@@ -58,15 +25,16 @@ const User = () => {
 
 	const [openForm, setOpenForm] = useState(false);
 	const [editData, setEditData] = useState<UserObject | null>(null);
+	const [formAction, setFormAction] = useState<FormAction>("create");
 
 	const [detailData, setDetailData] = useState<UserObject | null>(null);
 	const [detailOpen, setDetailOpen] = useState(false);
 
 	const onCloseForm = () => setOpenForm(false);
 
-	const handleCreate = async (data: Partial<UserObject>) => {
+	const handleCreate = async (data: FormData) => {
 		try {
-			const res = await createUser(data as Omit<UserObject, "id">);
+			const res = await createUser(data as any);
 			if (res?.code === 1 && res?.result) {
 				setUsers([...users, res.result]);
 			}
@@ -78,12 +46,12 @@ const User = () => {
 			};
 		}
 	};
-	const handleUpdate = async (data: UserObject) => {
-		if (!data.id) return { code: -1, message: "Missing ID for update" };
+	const handleUpdate = async (id: number, data: FormData) => {
 		try {
-			const res = await updateUser(data.id, data);
+			const res = await updateUser(id, data as any);
 			if (res?.code === 1 && res?.result) {
-				setUsers(users.map((p) => (p.id === res.result.id ? res.result.id : p)));
+				setUsers(users.map((p) => (p.id === res.result.id ? res.result : p)));
+				// window.location.reload();
 			}
 			return { code: res?.code, message: res?.message };
 		} catch (err: any) {
@@ -107,6 +75,7 @@ const User = () => {
 			};
 		}
 	};
+
 	const handleDetail = async (id: number) => {
 		if (!id) return { code: -1, message: "Missing ID to get detail" };
 		try {
@@ -132,6 +101,7 @@ const User = () => {
 						users={users}
 						onEdit={(perm) => {
 							setEditData(perm);
+							setFormAction("update");
 							setOpenForm(true);
 						}}
 						onDelete={handleDelete}
@@ -145,10 +115,18 @@ const User = () => {
 			<Form
 				open={openForm}
 				onClose={onCloseForm}
-				onSubmit={(data) =>
-					editData ? handleUpdate({ ...editData, ...data }) : handleCreate(data)
-				}
-				data={editData}
+				action={formAction}
+				data={editData || undefined}
+				onSubmit={(body) => {
+					switch (formAction) {
+						case "create":
+							return handleCreate(body as FormData);
+						case "update":
+							return handleUpdate(editData?.id!, body as FormData);
+						default:
+							return Promise.resolve({ code: -1, message: "Thiếu dữ liệu" });
+					}
+				}}
 			></Form>
 		</div>
 	);

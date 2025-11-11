@@ -31,6 +31,9 @@ const FieldDisplay = ({
 					<div
 						className="field-value line-clamp-1 overflow-hidden text-ellipsis leading-[20px]"
 						title={value?.toString()}
+						style={{
+							width: "calc(100% - 12vw)",
+						}}
 					>
 						{value}
 					</div>

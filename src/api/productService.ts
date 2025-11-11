@@ -23,6 +23,7 @@ export interface Product {
 	createdAt?: Date;
 	updatedAt?: Date;
 	createdBy?: number;
+	defaultImageId?: number | null;
 }
 
 export interface ProductQuery extends BaseQuery {}

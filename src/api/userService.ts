@@ -15,6 +15,7 @@ export interface User {
 	fullname: string;
 	dob?: Date;
 	avatar?: string;
+	avatarFile?: File;
 	address?: string;
 	phone?: string;
 	status?: UserStatus;

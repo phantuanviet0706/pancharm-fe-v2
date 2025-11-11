@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import BaseLayout from "../../components/BaseLayout";
 import CardItem from "../../components/CardItem";
 import { Pagination } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import { useProducts } from "../../../../hooks/useProducts";
 
 const Product = () => {
+	const [page, setPage] = useState(0);
+	const { products, totalPages, total } = useProducts(useMemo(() => ({ limit: 20, page }), []));
+
 	return (
 		<BaseLayout>
 			<div className="products-container px-[5em]">
@@ -126,7 +130,7 @@ const Product = () => {
 
 					{/* ==== PRODUCT LIST ==== */}
 					<div className="product-list w-[80%]">
-						<div className="product-description text-[var(--color-card-bg)] text-center mb-[1em]">
+						{/* <div className="product-description text-[var(--color-card-bg)] text-center mb-[1em]">
 							<div className="title uppercase text-[1.5em] font-semibold">
 								Vòng tay trà an đính đá
 							</div>
@@ -137,15 +141,22 @@ const Product = () => {
 								trọng, quý phái cho sản phẩm. Những mẫu vòng tay đính đá có thể được
 								làm từ các chất liệu như bạc, vàng.
 							</div>
-						</div>
+						</div> */}
 
 						<div className="product-items grid grid-cols-1 xl:grid-cols-3 gap-[2em] justify-items-center mb-[2em]">
-							{[1, 1, 1, 1, 1, 1].map((item, idx) => (
+							{products.map((item, idx) => (
 								<CardItem key={idx} item={item} />
 							))}
 						</div>
 
-						<Pagination className="flex justify-center" size="large" count={1} />
+						<Pagination
+							className="flex justify-center"
+							size="large"
+							count={totalPages}
+							page={page + 1}
+							onChange={(e, value) => setPage(value - 1)}
+							color="primary"
+						/>
 					</div>
 				</div>
 			</div>

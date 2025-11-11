@@ -3,6 +3,7 @@ import { Category, DEFAULT_CATEGORY, fetchData } from "../../../../api/categoryS
 import GenericDialog from "../../../../components/GenericDialog";
 import FormInput from "../../../../components/FormInput";
 import { useFormHandler } from "../../../../hooks/useFormHandler";
+import { toFormData } from "axios";
 
 interface FormProps {
 	open: boolean;
@@ -10,9 +11,10 @@ interface FormProps {
 	onSubmit: (data: any) => Promise<{ code: number; message: string }>;
 	data?: Category;
 	onSuccess?: (code: number, message: string) => void;
+	action?: "create" | "update";
 }
 
-const Form = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) => {
+const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: FormProps) => {
 	const { form, setForm, handleSubmit } = useFormHandler<Category>(
 		data ?? null,
 		DEFAULT_CATEGORY,
@@ -64,10 +66,85 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) => {
 		}
 	}, [form.parentId, form.parentName]);
 
+	const handleSave = async () => {
+		try {
+			const payload: Partial<Category> = {
+				name: form.name,
+				slug: form.slug,
+				parentId: form.parentId,
+			};
+
+			const fd = payload;
+			const res = await onSubmit(fd);
+			onSuccess?.(res.code, res.message);
+			if (res.code === 1) onClose();
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
+	let formContent: React.ReactNode = null;
+	let title = "";
+
+	switch (action) {
+		default:
+			title = data ? "Chỉnh sửa Danh mục" : "Thêm mới Danh mục";
+			formContent = (
+				<>
+					<div className="grid grid-cols-2 gap-4">
+						<FormInput
+							type="text"
+							label="Tên danh mục"
+							name="name"
+							value={form.name}
+							onChange={(v) => setForm((f) => ({ ...f, name: v }))}
+						/>
+						<FormInput
+							type="text"
+							label="Mã danh mục"
+							name="slug"
+							value={form.slug}
+							onChange={(v) => setForm((f) => ({ ...f, slug: v }))}
+						/>
+					</div>
+
+					<FormInput
+						type="autocomplete"
+						label="Danh mục cha"
+						name="category_id"
+						value={
+							form.parentId
+								? (catOpts.find((o) => o.id === form.parentId) ?? null)
+								: null
+						}
+						autocompleteOptions={catOpts}
+						loading={loadingCats}
+						onSearch={handleSearchCategory}
+						valueAs="object"
+						optionValueKey="id"
+						optionLabelKey="name"
+						onChange={(selected) => {
+							if (!selected)
+								return setForm((f) => ({
+									...f,
+									parentId: null as any,
+									parentName: "",
+								}));
+							setForm((f) => ({
+								...f,
+								parentId: selected.id,
+								parentName: selected.name ?? "",
+							}));
+						}}
+					/>
+				</>
+			);
+	}
+
 	return (
 		<GenericDialog
 			open={open}
-			title={data ? "Chỉnh sửa Danh mục" : "Thêm mới Danh mục"}
+			title={title}
 			onClose={onClose}
 			actions={[
 				{
@@ -83,53 +160,14 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) => {
 				{
 					label: "Lưu",
 					variant: "contained",
-					onClick: () =>
-						handleSubmit((res) => {
-							onSuccess?.(res.code, res.message);
-							if (res.code === 1) onClose();
-						}),
+					onClick: () => {
+						handleSave();
+					},
 					sx: { width: "50%", backgroundColor: "var(--color-card-bg)" },
 				},
 			]}
 		>
-			<div className="grid grid-cols-2 gap-4">
-				<FormInput
-					type="text"
-					label="Tên danh mục"
-					name="name"
-					value={form.name}
-					onChange={(v) => setForm((f) => ({ ...f, name: v }))}
-				/>
-				<FormInput
-					type="text"
-					label="Mã danh mục"
-					name="slug"
-					value={form.slug}
-					onChange={(v) => setForm((f) => ({ ...f, slug: v }))}
-				/>
-			</div>
-
-			<FormInput
-				type="autocomplete"
-				label="Danh mục cha"
-				name="category_id"
-				value={form.parentId ? (catOpts.find((o) => o.id === form.parentId) ?? null) : null}
-				autocompleteOptions={catOpts}
-				loading={loadingCats}
-				onSearch={handleSearchCategory}
-				valueAs="object"
-				optionValueKey="id"
-				optionLabelKey="name"
-				onChange={(selected) => {
-					if (!selected)
-						return setForm((f) => ({ ...f, parentId: null as any, parentName: "" }));
-					setForm((f) => ({
-						...f,
-						parentId: selected.id,
-						parentName: selected.name ?? "",
-					}));
-				}}
-			/>
+			{formContent}
 		</GenericDialog>
 	);
 };

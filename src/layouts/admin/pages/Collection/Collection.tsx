@@ -72,7 +72,6 @@ const Collection = () => {
 			const res = await updateCollectionImage(id, body as any);
 			if (res?.code === 1 && res?.result) {
 				setCollections(collections.map((p) => (p.id === res.result.id ? res.result : p)));
-				window.location.reload();
 			}
 			return { code: res?.code, message: res?.message };
 		} catch (err: any) {

@@ -94,7 +94,12 @@ const Company = () => {
 										Thông tin chuyển khoản
 									</div>
 								</div>
-								<div className="field-value line-clamp-1 overflow-hidden text-ellipsis leading-[20px]">
+								<div
+									className="field-value line-clamp-1 overflow-hidden text-ellipsis leading-[20px]"
+									style={{
+										width: "calc(100% - 12vw)",
+									}}
+								>
 									<FilePreviewButton
 										url={data?.bankAttachment || ""}
 										title="Thông tin chuyển khoản"

@@ -38,7 +38,7 @@ const CardItem = ({ item }: CardItemProps) => {
 		>
 			<MUILink
 				component={RouterLink}
-				to="/products/detail"
+				to={"/products/" + item?.id}
 				underline="none"
 				sx={{
 					"&:hover": {

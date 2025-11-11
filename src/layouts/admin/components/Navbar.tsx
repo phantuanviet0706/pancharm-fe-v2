@@ -71,6 +71,7 @@ const Navbar = () => {
 									color: "var(--color-cream-soft-hover)",
 								},
 							}}
+							target="_blank"
 						>
 							Hỗ trợ
 						</Box>

@@ -79,7 +79,6 @@ const Product = () => {
 			const res = await updateCollectionImage(id, body as any);
 			if (res?.code === 1 && res?.result) {
 				setProducts(products.map((p) => (p.id === res.result.id ? res.result : p)));
-				window.location.reload();
 			}
 			return { code: res?.code, message: res?.message };
 		} catch (err: any) {
@@ -101,7 +100,7 @@ const Product = () => {
 				<div className="product-list">
 					<ProductTable
 						products={products}
-						totalPages={10}
+						totalPages={totalPages}
 						page={page}
 						setPage={setPage}
 						onEdit={(row) => {
@@ -188,6 +187,7 @@ const Product = () => {
 									},
 								}}
 								onClick={() => {
+									setFormAction("create")
 									setEditData(null);
 									setOpenForm(true);
 								}}

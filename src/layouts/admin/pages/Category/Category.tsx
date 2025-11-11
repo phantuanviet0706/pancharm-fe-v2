@@ -14,12 +14,7 @@ import {
 import { useCategories } from "../../../../hooks/useCategories";
 import ErrorPage from "../../../common/ErrorPage";
 
-const ROWS = [
-	{ id: 1, name: "Trang sức nam", slug: "CAT-1" },
-	{ id: 2, name: "Trang sức nữ", slug: "CAT-2" },
-	{ id: 3, name: "Dây chuyền", slug: "CAT-3" },
-	{ id: 4, name: "Nhẫn", slug: "CAT-4" },
-];
+type FormAction = "create" | "update";
 
 const Category = () => {
 	const [page, setPage] = useState(0);
@@ -31,15 +26,16 @@ const Category = () => {
 
 	const [openForm, setOpenForm] = useState(false);
 	const [editData, setEditData] = useState<CategoryObject | null>(null);
+	const [formAction, setFormAction] = useState<FormAction>("create");
 
 	const [detailData, setDetailData] = useState<CategoryObject | null>(null);
 	const [detailOpen, setDetailOpen] = useState(false);
 
 	const onCloseForm = () => setOpenForm(false);
 
-	const handleCreate = async (data: Partial<CategoryObject>) => {
+	const handleCreate = async (data: FormData) => {
 		try {
-			const res = await createCategory(data as Omit<CategoryObject, "id">);
+			const res = await createCategory(data as any);
 			if (res?.code === 1 && res?.result) {
 				setCategories([...categories, res.result]);
 			}
@@ -51,10 +47,9 @@ const Category = () => {
 			};
 		}
 	};
-	const handleUpdate = async (data: CategoryObject) => {
-		if (!data.id) return { code: -1, message: "Missing ID for update" };
+	const handleUpdate = async (id: number, data: FormData) => {
 		try {
-			const res = await updateCategory(data.id, data);
+			const res = await updateCategory(id, data as any);
 			if (res?.code === 1 && res?.result) {
 				setCategories(categories.map((p) => (p.id === res.result.id ? res.result : p)));
 			}
@@ -94,7 +89,7 @@ const Category = () => {
 				<div className="category-list">
 					<Table
 						categories={categories}
-						totalPages={10}
+						totalPages={totalPages}
 						page={page}
 						setPage={setPage}
 						onEdit={(perm) => {
@@ -110,10 +105,18 @@ const Category = () => {
 			<Form
 				open={openForm}
 				onClose={onCloseForm}
-				onSubmit={(data) =>
-					editData ? handleUpdate({ ...editData, ...data }) : handleCreate(data)
-				}
-				data={editData}
+				action={formAction}
+				data={editData || undefined}
+				onSubmit={(body) => {
+					switch (formAction) {
+						case "create":
+							return handleCreate(body as FormData);
+						case "update":
+							return handleUpdate(editData?.id!, body as FormData);
+						default:
+							return Promise.resolve({ code: -1, message: "Thiếu dữ liệu" });
+					}
+				}}
 			></Form>
 		</>
 	);

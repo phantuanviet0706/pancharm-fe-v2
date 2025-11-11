@@ -60,6 +60,7 @@ const Table = ({ users, onEdit, onDelete, onDetail, totalPages, page, setPage }:
 										label: "Xóa",
 										onClick: () => onDelete(row?.id ? row.id : 0),
 										color: "red",
+										acl: row.username != "admin"
 									},
 								]}
 							/>
