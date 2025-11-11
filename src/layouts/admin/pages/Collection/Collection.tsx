@@ -13,6 +13,7 @@ import {
 } from "../../../../api/collectionService";
 import { useCollections } from "../../../../hooks/useCollections";
 import Form from "./Form";
+import ErrorPage from "../../../common/ErrorPage";
 
 type FormAction = "create" | "update" | "updateImages";
 
@@ -79,6 +80,59 @@ const Collection = () => {
 		}
 	};
 
+	let content = (
+		<>
+			<CommonLayout title="Thông tin Bộ sưu tập" width={60}>
+				<div className="category-list">
+					<Table
+						collections={collections}
+						onEdit={(row) => {
+							setEditData(row);
+							setFormAction("update");
+							setOpenForm(true);
+						}}
+						onDelete={handleDelete}
+						onDetail={() => {}}
+						page={page}
+						totalPages={totalPages}
+						setPage={setPage}
+						onEditImages={(row) => {
+							setEditData(row);
+							setFormAction("updateImages");
+							setOpenForm(true);
+						}}
+					/>
+				</div>
+			</CommonLayout>
+
+			<Form
+				open={openForm}
+				onClose={onCloseForm}
+				action={formAction}
+				data={editData || undefined}
+				onSubmit={(body) => {
+					switch (formAction) {
+						case "create":
+							return handleCreate(body as FormData);
+						case "update":
+							return handleUpdate(editData?.id!, body as FormData);
+						case "updateImages":
+							return handleUpdateImage(editData?.id!, body as FormData);
+						default:
+							return Promise.resolve({ code: -1, message: "Thiếu dữ liệu" });
+					}
+				}}
+			/>
+		</>
+	);
+
+	if (loading) {
+		content = <div className="my-10 mx-30">Đang tải thông tin bộ sưu tập...</div>;
+	}
+	if (error) {
+		content = <ErrorPage message="Không thể tải thông tin bộ sưu tập"></ErrorPage>;
+	}
+
 	return (
 		<>
 			<BaseLayout
@@ -115,47 +169,7 @@ const Collection = () => {
 					</div>
 				}
 			>
-				<CommonLayout title="Thông tin Bộ sưu tập" width={60}>
-					<div className="category-list">
-						<Table
-							collections={collections}
-							onEdit={(row) => {
-								setEditData(row);
-								setFormAction("update");
-								setOpenForm(true);
-							}}
-							onDelete={handleDelete}
-							onDetail={() => {}}
-							page={page}
-							totalPages={totalPages}
-							setPage={setPage}
-							onEditImages={(row) => {
-								setEditData(row);
-								setFormAction("updateImages");
-								setOpenForm(true);
-							}}
-						/>
-					</div>
-				</CommonLayout>
-
-				<Form
-					open={openForm}
-					onClose={onCloseForm}
-					action={formAction}
-					data={editData || undefined}
-					onSubmit={(body) => {
-						switch (formAction) {
-							case "create":
-								return handleCreate(body as FormData);
-							case "update":
-								return handleUpdate(editData?.id!, body as FormData);
-							case "updateImages":
-								return handleUpdateImage(editData?.id!, body as FormData);
-							default:
-								return Promise.resolve({ code: -1, message: "Thiếu dữ liệu" });
-						}
-					}}
-				/>
+				{content}
 			</BaseLayout>
 		</>
 	);

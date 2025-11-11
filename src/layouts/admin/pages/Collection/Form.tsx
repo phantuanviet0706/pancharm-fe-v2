@@ -41,8 +41,12 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 	}, [action, open, initialDefaultId]);
 
 	const toFormData = (payload: Partial<Collection>) => {
-		const fd = handleFormData({ ...data, collectionImages: undefined });
-		const mixed = (data as any)?.collectionImageFiles;
+		const fd = handleFormData({
+			...payload,
+			collectionImages: undefined,
+			collectionImageFiles: undefined,
+		});
+		const mixed = (payload as any)?.collectionImageFiles;
 		const arr: any[] = Array.isArray(mixed) ? mixed : mixed ? [mixed] : [];
 		arr.forEach((item) => {
 			if (isFile(item)) fd.append(UPLOAD_KEY, item, item.name);

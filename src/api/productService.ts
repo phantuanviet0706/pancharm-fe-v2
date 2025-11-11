@@ -18,9 +18,8 @@ export interface Product {
 	categoryName?: string;
 	config?: JSON;
 
-	existingImages?: ProductImage[];
 	productImages?: ProductImage[];
-	newImages?: File[];
+	productImageFiles?: File[];
 	createdAt?: Date;
 	updatedAt?: Date;
 	createdBy?: number;
@@ -97,6 +96,20 @@ export const getProduct = async (id: number) => {
 		return res.data;
 	} catch (error) {
 		console.error("Failed to get product:", error);
+		throw error;
+	}
+};
+
+export const updateCollectionImage = async (id: number, payload: Partial<Product>) => {
+	try {
+		const res = await axiosClient.put<Product>(`${API_URL}/${id}/image`, payload, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+		});
+		return res.data;
+	} catch (error) {
+		console.error("Failed to update product image:", error);
 		throw error;
 	}
 };

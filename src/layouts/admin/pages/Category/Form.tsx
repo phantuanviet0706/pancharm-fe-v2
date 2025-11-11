@@ -33,8 +33,10 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) => {
 		setLoadingCats(true);
 		try {
 			const res = await fetchData(keyword ? { keyword } : {});
-			console.log(res)
-			setCatOpts((res?.result?.content ?? []).map((it: any) => ({ id: it.id, name: it.name })));
+			console.log(res);
+			setCatOpts(
+				(res?.result?.content ?? []).map((it: any) => ({ id: it.id, name: it.name })),
+			);
 		} catch (e) {
 			console.error(e);
 			setCatOpts([]);
@@ -60,7 +62,6 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) => {
 		if (!exist) {
 			setCatOpts((prev) => [{ id: form.parentId, name: form.parentName || "" }, ...prev]);
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [form.parentId, form.parentName]);
 
 	return (
@@ -112,15 +113,11 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) => {
 				type="autocomplete"
 				label="Danh mục cha"
 				name="category_id"
-				value={
-					form.parentId
-						? { id: form.parentId, name: form.parentName || "" } // object để hiện đúng label khi edit
-						: null
-				}
-				autocompleteOptions={catOpts} // phải là array
+				value={form.parentId ? (catOpts.find((o) => o.id === form.parentId) ?? null) : null}
+				autocompleteOptions={catOpts}
 				loading={loadingCats}
-				onSearch={handleSearchCategory} // nếu search BE
-				valueAs="object" // hoặc valueAs="id" nếu bạn chỉ muốn id
+				onSearch={handleSearchCategory}
+				valueAs="object"
 				optionValueKey="id"
 				optionLabelKey="name"
 				onChange={(selected) => {

@@ -7,6 +7,7 @@ interface ActionItem {
 	onClick: () => void;
 	color?: string;
 	icon?: React.ReactNode;
+	acl?: boolean;
 }
 
 interface ActionMenuProps {
@@ -20,25 +21,32 @@ export default function ActionMenu({ actions }: ActionMenuProps) {
 	const handleClick = (e: React.MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget);
 	const handleClose = () => setAnchorEl(null);
 
+	const safeActions = actions.map((a) => ({ acl: true, ...a }));
+
 	return (
 		<>
 			<IconButton onClick={handleClick}>
 				<MoreVertIcon />
 			</IconButton>
 			<Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-				{actions.map((action, index) => (
-					<MenuItem
-						key={index}
-						onClick={() => {
-							handleClose();
-							action.onClick();
-						}}
-						style={action.color ? { color: action.color } : {}}
-					>
-						{action.icon && <span style={{ marginRight: 8 }}>{action.icon}</span>}
-						{action.label}
-					</MenuItem>
-				))}
+				{safeActions.map((action, index) => {
+					if (!action.acl) {
+						return;
+					}
+					return (
+						<MenuItem
+							key={index}
+							onClick={() => {
+								handleClose();
+								action.onClick();
+							}}
+							style={action.color ? { color: action.color } : {}}
+						>
+							{action.icon && <span style={{ marginRight: 8 }}>{action.icon}</span>}
+							{action.label}
+						</MenuItem>
+					);
+				})}
 			</Menu>
 		</>
 	);

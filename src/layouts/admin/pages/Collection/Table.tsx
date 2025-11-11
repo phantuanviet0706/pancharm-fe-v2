@@ -77,6 +77,8 @@ const Table = ({
 									{
 										label: "Chỉnh sửa hiển thị ảnh",
 										onClick: () => onEditImages(row),
+										acl:
+											row.collectionImages && row.collectionImages.length > 0,
 									},
 									{
 										label: "Xóa",

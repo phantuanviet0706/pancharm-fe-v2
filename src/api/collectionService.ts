@@ -14,7 +14,6 @@ export interface Collection {
 
 	collectionImages?: CollectionImage[];
 	collectionImageFiles?: File[];
-	newImages?: File[];
 	createdAt?: Date;
 	updatedAt?: Date;
 	createdBy?: number;

@@ -172,6 +172,7 @@ const FormInput: React.FC<FormInputProps> = ({
 							disabled={disabled}
 							className={`${pillStyle} peer placeholder-transparent`}
 							id={name}
+							name={name}
 							tabIndex={tabIndex}
 						/>
 						{renderFloatingLabel()}
@@ -191,6 +192,7 @@ const FormInput: React.FC<FormInputProps> = ({
 							disabled={disabled}
 							className={`${pillStyle} peer placeholder-transparent`}
 							id={name}
+							name={name}
 							tabIndex={tabIndex}
 						/>
 						{renderFloatingLabel()}
@@ -264,15 +266,12 @@ const FormInput: React.FC<FormInputProps> = ({
 				return (
 					<DateInput
 						name={name}
-						label={label}
 						value={value}
 						onChange={onChange}
 						required={required}
 						disabled={disabled}
 						isRounded={isRounded}
 						tabIndex={tabIndex}
-						// min="2020-01-01"
-						// max="2030-12-31"
 					/>
 				);
 
@@ -280,15 +279,12 @@ const FormInput: React.FC<FormInputProps> = ({
 				return (
 					<DatetimeInput
 						name={name}
-						label={label}
 						value={value}
 						onChange={onChange}
 						required={required}
 						disabled={disabled}
 						isRounded={isRounded}
 						tabIndex={tabIndex}
-						// min="2025-01-01T00:00"
-						// max="2026-12-31T23:59"
 					/>
 				);
 

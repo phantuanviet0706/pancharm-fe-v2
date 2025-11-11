@@ -14,16 +14,24 @@ axiosClient.interceptors.request.use((config) => {
 	return config;
 });
 
+let isRefreshing = false;
+
 axiosClient.interceptors.response.use(
 	(response) => response,
 	(error) => {
 		if (error.response?.status === 401) {
 			console.warn("[axiosClient] Token hết hạn hoặc không hợp lệ. Quay về trang đăng nhập.");
 
-			localStorage.removeItem("token");
-			sessionStorage.removeItem("token");
+			if (!isRefreshing) {
+				isRefreshing = true;
 
-			window.location.href = "/login";
+				localStorage.removeItem("token");
+				sessionStorage.removeItem("token");
+
+				setTimeout(() => {
+					window.location.href = "/login";
+				}, 100);
+			}
 		}
 		return Promise.reject(error);
 	},
