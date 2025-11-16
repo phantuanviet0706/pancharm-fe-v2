@@ -7,7 +7,7 @@ type OrderItemProps = {
 	imageUrl: string;
 	title: string;
 	subTitle?: string;
-	quantity: number;
+	quantity: number | undefined;
 	price: number;
 	className?: string;
 	onClick?: () => void;

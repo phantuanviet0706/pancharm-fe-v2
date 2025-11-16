@@ -24,8 +24,11 @@ import { User } from "../../../api/userService";
 import { href } from "react-router-dom";
 import { logout } from "../../../api/authService";
 import { ConfigContext } from "../../../contexts/ConfigProvider";
+import { useCartDialog } from "../pages/Cart/CartDialogProvider";
+import { getCookie } from "../../../utils/auth";
 
 const MAIN_MENU = [
+	{ key: "products", label: "Sản phẩm", href: "/products" },
 	{ key: "collections", label: "BST Mới", href: "/collections" },
 	{ key: "categories", label: "Trang sức" },
 	{ key: "gifts", label: "Quà tặng", href: "/gifts" },
@@ -74,15 +77,15 @@ const PROFILE_SETTINGS = [
 
 const handleLogout = async () => {
 	try {
-		const token = localStorage.getItem("token") || sessionStorage.getItem("token") || "";
-		const res = await logout({ token });
-		if (res?.code !== 1) {
-			throw res?.message ?? "Logout Failed";
-		}
-		return;
-	} catch (err: any) {
+		const token = getCookie("ACCESS_TOKEN") || "";
+
+		await logout({ token });
+	} catch (err) {
 		console.error("Failed to logout:", err);
-		throw err;
+	} finally {
+		document.cookie = "ACCESS_TOKEN=; Max-Age=0; Path=/;";
+
+		window.location.href = "/login";
 	}
 };
 
@@ -120,12 +123,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 	const [openProfile, setOpenProfile] = useState(false);
 	const profileRef = useRef<HTMLDivElement | null>(null);
 
-	const [openCart, setOpenCart] = useState(false);
-	const handleCloseCart = (_e?: object, reason?: "backdropClick" | "escapeKeyDown") => {
-		if (reason === "backdropClick" || reason === "escapeKeyDown") {
-			setOpenCart(false);
-		}
-	};
+	const { openCart } = useCartDialog();
 
 	const [openCategories, setOpenCategories] = useState(false);
 	const categoriesRef = useRef<HTMLDivElement | null>(null);
@@ -160,7 +158,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 		</>
 	);
 
-	const token = localStorage.getItem("token") || sessionStorage.getItem("token") || "";
+	const token = getCookie("ACCESS_TOKEN");
 	if (token) {
 		const { me, setMe } = useMe();
 		userProfileHtml = (
@@ -234,10 +232,10 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 	return (
 		<div className="sticky top-0 z-[1000] bg-[var(--color-cream-thick)] mb-0">
 			<div className="hidden lg:flex justify-between px-5 h-[30px] border-b font-normal text-base bg-[var(--color-card-bg)]">
-				{HEADER_ITEMS.map(
+				{/* {HEADER_ITEMS.map(
 					(item, idx) =>
 						item.display && (
-							<div key={idx} className={item.className + " top-0.5"}>
+							<div key={idx} className={item.className + " top-0.5 w-[33%]"}>
 								<div
 									className={
 										"flex items-center gap-1 " +
@@ -254,17 +252,17 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 												{item.title}:
 											</span>
 											<span className="text-sm">&nbsp;</span>
-											<span className="item-content text-sm">
+											<span className="item-content text-sm line-clamp-1 overflow-hidden text-ellipsis">
 												{item.content}
 											</span>
 										</a>
 									) : (
 										<span className="flex items-center text-[var(--color-cream-bg)]">
-											<span className="item-title text-sm">
+											<span className="item-title text-sm w-[10em]">
 												{item.title}:
 											</span>
 											<span className="text-sm">&nbsp;</span>
-											<span className="item-content text-sm">
+											<span className="item-content text-sm line-clamp-1 overflow-hidden text-ellipsis">
 												{item.content}
 											</span>
 										</span>
@@ -272,7 +270,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 								</div>
 							</div>
 						),
-				)}
+				)} */}
 			</div>
 
 			<Box component="nav" aria-label="Main navigation">
@@ -383,7 +381,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 						<IconButton
 							sx={{ color: "var(--color-card-bg)" }}
 							aria-label="Giỏ hàng"
-							onClick={() => setOpenCart(true)}
+							onClick={openCart}
 						>
 							<ShoppingCartIcon />
 						</IconButton>
@@ -392,36 +390,6 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 					</div>
 				</div>
 			</Box>
-
-			{/* Dialog Cart */}
-			<Dialog
-				open={openCart}
-				onClose={handleCloseCart}
-				fullWidth
-				maxWidth="sm"
-				PaperProps={{
-					sx: {
-						border: "5px solid var(--color-card-thick)",
-						borderRadius: "0px",
-						backgroundColor: "var(--color-cream-bg)",
-						boxShadow: "0 4px 24px rgba(0,0,0,0.1)",
-						color: "var(--color-card-bg)",
-						textAlign: "center",
-					},
-				}}
-			>
-				<DialogTitle
-					sx={{
-						textTransform: "uppercase",
-						fontWeight: 600,
-					}}
-				>
-					Giỏ hàng của bạn
-				</DialogTitle>
-				<DialogContent>
-					<Cart></Cart>
-				</DialogContent>
-			</Dialog>
 		</div>
 	);
 };

@@ -14,6 +14,10 @@ export interface Company {
 	bankAttachmentFile?: File;
 	config?: JSON;
 	companyInfos: CompanyInfo[];
+	bankConfig?: string;
+	bankName?: string;
+	bankAccountHolder?: string;
+	bankNumber?: string;
 }
 
 export const updateCompany = async (payload: FormData | Partial<Company>) => {

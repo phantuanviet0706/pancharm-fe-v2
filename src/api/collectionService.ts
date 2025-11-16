@@ -50,11 +50,7 @@ export const fetchData = async (query: CollectionQuery = {}) => {
 
 export const createCollection = async (payload: Omit<Collection, "id">) => {
 	try {
-		const res = await axiosClient.post<Collection>(API_URL, payload, {
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
-		});
+		const res = await axiosClient.post<Collection>(API_URL, payload);
 		return res.data;
 	} catch (error) {
 		console.error("Failed to create collection:", error);
@@ -64,11 +60,7 @@ export const createCollection = async (payload: Omit<Collection, "id">) => {
 
 export const updateCollection = async (id: number, payload: Partial<Collection>) => {
 	try {
-		const res = await axiosClient.put<Collection>(`${API_URL}/${id}`, payload, {
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
-		});
+		const res = await axiosClient.put<Collection>(`${API_URL}/${id}`, payload);
 		return res.data;
 	} catch (error) {
 		console.error("Failed to update collection:", error);
@@ -98,11 +90,7 @@ export const getCollection = async (id: number) => {
 
 export const updateCollectionImage = async (id: number, payload: Partial<Collection>) => {
 	try {
-		const res = await axiosClient.put<Collection>(`${API_URL}/${id}/image`, payload, {
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
-		});
+		const res = await axiosClient.put<Collection>(`${API_URL}/${id}/image`, payload);
 		return res.data;
 	} catch (error) {
 		console.error("Failed to update collection image:", error);

@@ -69,11 +69,7 @@ export const createProduct = async (payload: Omit<Product, "id">) => {
 
 export const updateProduct = async (id: number, payload: Partial<Product>) => {
 	try {
-		const res = await axiosClient.put<Product>(`${API_URL}/${id}`, payload, {
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
-		});
+		const res = await axiosClient.put<Product>(`${API_URL}/${id}`, payload);
 		return res.data;
 	} catch (error) {
 		console.error("Failed to update product:", error);
@@ -103,11 +99,7 @@ export const getProduct = async (id: number) => {
 
 export const updateCollectionImage = async (id: number, payload: Partial<Product>) => {
 	try {
-		const res = await axiosClient.put<Product>(`${API_URL}/${id}/image`, payload, {
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
-		});
+		const res = await axiosClient.put<Product>(`${API_URL}/${id}/image`, payload);
 		return res.data;
 	} catch (error) {
 		console.error("Failed to update product image:", error);

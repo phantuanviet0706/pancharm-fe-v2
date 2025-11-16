@@ -9,7 +9,7 @@ interface FormProps {
 	type?: string;
 	open: boolean;
 	onClose: () => void;
-	onSubmit: (data: any) => Promise<{ code: number; message: string }>;
+	onSubmit: (data: any) => any;
 	data?: User | null;
 	onSuccess?: (code: number, message: string) => void;
 	action?: "create" | "update";

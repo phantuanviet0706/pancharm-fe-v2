@@ -13,6 +13,7 @@ import UserCollection from "./layouts/user/pages/Collection/Collection";
 import Profile from "./layouts/user/pages/User/Profile";
 import UserInfo from "./layouts/user/pages/User/UserInfo";
 import Order from "./layouts/user/pages/Order/Order";
+import OrderSuccess from "./layouts/user/pages/Order/OrderSuccess";
 
 // Import Common Routes
 import NotFound from "./layouts/common/NotFound";
@@ -30,6 +31,12 @@ import Company from "./layouts/admin/pages/Company/Company";
 import CompanyInfo from "./layouts/admin/pages/Company/CompanyInfo/CompanyInfo";
 import AdminCollection from "./layouts/admin/pages/Collection/Collection";
 import AdminProduct from "./layouts/admin/pages/Product/Product";
+import AdminOrder from "./layouts/admin/pages/Order/Order";
+import { CartDialogProvider } from "./layouts/user/pages/Cart/CartDialogProvider";
+import OrderPayment from "./layouts/user/pages/Order/OrderPayment";
+
+// Require Admin route
+import RequireAdmin from "./guard/RequireAdmin";
 
 function App() {
 	const SAMPLE_DATA = [
@@ -60,59 +67,62 @@ function App() {
 
 	return (
 		<>
-			<Router>
-				{/* <Home /> */}
-				<Routes>
-					{/* User Routes */}
-					<Route path="/" element={<UserHome />} />
-					<Route path="/products">
-						<Route index element={<Product />} />
-						<Route path=":id" element={<ProductDetail />} />
-					</Route>
-					<Route path="/orders">
-						<Route index element={<Order />} />
-					</Route>
-					<Route path="/profile">
-						<Route index element={<Profile />}></Route>
-						<Route path="info" element={<UserInfo />}></Route>
-					</Route>
-
-					<Route path="/collections">
-						<Route index element={<UserCollection />}></Route>
-					</Route>
-
-					{SAMPLE_DATA.map((item, index) => (
-						<Route
-							key={index}
-							path={item.path}
-							element={<DynamicPage name={item.name} content={item.content} />}
-						/>
-					))}
-
-					{/* Admin Routes */}
-					<Route path="/admin">
-						<Route index element={<AdminHome />} />
-						<Route path="users" element={<User />} />
-						<Route path="others" element={<Other />}></Route>
-						<Route path="company">
-							<Route index element={<Company />}></Route>
-							<Route path="info" element={<CompanyInfo />}></Route>
+			<CartDialogProvider>
+					{/* <Home /> */}
+					<Routes>
+						{/* User Routes */}
+						<Route path="/" element={<UserHome />} />
+						<Route path="/products">
+							<Route index element={<Product />} />
+							<Route path=":id" element={<ProductDetail />} />
 						</Route>
-						<Route path="categories" element={<AdminCategory />}></Route>
-						<Route path="collections" element={<AdminCollection />}></Route>
-						<Route path="products" element={<AdminProduct />}></Route>
-					</Route>
+						<Route path="/orders">
+							<Route index element={<Order />} />
+							<Route path="payment" element={<OrderPayment />} />
+							<Route path="success" element={<OrderSuccess />} />
+						</Route>
+						<Route path="/profile">
+							<Route index element={<Profile />}></Route>
+							<Route path="info" element={<UserInfo />}></Route>
+						</Route>
 
-					{/* Common Routes */}
-					<Route path="/login" element={<LoginPage />}></Route>
-					<Route path="/register" element={<RegisterPage />}></Route>
-					<Route path="/forgot" element={<ForgotPage />}></Route>
-					<Route path="/change-password" element={<ChangePasswordPage />}></Route>
+						<Route path="/collections">
+							<Route index element={<UserCollection />}></Route>
+						</Route>
 
-					{/* Not Found */}
-					<Route path="*" element={<NotFound />} />
-				</Routes>
-			</Router>
+						{SAMPLE_DATA.map((item, index) => (
+							<Route
+								key={index}
+								path={item.path}
+								element={<DynamicPage name={item.name} content={item.content} />}
+							/>
+						))}
+
+						{/* Admin Routes */}
+						<Route path="/admin" element={<RequireAdmin />}>
+							{/* <Route index element={<AdminHome />} /> */}
+							<Route index element={<AdminOrder />} />
+							<Route path="users" element={<User />} />
+							<Route path="others" element={<Other />}></Route>
+							<Route path="company">
+								<Route index element={<Company />}></Route>
+								<Route path="info" element={<CompanyInfo />}></Route>
+							</Route>
+							<Route path="categories" element={<AdminCategory />}></Route>
+							<Route path="collections" element={<AdminCollection />}></Route>
+							<Route path="products" element={<AdminProduct />}></Route>
+						</Route>
+
+						{/* Common Routes */}
+						<Route path="/login" element={<LoginPage />}></Route>
+						<Route path="/register" element={<RegisterPage />}></Route>
+						<Route path="/forgot" element={<ForgotPage />}></Route>
+						<Route path="/change-password" element={<ChangePasswordPage />}></Route>
+
+						{/* Not Found */}
+						<Route path="*" element={<NotFound />} />
+					</Routes>
+			</CartDialogProvider>
 		</>
 	);
 }

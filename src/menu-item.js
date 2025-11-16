@@ -1,17 +1,32 @@
 const menuItems = {
 	items: [
+		// {
+		// 	id: "navigation",
+		// 	name: "Điều hướng",
+		// 	subtitle: "",
+		// 	type: "group",
+		// 	children: [
+		// 		{
+		// 			id: "dashboard",
+		// 			title: "Bảng điều khiển",
+		// 			type: "item",
+		// 			url: "/admin",
+		// 			icon: "home",
+		// 		},
+		// 	],
+		// },
 		{
-			id: "navigation",
-			name: "Điều hướng",
+			id: "orders",
+			name: "Chung",
 			subtitle: "",
 			type: "group",
 			children: [
 				{
-					id: "dashboard",
-					title: "Bảng điều khiển",
+					id: "order",
+					title: "Đơn hàng",
 					type: "item",
 					url: "/admin",
-					icon: "home",
+					icon: "shopping_cart",
 				},
 			],
 		},

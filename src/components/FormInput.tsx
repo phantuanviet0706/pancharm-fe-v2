@@ -27,6 +27,8 @@ export interface FormInputProps {
 	value?: any;
 	placeholder?: string;
 	required?: boolean;
+	/** Message lỗi custom khi required mà để trống */
+	requiredMessage?: string;
 	disabled?: boolean;
 	onChange?: (value: any) => void;
 	className?: string;
@@ -47,7 +49,7 @@ export interface FormInputProps {
 	freeSolo?: boolean;
 	tabIndex?: number;
 
-	showActions?: boolean
+	showActions?: boolean;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -57,6 +59,7 @@ const FormInput: React.FC<FormInputProps> = ({
 	value,
 	placeholder,
 	required,
+	requiredMessage,
 	disabled,
 	onChange,
 	className = "",
@@ -78,7 +81,7 @@ const FormInput: React.FC<FormInputProps> = ({
 
 	tabIndex,
 
-	showActions = false
+	showActions = false,
 }) => {
 	// ====== Styles ======
 	const pillStyle =
@@ -140,6 +143,43 @@ const FormInput: React.FC<FormInputProps> = ({
 	// ====== Password toggle ======
 	const [showPassword, setShowPassword] = useState(false);
 
+	// ====== Required validation ======
+	const [touched, setTouched] = useState(false);
+
+	const handleBlur = () => {
+		if (!touched) setTouched(true);
+	};
+
+	const isEmptyValue = (val: any) => {
+		if (val === null || val === undefined) return true;
+		if (typeof val === "string") return val.trim() === "";
+		return false;
+	};
+
+	let currentValForValidation: any = undefined;
+	switch (type) {
+		case "text":
+		case "password":
+		case "textarea":
+			currentValForValidation = onChange ? value : internalValue;
+			break;
+		case "int":
+		case "float":
+			currentValForValidation = value;
+			break;
+		case "autocomplete":
+			currentValForValidation = value;
+			break;
+		default:
+			currentValForValidation = value;
+	}
+
+	const hasError = !!required && touched && isEmptyValue(currentValForValidation);
+	const errorText =
+		hasError &&
+		(requiredMessage ||
+			(label ? `Vui lòng nhập ${label.toLowerCase()}` : "Vui lòng nhập thông tin"));
+
 	// ====== Floating label ======
 	const renderFloatingLabel = () =>
 		label ? (
@@ -167,6 +207,7 @@ const FormInput: React.FC<FormInputProps> = ({
 							inputMode="numeric"
 							value={displayValue}
 							onChange={(e) => handleNumberInput(e, false)}
+							onBlur={handleBlur}
 							placeholder={label}
 							required={required}
 							disabled={disabled}
@@ -187,6 +228,7 @@ const FormInput: React.FC<FormInputProps> = ({
 							inputMode="decimal"
 							value={displayValue}
 							onChange={(e) => handleNumberInput(e, true)}
+							onBlur={handleBlur}
 							placeholder={label}
 							required={required}
 							disabled={disabled}
@@ -211,6 +253,7 @@ const FormInput: React.FC<FormInputProps> = ({
 									? onChange(e.target.value)
 									: setInternalValue(e.target.value)
 							}
+							onBlur={handleBlur}
 							required={required}
 							disabled={disabled}
 							placeholder={label}
@@ -233,6 +276,7 @@ const FormInput: React.FC<FormInputProps> = ({
 									? onChange(e.target.value)
 									: setInternalValue(e.target.value)
 							}
+							onBlur={handleBlur}
 							required={required}
 							disabled={disabled}
 							placeholder=" "
@@ -295,6 +339,7 @@ const FormInput: React.FC<FormInputProps> = ({
 							type="checkbox"
 							checked={!!value}
 							onChange={(e) => onChange?.(e.target.checked)}
+							onBlur={handleBlur}
 							className="accent-[var(--color-card-bg)] w-5 h-5"
 							name={name}
 							disabled={disabled}
@@ -307,9 +352,9 @@ const FormInput: React.FC<FormInputProps> = ({
 			case "radio":
 				return (
 					<div className="flex flex-wrap gap-4">
-						{options?.map((opt) => (
+						{options?.map((opt, idx) => (
 							<label
-								key={String(opt.value)}
+								key={idx}
 								className={`flex items-center gap-2 cursor-pointer rounded-md border px-3 py-2
                 ${
 					value === opt.value
@@ -323,6 +368,7 @@ const FormInput: React.FC<FormInputProps> = ({
 									value={String(opt.value)}
 									checked={value === opt.value}
 									onChange={() => onChange?.(opt.value)}
+									onBlur={handleBlur}
 									disabled={disabled}
 									className="accent-[var(--color-card-bg)] w-4 h-4"
 									tabIndex={tabIndex}
@@ -342,6 +388,7 @@ const FormInput: React.FC<FormInputProps> = ({
 						name={name}
 						{...(value ? { value } : {})}
 						onChange={(e) => onChange?.(e.target.value)}
+						onBlur={handleBlur}
 						disabled={disabled}
 						className="w-12 h-10 cursor-pointer border border-gray-300 rounded-md"
 						tabIndex={tabIndex}
@@ -367,8 +414,8 @@ const FormInput: React.FC<FormInputProps> = ({
 				return (
 					<div className="select-opts">
 						<div className="opts-wrapper">
-							{options?.map((item) => (
-								<div key={String(item.value)} className="opts-item mb-2">
+							{options?.map((item, idx) => (
+								<div key={idx} className="opts-item mb-2">
 									<label
 										className={`flex items-center gap-2 cursor-pointer border px-3 py-2
                     ${
@@ -383,6 +430,7 @@ const FormInput: React.FC<FormInputProps> = ({
 											value={String(item.value)}
 											checked={value === item.value}
 											onChange={() => onChange?.(item.value)}
+											onBlur={handleBlur}
 											disabled={disabled}
 											className="accent-[var(--color-card-bg)] w-4 h-4"
 											tabIndex={tabIndex}
@@ -406,6 +454,7 @@ const FormInput: React.FC<FormInputProps> = ({
 									? onChange(e.target.value)
 									: setInternalValue(e.target.value)
 							}
+							onBlur={handleBlur}
 							required={required}
 							disabled={disabled}
 							placeholder={label}
@@ -441,6 +490,7 @@ const FormInput: React.FC<FormInputProps> = ({
 							theme="snow"
 							value={value || ""}
 							onChange={onChange}
+							onBlur={handleBlur as any}
 							placeholder={placeholder}
 							className="pc-quill__root"
 						/>
@@ -488,6 +538,7 @@ const FormInput: React.FC<FormInputProps> = ({
 						getOptionLabel={(o) => labelOf(o)}
 						isOptionEqualToValue={equals}
 						noOptionsText={loading ? "Đang tải..." : "Không có dữ liệu"}
+						onBlur={handleBlur}
 						slotProps={{
 							popper: { sx: { zIndex: 1700 } },
 							paper: { elevation: 4, sx: { maxHeight: 320 } },
@@ -499,6 +550,8 @@ const FormInput: React.FC<FormInputProps> = ({
 								placeholder={placeholder}
 								required={required}
 								disabled={disabled}
+								error={!!hasError}
+								helperText={hasError ? errorText : undefined}
 								variant="outlined"
 								size="medium"
 								sx={{
@@ -529,6 +582,7 @@ const FormInput: React.FC<FormInputProps> = ({
 							id={name}
 							value={value ?? ""}
 							onChange={(e) => onChange?.(e.target.value)}
+							onBlur={handleBlur}
 							placeholder=" "
 							required={required}
 							disabled={disabled}
@@ -555,6 +609,10 @@ const FormInput: React.FC<FormInputProps> = ({
 				</label>
 			)}
 			{renderInput()}
+			{/* Error inline (trừ autocomplete dùng helperText của MUI) */}
+			{type !== "autocomplete" && hasError && (
+				<p className="mt-1 text-xs text-red-500">{errorText}</p>
+			)}
 		</div>
 	);
 };

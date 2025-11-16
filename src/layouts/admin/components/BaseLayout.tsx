@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import { getCookie } from "../../../utils/auth";
 
 export interface BaseLayoutProps {
 	children?: React.ReactNode;
@@ -11,7 +13,7 @@ const BaseLayout = ({ children, headers }: BaseLayoutProps) => {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+		const token = getCookie("ACCESS_TOKEN");
 		if (!token) {
 			navigate("/");
 		}

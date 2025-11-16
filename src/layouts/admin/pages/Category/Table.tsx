@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import ActionMenu from "../../../../components/ActionMenu";
 import GenericTable from "../../../../components/GenericTable";
 import { Category } from "../../../../api/categoryService";
 import { Pagination } from "@mui/material";
+import GenericDialog from "../../../../components/GenericDialog";
 
 interface TableProps {
 	categories: Category[];
@@ -23,6 +24,28 @@ const Table = ({
 	page,
 	setPage,
 }: TableProps) => {
+	// ==== Confirm delete state ====
+	const [confirmOpen, setConfirmOpen] = useState(false);
+	const [pendingRow, setPendingRow] = useState<Category | null>(null);
+
+	const askDelete = (row: Category) => {
+		setPendingRow(row);
+		setConfirmOpen(true);
+	};
+
+	const handleConfirmDelete = async () => {
+		if (pendingRow?.id != null) {
+			await onDelete(pendingRow.id);
+		}
+		setConfirmOpen(false);
+		setPendingRow(null);
+	};
+
+	const handleCancelDelete = () => {
+		setConfirmOpen(false);
+		setPendingRow(null);
+	};
+
 	return (
 		<div>
 			<GenericTable
@@ -51,7 +74,7 @@ const Table = ({
 									},
 									{
 										label: "Xóa",
-										onClick: () => onDelete(row?.id ? row.id : 0),
+										onClick: () => askDelete(row),
 										color: "red",
 									},
 								]}
@@ -69,6 +92,41 @@ const Table = ({
 					color="primary"
 				/>
 			</div>
+
+			<GenericDialog
+				open={confirmOpen}
+				title="Xác nhận xóa"
+				onClose={handleCancelDelete}
+				actions={[
+					{
+						label: "Hủy",
+						variant: "outlined",
+						onClick: handleCancelDelete,
+						sx: {
+							width: "50%",
+							borderColor: "var(--color-card-bg)",
+							color: "var(--color-card-bg)",
+						},
+					},
+					{
+						label: "Xóa",
+						variant: "contained",
+						onClick: handleConfirmDelete,
+						sx: { width: "50%", backgroundColor: "#dc2626" },
+					},
+				]}
+			>
+				<div className="text-[14px] leading-6">
+					Bạn có chắc muốn xóa danh mục
+					{pendingRow?.name ? (
+						<>
+							{" "}
+							<b>{pendingRow.name}</b>
+						</>
+					) : null}
+					? Hành động này không thể hoàn tác.
+				</div>
+			</GenericDialog>
 		</div>
 	);
 };

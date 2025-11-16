@@ -6,10 +6,12 @@ import BaseLayout from "../../components/BaseLayout";
 import { Button, Link } from "@mui/material";
 import { useCollections } from "../../../../hooks/useCollections";
 import { useProducts } from "../../../../hooks/useProducts";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
 	const { collections } = useCollections(useMemo(() => ({ limit: 2, isDefault: 1 }), []));
 	const { products } = useProducts(useMemo(() => ({ limit: 10 }), []));
+	const navigate = useNavigate();
 
 	return (
 		<>
@@ -26,28 +28,20 @@ const Home = () => {
 									backgroundColor: "var(--color-cream-bg)",
 									"&:hover": {
 										backgroundColor: "var(--color-cream-bg-hover)",
+										color: "var(--color-card-bg-hover)",
 									},
 									borderRadius: "9999px",
 									paddingInline: "32px",
 									paddingBlock: "10px",
 									boxShadow: "0 4px 20px rgba(0,0,0,0.25)",
+									color: "var(--color-card-bg)",
+									fontSize: "1em",
+									fontWeight: "700",
+									letterSpacing: "0.05em",
 								}}
+								onClick={() => navigate("/products")}
 							>
-								<Link
-									href="/products"
-									underline="none"
-									sx={{
-										color: "var(--color-card-bg)",
-										"&:hover": {
-											color: "var(--color-card-bg-hover)",
-										},
-										fontSize: "1.25em",
-										fontWeight: "700",
-										letterSpacing: "0.05em",
-									}}
-								>
-									Mua ngay
-								</Link>
+								Mua ngay
 							</Button>
 						</div>
 					</Video>
@@ -137,39 +131,44 @@ const Home = () => {
 						</div>
 					</section>
 
-					<div className="text-center">
-						<div className="uppercase text-3xl">Sản phẩm</div>
-						<Slide items={products} />
-					</div>
+					{products.length > 0 && (
+						<div className="text-center">
+							<div className="uppercase text-3xl">Sản phẩm</div>
+							<Slide items={products} />
+						</div>
+					)}
 
-					<div className="grid gap-5">
-						<div className="uppercase text-3xl text-center">Bộ sưu tập</div>
-						<div className="home-page-collections">
-							<div className="flex gap-5 px-15 justify-center">
-								{collections.map((item, idx) => {
-									const defaultImage = item.collectionImages?.find((img) => {
-										return img.isDefault == true ? img : null;
-									});
+					{collections.length > 0 && (
+						<div className="grid gap-5">
+							<div className="uppercase text-3xl text-center">Bộ sưu tập</div>
+							<div className="home-page-collections">
+								<div className="flex gap-5 px-15 justify-center">
+									{collections.map((item, idx) => {
+										const defaultImage = item.collectionImages?.find((img) => {
+											return img.isDefault == true ? img : null;
+										});
 
-									return (
-										<div className="relative w-[30em] h-[30em]" key={idx}>
-											<a className="relative" href="#">
-												<img
-													src={
-														defaultImage?.path ?? "/collection/01.jpeg"
-													}
-													className="w-[30em] h-[30em]"
-												/>
-												<span className="absolute bottom-6 left-[50%] -translate-x-1/2 rounded-lg bg-black/50 px-4 py-2 text-white text-base md:text-md">
-													{item.name}
-												</span>
-											</a>
-										</div>
-									);
-								})}
+										return (
+											<div className="relative w-[30em] h-[30em]" key={idx}>
+												<a className="relative" href="#">
+													<img
+														src={
+															defaultImage?.path ??
+															"/collection/01.jpeg"
+														}
+														className="w-[30em] h-[30em]"
+													/>
+													<span className="absolute bottom-6 left-[50%] -translate-x-1/2 rounded-lg bg-black/50 px-4 py-2 text-white text-base md:text-md">
+														{item.name}
+													</span>
+												</a>
+											</div>
+										);
+									})}
+								</div>
 							</div>
 						</div>
-					</div>
+					)}
 				</div>
 			</BaseLayout>
 		</>

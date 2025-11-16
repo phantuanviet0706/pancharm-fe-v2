@@ -11,7 +11,7 @@ const UPLOAD_KEY = "collectionImages";
 interface FormProps {
 	open: boolean;
 	onClose: () => void;
-	onSubmit: (data: any) => Promise<{ code: number; message: string }>;
+	onSubmit: (data: any) => any;
 	data?: Collection;
 	onSuccess?: (code: number, message: string) => void;
 	action?: "create" | "update" | "updateImages";

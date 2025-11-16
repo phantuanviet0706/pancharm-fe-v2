@@ -1,11 +1,13 @@
 import axios from "axios";
+import { getCookie } from "../utils/auth";
 
 const axiosClient = axios.create({
 	baseURL: import.meta.env.VITE_APP_URL,
+	withCredentials: true,
 });
 
 axiosClient.interceptors.request.use((config) => {
-	const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+	const token = getCookie("ACCESS_TOKEN");
 
 	if (token) {
 		config.headers.Authorization = `Bearer ${token}`;
@@ -25,8 +27,7 @@ axiosClient.interceptors.response.use(
 			if (!isRefreshing) {
 				isRefreshing = true;
 
-				localStorage.removeItem("token");
-				sessionStorage.removeItem("token");
+				document.cookie = "ACCESS_TOKEN=; Max-Age=0; path=/;";
 
 				setTimeout(() => {
 					window.location.href = "/login";

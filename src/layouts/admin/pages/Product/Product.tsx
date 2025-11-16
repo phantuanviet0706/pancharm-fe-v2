@@ -14,10 +14,13 @@ import {
 } from "../../../../api/productService";
 import { useProducts } from "../../../../hooks/useProducts";
 import ErrorPage from "../../../common/ErrorPage";
+import { useSnackbar } from "../../../../contexts/SnackbarProvider";
 
 type FormAction = "create" | "update" | "updateImages";
 
 const Product = () => {
+	const { showSnackbar } = useSnackbar();
+
 	const [page, setPage] = useState(0);
 	const [searchText, setSearchText] = useState("");
 
@@ -39,13 +42,17 @@ const Product = () => {
 			const res = await createProduct(body as any);
 			if (res?.code === 1 && res?.result) {
 				setProducts([...products, res.result]);
+				setOpenForm(false);
 			}
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return {
-				code: -1,
+			return showSnackbar({
 				message: err?.response?.data?.message || err.message,
-			};
+				severity: "error",
+			});
 		}
 	};
 	const handleUpdate = async (id: number, body: FormData) => {
@@ -53,24 +60,34 @@ const Product = () => {
 			const res = await updateProduct(id, body as any);
 			if (res?.code === 1 && res?.result) {
 				setProducts(products.map((p) => (p.id === res.result.id ? res.result : p)));
+				setOpenForm(false);
 			}
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return { code: -1, message: err?.response?.data?.message || err.message };
+			return showSnackbar({
+				message: err?.response?.data?.message || err.message,
+				severity: "error",
+			});
 		}
 	};
 	const handleDelete = async (id: number) => {
 		try {
 			const res = await deleteProduct(id);
 			if (res?.code === 1) {
-				return window.location.reload();
+				setProducts(products.filter((p) => p.id !== id));
 			}
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return {
-				code: -1,
+			return showSnackbar({
 				message: err?.response?.data?.message || err.message,
-			};
+				severity: "error",
+			});
 		}
 	};
 
@@ -79,10 +96,17 @@ const Product = () => {
 			const res = await updateCollectionImage(id, body as any);
 			if (res?.code === 1 && res?.result) {
 				setProducts(products.map((p) => (p.id === res.result.id ? res.result : p)));
+				setOpenForm(false);
 			}
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return { code: -1, message: err?.response?.data?.message || err.message };
+			return showSnackbar({
+				message: err?.response?.data?.message || err.message,
+				severity: "error",
+			});
 		}
 	};
 
@@ -187,7 +211,7 @@ const Product = () => {
 									},
 								}}
 								onClick={() => {
-									setFormAction("create")
+									setFormAction("create");
 									setEditData(null);
 									setOpenForm(true);
 								}}

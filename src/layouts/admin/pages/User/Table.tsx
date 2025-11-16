@@ -43,29 +43,29 @@ const Table = ({ users, onEdit, onDelete, onDetail, totalPages, page, setPage }:
 					{ key: "email", label: "Email" },
 					{ key: "phone", label: "Số điện thoại" },
 					{ key: "status", label: "Trạng thái" },
-					{
-						key: "actions",
-						label: "Thao tác",
-						align: "right",
-						width: "100px",
-						headerStyle: { marginRight: "10px" },
-						render: (row) => (
-							<ActionMenu
-								actions={[
-									{
-										label: "Sửa",
-										onClick: () => onEdit(row),
-									},
-									{
-										label: "Xóa",
-										onClick: () => onDelete(row?.id ? row.id : 0),
-										color: "red",
-										acl: row.username != "admin"
-									},
-								]}
-							/>
-						),
-					},
+					// {
+					// 	key: "actions",
+					// 	label: "Thao tác",
+					// 	align: "right",
+					// 	width: "100px",
+					// 	headerStyle: { marginRight: "10px" },
+					// 	render: (row) => (
+					// 		<ActionMenu
+					// 			actions={[
+					// 				{
+					// 					label: "Sửa",
+					// 					onClick: () => onEdit(row),
+					// 				},
+					// 				{
+					// 					label: "Xóa",
+					// 					onClick: () => onDelete(row?.id ? row.id : 0),
+					// 					color: "red",
+					// 					acl: row.username != "admin"
+					// 				},
+					// 			]}
+					// 		/>
+					// 	),
+					// },
 				]}
 			></GenericTable>
 

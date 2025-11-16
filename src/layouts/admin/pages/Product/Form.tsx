@@ -13,7 +13,7 @@ const UPLOAD_KEY = "productImages";
 interface FormProps {
 	open: boolean;
 	onClose: () => void;
-	onSubmit: (data: any) => Promise<{ code: number; message: string }>;
+	onSubmit: (data: any) => any;
 	data?: Product;
 	onSuccess?: (code: number, message: string) => void;
 	action?: "create" | "update" | "updateImages";

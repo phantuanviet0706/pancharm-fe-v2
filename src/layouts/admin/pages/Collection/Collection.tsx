@@ -14,10 +14,13 @@ import {
 import { useCollections } from "../../../../hooks/useCollections";
 import Form from "./Form";
 import ErrorPage from "../../../common/ErrorPage";
+import { useSnackbar } from "../../../../contexts/SnackbarProvider";
 
 type FormAction = "create" | "update" | "updateImages";
 
 const Collection = () => {
+	const { showSnackbar } = useSnackbar();
+
 	const [page, setPage] = useState(0);
 	const [searchText, setSearchText] = useState("");
 
@@ -36,11 +39,17 @@ const Collection = () => {
 			const res = await createCollection(body as any);
 			if (res?.code === 1 && res?.result) {
 				setCollections([...collections, res.result]);
-				window.location.reload();
+				setOpenForm(false);
 			}
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return { code: -1, message: err?.response?.data?.message || err.message };
+			return showSnackbar({
+				message: err?.response?.data?.message || err.message,
+				severity: "error",
+			});
 		}
 	};
 
@@ -49,11 +58,17 @@ const Collection = () => {
 			const res = await updateCollection(id, body as any);
 			if (res?.code === 1 && res?.result) {
 				setCollections(collections.map((p) => (p.id === res.result.id ? res.result : p)));
-				window.location.reload();
+				setOpenForm(false);
 			}
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return { code: -1, message: err?.response?.data?.message || err.message };
+			return showSnackbar({
+				message: err?.response?.data?.message || err.message,
+				severity: "error",
+			});
 		}
 	};
 
@@ -61,9 +76,15 @@ const Collection = () => {
 		try {
 			const res = await deleteCollection(id);
 			if (res?.code === 1) window.location.reload();
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return { code: -1, message: err?.response?.data?.message || err.message };
+			return showSnackbar({
+				message: err?.response?.data?.message || err.message,
+				severity: "error",
+			});
 		}
 	};
 
@@ -73,9 +94,15 @@ const Collection = () => {
 			if (res?.code === 1 && res?.result) {
 				setCollections(collections.map((p) => (p.id === res.result.id ? res.result : p)));
 			}
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return { code: -1, message: err?.response?.data?.message || err.message };
+			return showSnackbar({
+				message: err?.response?.data?.message || err.message,
+				severity: "error",
+			});
 		}
 	};
 

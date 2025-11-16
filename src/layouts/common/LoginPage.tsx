@@ -17,16 +17,23 @@ const LoginPage = () => {
 	const handleLogin = async () => {
 		try {
 			const res = await login({ username, password, remeber: rememberMe });
+
 			if (res?.code === 1 && res?.result) {
 				const result = res.result;
-				if (rememberMe) {
-					localStorage.setItem("token", result.token);
-				} else {
-					sessionStorage.setItem("token", result.token);
+				const token = result.token;
+
+				if (token) {
+					if (rememberMe) {
+						const maxAge = 60 * 60 * 24 * 30;
+						document.cookie = `ACCESS_TOKEN=${token}; Path=/; Max-Age=${maxAge};`;
+					} else {
+						document.cookie = `ACCESS_TOKEN=${token}; Path=/;`;
+					}
 				}
 
 				navigate("/");
 			}
+
 			return { code: res?.code, message: res?.message };
 		} catch (err: any) {
 			return {

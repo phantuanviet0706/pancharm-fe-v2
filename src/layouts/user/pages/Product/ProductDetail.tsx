@@ -8,6 +8,8 @@ import CardItem from "../../components/CardItem";
 import { useNavigate, useParams } from "react-router-dom";
 import { getProduct, Product } from "../../../../api/productService";
 import { formatVND } from "../../../../utils/helper";
+import { useSnackbar } from "../../../../contexts/SnackbarProvider";
+import { getCart, saveCart } from "../../../../utils/cart";
 
 const SLIDES = [
 	{
@@ -28,6 +30,9 @@ const SLIDES = [
 ];
 
 const ProductDetail = () => {
+	// ---- Declare state snackbar ----
+	const { showSnackbar } = useSnackbar();
+
 	// ---- Get Product ----
 	const { id } = useParams<{ id: string }>();
 	const [product, setProduct] = useState<Product | null>(null);
@@ -57,7 +62,8 @@ const ProductDetail = () => {
 				mode: "buy-now",
 				item: {
 					productId: product?.id,
-					quantity: 1,
+					quantity: quantity,
+					unitPrice: product?.unitPrice,
 				},
 			},
 		});
@@ -65,7 +71,26 @@ const ProductDetail = () => {
 
 	// ~ Handle add to cart ~
 	const handleAddToCart = () => {
-		alert("Cart");
+		const carts = getCart();
+
+		const idx = carts.findIndex((c) => c.productId === product?.id);
+
+		if (idx >= 0) {
+			carts[idx].quantity += quantity;
+		} else {
+			carts.push({
+				productId: product?.id ?? 0,
+				unitPrice: product?.unitPrice ?? 0,
+				quantity,
+			});
+		}
+
+		saveCart(carts);
+
+		showSnackbar({
+			message: "Thêm sản phẩm vào giỏ hàng thành công!",
+			severity: "success",
+		});
 	};
 
 	// ---- Scroll description ----
@@ -115,6 +140,9 @@ const ProductDetail = () => {
 		};
 	}, []);
 
+	// ---- Quantity config ----
+	const [quantity, setQuantity] = useState(1);
+
 	return (
 		<BaseLayout>
 			<div ref={rootRef} style={{ margin: 0 }}></div>
@@ -143,9 +171,9 @@ const ProductDetail = () => {
 								<div>
 									<InputNumber
 										min={1}
-										max={product?.quantity || 1}
+										max={product?.quantity || quantity}
 										initial={1}
-										// onChange={}
+										onChange={(e) => setQuantity(e)}
 									/>
 								</div>
 							</div>

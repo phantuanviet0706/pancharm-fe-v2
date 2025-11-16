@@ -22,14 +22,14 @@ const FieldDisplay = ({
 		<div className="field-display-container">
 			<div className="field-display-wrapper">
 				<div className={`display-field ${inlineStyle}`}>
-					<div className={`field-label mb-2 w-[12vw] items-center ${labelIconStyle}`}>
+					<div className={`field-label mb-2 w-[12vw] items-start ${labelIconStyle}`}>
 						{icon && <div className="label-icon w-[20px] h-[20px]">{icon}</div>}
 						<div className="label-content uppercase font-semibold text-[13px] leading-[20px]">
 							{label}
 						</div>
 					</div>
 					<div
-						className="field-value line-clamp-1 overflow-hidden text-ellipsis leading-[20px]"
+						className="field-value leading-[20px]"
 						title={value?.toString()}
 						style={{
 							width: "calc(100% - 12vw)",

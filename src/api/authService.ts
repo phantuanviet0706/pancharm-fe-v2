@@ -36,9 +36,6 @@ export const logout = async (data: AuthLogout) => {
 		console.error('Failed to logout:', err);
 		throw err;
 	} finally {
-		localStorage.removeItem('token');
-		sessionStorage.removeItem('token');
-
 		window.location.assign('/');
 	}
 };

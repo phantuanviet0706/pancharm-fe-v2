@@ -90,6 +90,8 @@ export default function GenericPreviewDialog({
 									maxWidth: "100%",
 									maxHeight: "60vh",
 									objectFit: "contain",
+									minWidth: "20em",
+									minHeight: "20em"
 								}}
 							/>
 						</Box>

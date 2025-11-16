@@ -13,10 +13,13 @@ import {
 } from "../../../../api/categoryService";
 import { useCategories } from "../../../../hooks/useCategories";
 import ErrorPage from "../../../common/ErrorPage";
+import { useSnackbar } from "../../../../contexts/SnackbarProvider";
 
 type FormAction = "create" | "update";
 
 const Category = () => {
+	const { showSnackbar } = useSnackbar();
+
 	const [page, setPage] = useState(0);
 	const [searchText, setSearchText] = useState("");
 
@@ -38,13 +41,17 @@ const Category = () => {
 			const res = await createCategory(data as any);
 			if (res?.code === 1 && res?.result) {
 				setCategories([...categories, res.result]);
+				setOpenForm(false);
 			}
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return {
-				code: -1,
+			return showSnackbar({
 				message: err?.response?.data?.message || err.message,
-			};
+				severity: "error",
+			});
 		}
 	};
 	const handleUpdate = async (id: number, data: FormData) => {
@@ -52,13 +59,17 @@ const Category = () => {
 			const res = await updateCategory(id, data as any);
 			if (res?.code === 1 && res?.result) {
 				setCategories(categories.map((p) => (p.id === res.result.id ? res.result : p)));
+				setOpenForm(false);
 			}
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return {
-				code: -1,
+			return showSnackbar({
 				message: err?.response?.data?.message || err.message,
-			};
+				severity: "error",
+			});
 		}
 	};
 	const handleDelete = async (id: number) => {
@@ -67,12 +78,15 @@ const Category = () => {
 			if (res?.code === 1) {
 				setCategories(categories.filter((p) => p.id !== id));
 			}
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return {
-				code: -1,
+			return showSnackbar({
 				message: err?.response?.data?.message || err.message,
-			};
+				severity: "error",
+			});
 		}
 	};
 	const handleDetail = async (id: number) => {

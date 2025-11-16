@@ -8,14 +8,14 @@ import { toFormData } from "axios";
 interface FormProps {
 	open: boolean;
 	onClose: () => void;
-	onSubmit: (data: any) => Promise<{ code: number; message: string }>;
+	onSubmit: (data: any) => any;
 	data?: Category;
 	onSuccess?: (code: number, message: string) => void;
 	action?: "create" | "update";
 }
 
 const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: FormProps) => {
-	const { form, setForm, handleSubmit } = useFormHandler<Category>(
+	const { form, setForm } = useFormHandler<Category>(
 		data ?? null,
 		DEFAULT_CATEGORY,
 		onSubmit,

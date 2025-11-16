@@ -12,10 +12,13 @@ import {
 } from "../../../../api/userService";
 import { useUsers } from "../../../../hooks/useUsers";
 import ErrorPage from "../../../common/ErrorPage";
+import { useSnackbar } from "../../../../contexts/SnackbarProvider";
 
 type FormAction = "create" | "update";
 
 const User = () => {
+	const { showSnackbar } = useSnackbar();
+
 	const [page, setPage] = useState(0);
 	const [searchText, setSearchText] = useState("");
 
@@ -37,13 +40,17 @@ const User = () => {
 			const res = await createUser(data as any);
 			if (res?.code === 1 && res?.result) {
 				setUsers([...users, res.result]);
+				setOpenForm(false);
 			}
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return {
-				code: -1,
+			return showSnackbar({
 				message: err?.response?.data?.message || err.message,
-			};
+				severity: "error",
+			});
 		}
 	};
 	const handleUpdate = async (id: number, data: FormData) => {
@@ -51,14 +58,17 @@ const User = () => {
 			const res = await updateUser(id, data as any);
 			if (res?.code === 1 && res?.result) {
 				setUsers(users.map((p) => (p.id === res.result.id ? res.result : p)));
-				// window.location.reload();
+				setOpenForm(false);
 			}
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return {
-				code: -1,
+			return showSnackbar({
 				message: err?.response?.data?.message || err.message,
-			};
+				severity: "error",
+			});
 		}
 	};
 	const handleDelete = async (id: number) => {
@@ -67,12 +77,15 @@ const User = () => {
 			if (res?.code === 1) {
 				setUsers(users.filter((p) => p.id !== id));
 			}
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return {
-				code: -1,
+			return showSnackbar({
 				message: err?.response?.data?.message || err.message,
-			};
+				severity: "error",
+			});
 		}
 	};
 
@@ -84,12 +97,15 @@ const User = () => {
 				setDetailData(res.result);
 				setDetailOpen(true);
 			}
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return {
-				code: -1,
+			return showSnackbar({
 				message: err?.response?.data?.message || err.message,
-			};
+				severity: "error",
+			});
 		}
 	};
 

@@ -9,26 +9,13 @@ import { handleFormData } from "../../../../utils/helper";
 interface FormProps {
 	open: boolean;
 	onClose: () => void;
-	onSubmit: (data: any) => Promise<{ code: number; message: string }>;
-	data?:
-		| (Company & {
-				avatarUrl?: string | null;
-				bankAttachmentUrl?: string | null;
-		  })
-		| null;
+	onSubmit: (data: any) => any;
+	data?: Company | null;
 	onSuccess?: (code: number, message: string) => void;
 }
 
 const CompanyForm = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) => {
-	const { form, setForm, handleSubmit } = useFormHandler<Company>(
-		data ?? null,
-		{},
-		onSubmit,
-		open,
-		(form: Partial<Company>) => ({
-			...form,
-		}),
-	);
+	const { form, setForm } = useFormHandler<Company>(data ?? null, {}, onSubmit, open);
 
 	const toFormData = (data: Partial<Company>) => {
 		const fd = handleFormData(data);
@@ -53,8 +40,29 @@ const CompanyForm = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) =>
 		if (!data) {
 			return;
 		}
-		setForm(data);
-	}, [data]);
+
+		let bankConfigObj: any = {};
+
+		if (typeof data.bankConfig === "string" && data.bankConfig.trim() !== "") {
+			bankConfigObj = JSON.parse(data.bankConfig);
+		}
+
+		if (typeof data.bankConfig === "object" && data.bankConfig !== null) {
+			bankConfigObj = data.bankConfig;
+		}
+
+		setForm({
+			...data,
+			bankName: bankConfigObj.bankName ?? bankConfigObj.bank_name ?? data.bankName ?? "",
+			bankAccountHolder:
+				bankConfigObj.bankAccountHolder ??
+				bankConfigObj.bank_account_holder ??
+				data.bankAccountHolder ??
+				"",
+			bankNumber:
+				bankConfigObj.bankNumber ?? bankConfigObj.bank_number ?? data.bankNumber ?? "",
+		});
+	}, [data, setForm]);
 
 	return (
 		<GenericDialog
@@ -126,6 +134,29 @@ const CompanyForm = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) =>
 				value={form.bankAttachment}
 				onChange={(e) => setForm({ ...form, bankAttachmentFile: e })}
 			></FormInput>
+			<div className="grid grid-cols-3 gap-4">
+				<FormInput
+					type="text"
+					label="Tên ngân hàng"
+					name="bankName"
+					value={form.bankName}
+					onChange={(e) => setForm({ ...form, bankName: e })}
+				></FormInput>
+				<FormInput
+					type="text"
+					label="Chủ tài khoản"
+					name="bankAccountHolder"
+					value={form.bankAccountHolder}
+					onChange={(e) => setForm({ ...form, bankAccountHolder: e })}
+				></FormInput>
+				<FormInput
+					type="text"
+					label="Số tài khoản"
+					name="bankNumber"
+					value={form.bankNumber}
+					onChange={(e) => setForm({ ...form, bankNumber: e })}
+				></FormInput>
+			</div>
 		</GenericDialog>
 	);
 };

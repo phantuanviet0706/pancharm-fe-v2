@@ -10,8 +10,12 @@ import { Company as CompanyObject, updateCompany } from "../../../../api/company
 import { useCompany } from "../../../../hooks/useCompany";
 import FilePreviewButton from "../../../../components/FilePreviewButton";
 import ErrorPage from "../../../common/ErrorPage";
+import { useSnackbar } from "../../../../contexts/SnackbarProvider";
+import { parseBankConfig } from "../../../../utils/company";
 
 const Company = () => {
+	const { showSnackbar } = useSnackbar();
+
 	const { data, setData, loading, error } = useCompany();
 	const [page, setPage] = useState(0);
 	const [searchText, setSearchText] = useState("");
@@ -34,20 +38,36 @@ const Company = () => {
 						localStorage.setItem("APP_CONFIG", JSON.stringify(appData));
 					}
 				}
-				// window.location.reload();
+				setTimeout(() => {
+					window.location.reload();
+				}, 500);
 			} else {
 			}
-			return {
-				code: res.code,
-				message: res.message,
-			};
+			return showSnackbar({
+				message: res.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (error: any) {
-			return {
-				code: -1,
-				message: error?.response?.data?.message || error.message,
-			};
+			return showSnackbar({
+				message: error?.response?.data?.message || error.message || "Có lỗi xảy ra.",
+				severity: "error",
+			});
 		}
 	};
+
+	const bankInfo = parseBankConfig(data?.bankConfig);
+
+	let bankInfoHtml = null;
+
+	if (bankInfo) {
+		bankInfoHtml = (
+			<FieldDisplay
+				label=""
+				value={`${bankInfo.bankName} - ${bankInfo.bankAccountHolder} - ${bankInfo.bankNumber}`}
+				inline
+			/>
+		);
+	}
 
 	let content = (
 		<div>
@@ -83,6 +103,8 @@ const Company = () => {
 						icon={<Icon name="location" />}
 						inline
 					></FieldDisplay>
+
+					{/* Thông tin chuyển khoản */}
 					<div className="field-display-container">
 						<div className="field-display-wrapper">
 							<div className={`display-field flex gap-12`}>
@@ -110,6 +132,8 @@ const Company = () => {
 							</div>
 						</div>
 					</div>
+
+					{bankInfoHtml}
 				</div>
 			</CommonLayout>
 
