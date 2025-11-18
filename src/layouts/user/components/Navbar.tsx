@@ -31,7 +31,7 @@ const MAIN_MENU = [
 	{ key: "collections", label: "BST Mới", href: "/collections" },
 	{ key: "categories", label: "Trang sức" },
 	{ key: "products", label: "Sản phẩm", href: "/products" },
-	// { key: "gifts", label: "Quà tặng", href: "/gifts" },
+	{ key: "gifts", label: "Quà tặng", href: "/gifts" },
 	// { key: "others", label: "Phụ kiện phong thủy", href: "/others" },
 ];
 
