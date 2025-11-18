@@ -28,11 +28,11 @@ import { useCartDialog } from "../pages/Cart/CartDialogProvider";
 import { getCookie } from "../../../utils/auth";
 
 const MAIN_MENU = [
-	{ key: "products", label: "Sản phẩm", href: "/products" },
 	{ key: "collections", label: "BST Mới", href: "/collections" },
 	{ key: "categories", label: "Trang sức" },
-	{ key: "gifts", label: "Quà tặng", href: "/gifts" },
-	{ key: "others", label: "Phụ kiện phong thủy", href: "/others" },
+	{ key: "products", label: "Sản phẩm", href: "/products" },
+	// { key: "gifts", label: "Quà tặng", href: "/gifts" },
+	// { key: "others", label: "Phụ kiện phong thủy", href: "/others" },
 ];
 
 const CATEGORY_OPTIONS = [
