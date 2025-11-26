@@ -5,9 +5,11 @@ import BaseLayout from "../../components/BaseLayout";
 import { Button } from "@mui/material";
 import { ConfigContext } from "../../../../contexts/ConfigProvider";
 import { parseBankConfig } from "../../../../utils/company";
+import { useSnackbar } from "../../../../contexts/SnackbarProvider";
 
 const OrderPayment = () => {
 	const navigate = useNavigate();
+	const { showSnackbar } = useSnackbar();
 
 	// ---- Setup global state config ----
 	const { state: APP_CONFIG } = useContext(ConfigContext);
@@ -39,7 +41,10 @@ const OrderPayment = () => {
 			const res = await createOrder(payload);
 			return res;
 		} catch (err: any) {
-			return { code: -1, message: err?.response?.data?.message || err.message };
+			return showSnackbar({
+				message: err?.response?.data?.message || err.message,
+				severity: "success",
+			});
 		}
 	};
 
@@ -71,7 +76,7 @@ const OrderPayment = () => {
 						<p>
 							💫 Vui lòng <b>quét mã QR</b> hoặc{" "}
 							<b>chuyển khoản theo thông tin bên cạnh</b>:
-							<br/>
+							<br />
 							<span>{bankInfoHtml}</span>
 						</p>
 						<p>
@@ -88,8 +93,7 @@ const OrderPayment = () => {
 						</p>
 						<p className="italic text-xs md:text-sm text-[var(--color-sub-text,#8a5a4a)]">
 							Lưu ý: Nếu sau 10–15 phút chưa thấy đơn được xác nhận, bạn có thể inbox
-							fanpage của shop kèm hình ảnh giao dịch để được hỗ trợ nhanh
-							hơn.
+							fanpage của shop kèm hình ảnh giao dịch để được hỗ trợ nhanh hơn.
 						</p>
 					</div>
 				</div>

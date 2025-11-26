@@ -5,8 +5,10 @@ import FormInput from "../../components/FormInput";
 import { useNavigate } from "react-router-dom";
 import { changePassword } from "../../api/userService";
 import { handleKeyDown } from "../../utils/helper";
+import { useSnackbar } from "../../contexts/SnackbarProvider";
 
 const ChangePasswordPage = () => {
+	const { showSnackbar } = useSnackbar();
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const navigate = useNavigate();
@@ -19,19 +21,28 @@ const ChangePasswordPage = () => {
 			if (res?.code === 1 && res?.result) {
 				navigate("/");
 			}
-			return { code: res?.code, message: res?.message };
+
+			return showSnackbar({
+				message: res?.message || "Cập nhật thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return {
-				code: -1,
+			return showSnackbar({
 				message: err?.response?.data?.message || err.message,
-			};
+				severity: "error",
+			});
 		}
+	};
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		await handleChangePassword();
 	};
 
 	return (
 		<>
 			<AuthPage title="Đổi mật khẩu" header=" ">
-				<div className="nav-content-form">
+				<form className="nav-content-form" onSubmit={handleSubmit}>
 					<div className="nav-form">
 						<FormInput
 							type="password"
@@ -52,6 +63,7 @@ const ChangePasswordPage = () => {
 					</div>
 					<div className="nav-btn relative text-center">
 						<Button
+							type="submit"
 							ref={buttonRef}
 							className="submit-btn w-[120px] h-[28px]"
 							sx={{
@@ -63,12 +75,11 @@ const ChangePasswordPage = () => {
 									color: "var(--color-cream-bg-hover)",
 								},
 							}}
-							onClick={handleChangePassword}
 						>
 							<div className="submit-content">Cập nhật</div>
 						</Button>
 					</div>
-				</div>
+				</form>
 			</AuthPage>
 		</>
 	);

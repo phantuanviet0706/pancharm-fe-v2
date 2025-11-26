@@ -27,7 +27,7 @@ export default function GenericTable<T>({
 	zebra = true,
 	compact = false,
 }: GenericTableProps<T>) {
-	if (!data || data.length === 0) return <p className="text-sm text-gray-500">No data found.</p>;
+	if (!data || data.length === 0) return <p className="text-sm text-gray-500 text-center my-4">Không tìm thấy dữ liệu</p>;
 
 	const pad = compact ? "px-3 py-2" : "px-4 py-3";
 

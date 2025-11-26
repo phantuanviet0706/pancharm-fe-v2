@@ -10,6 +10,7 @@ const UserNav = ({ settings }: UserNavProps) => {
 			{settings.map((item, idx) => (
 				<>
 					<a
+						key={idx}
 						href={item.href}
 						className="block rounded-lg px-3 py-2 text-sm text-white/95 hover:bg-black/10 uppercase text-center"
 						style={

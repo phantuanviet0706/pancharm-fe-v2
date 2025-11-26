@@ -3,16 +3,36 @@ import GenericTable from "../../../../components/GenericTable";
 import ActionMenu from "../../../../components/ActionMenu";
 import { Pagination } from "@mui/material";
 import { Order } from "../../../../api/orderService";
+import { OrderStatus } from "../../../../constants/orderStatus";
 
 interface OrderTable {
 	orders: Order[];
-	onDetail: (orderId: number) => void;
 	totalPages: number;
 	page: number;
 	setPage: (page: number) => void;
+
+	onAction: (type: string, order: Order) => void;
 }
 
-const Table = ({ orders, onDetail, totalPages, page, setPage }: OrderTable) => {
+const Table = ({ orders, onAction, totalPages, page, setPage }: OrderTable) => {
+	const getActions = (row: any) => {
+		var action: any[] = [];
+		if (!row) {
+			return action;
+		}
+
+		if (row.status === OrderStatus.PROCESSING) {
+			action.push({ label: "Xác nhận đơn hàng", onClick: () => onAction("confirm", row) });
+		}
+
+		action.push(
+			{ label: "Xem chi tiết", onClick: () => onAction("detail", row) },
+			{ label: "Hủy đơn hàng", onClick: () => onAction("cancel", row) },
+		);
+
+		return action;
+	};
+
 	return (
 		<div>
 			<GenericTable
@@ -33,7 +53,7 @@ const Table = ({ orders, onDetail, totalPages, page, setPage }: OrderTable) => {
 						align: "right",
 						width: "100px",
 						headerStyle: { marginRight: "10px" },
-						render: (row) => <ActionMenu actions={[]} />,
+						render: (row) => <ActionMenu actions={getActions(row)} />,
 					},
 				]}
 			></GenericTable>

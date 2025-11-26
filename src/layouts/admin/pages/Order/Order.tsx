@@ -16,21 +16,31 @@ const Order = () => {
 	const [searchText, setSearchText] = useState("");
 
 	const query = useMemo(() => ({ page, limit: 50, keyword: searchText }), [page, searchText]);
-	const { orders, loading, error, setOrders, total, totalPages } =
-		useOrders(query);
+	const { orders, loading, error, setOrders, total, totalPages } = useOrders(query);
 
 	const [openForm, setOpenForm] = useState(false);
 	const [editData, setEditData] = useState<OrderObject | null>(null);
 	const [formAction, setFormAction] = useState<FormAction>("");
 
+	const [detailData, setDetailData] = useState<OrderObject | null>(null);
+	const [detailOpen, setDetailOpen] = useState(false);
+
 	const onCloseForm = () => setOpenForm(false);
 	const handleDetail = async (id: number) => {
-		const cat = categories.find((c) => c.id === id);
-		if (cat) {
-			setDetailData(cat);
+		const order = orders.find((c) => c.id === id);
+		if (order) {
+			setDetailData(order);
 			setDetailOpen(true);
 		}
 	};
+
+	const handleAction = (type: string, order: OrderObject) => {
+		switch (type) {
+			case "detail":
+				handleDetail(order?.id ?? 0);
+				break;
+		}
+	}
 
 	let content = (
 		<>
@@ -41,7 +51,7 @@ const Order = () => {
 						totalPages={totalPages}
 						page={page}
 						setPage={setPage}
-						onDetail={handleDetail}
+						onAction={handleAction}
 					></Table>
 				</div>
 			</CommonLayout>

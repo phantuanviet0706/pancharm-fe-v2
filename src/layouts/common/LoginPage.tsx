@@ -6,8 +6,10 @@ import FormInput from "../../components/FormInput";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { login } from "../../api/authService";
 import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "../../contexts/SnackbarProvider";
 
 const LoginPage = () => {
+	const {showSnackbar} = useSnackbar();
 	const [rememberMe, setRememberMe] = useState(false);
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
@@ -34,13 +36,21 @@ const LoginPage = () => {
 				navigate("/");
 			}
 
-			return { code: res?.code, message: res?.message };
+			return showSnackbar({
+				message: res?.message || "Đăng nhập thành công",
+				severity: "success",
+			});
 		} catch (err: any) {
-			return {
-				code: -1,
+			return showSnackbar({
 				message: err?.response?.data?.message || err.message,
-			};
+				severity: "error",
+			});
 		}
+	};
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		await handleLogin();
 	};
 
 	return (
@@ -95,7 +105,7 @@ const LoginPage = () => {
 				// 	</>
 				// }
 			>
-				<div className="nav-content-form">
+				<form className="nav-content-form" onSubmit={handleSubmit}>
 					<div className="nav-form">
 						<FormInput
 							type="text"
@@ -112,6 +122,7 @@ const LoginPage = () => {
 					</div>
 					<div className="nav-btn relative text-center">
 						<Button
+							type="submit"
 							className="submit-btn w-[120px] h-[28px]"
 							sx={{
 								backgroundColor: "var(--color-card-bg)",
@@ -122,21 +133,18 @@ const LoginPage = () => {
 									color: "var(--color-cream-bg-hover)",
 								},
 							}}
-							onClick={() => {
-								handleLogin();
-							}}
 						>
 							<div className="submit-content">Đăng nhập</div>
 						</Button>
 					</div>
 					{/* <div className="nav-form-footer text-center mt-4">
-						<Link href="/forgot" underline="none">
-							<div className="forgot-content text-[var(--color-card-bg)] font-medium">
-								Quên mật khẩu?
-							</div>
-						</Link>
-					</div> */}
-				</div>
+							<Link href="/forgot" underline="none">
+								<div className="forgot-content text-[var(--color-card-bg)] font-medium">
+									Quên mật khẩu?
+								</div>
+							</Link>
+						</div> */}
+				</form>
 			</AuthPage>
 		</>
 	);
