@@ -118,6 +118,28 @@ const Product = () => {
 		}
 	};
 
+	//==== General action handler ====
+	const handleAction = (type: string, object: ProductObject) => {
+		switch (type) {
+			case "detail":
+				handleDetail(object?.id ?? 0);
+				break;
+			case "edit":
+				setEditData(object);
+				setFormAction("update");
+				setOpenForm(true);
+				break;
+			case "delete":
+				handleDelete(object?.id ?? 0);
+				break;
+			case "editImage":
+				setEditData(object);
+				setFormAction("updateImages");
+				setOpenForm(true);
+				break;
+		}
+	};
+
 	let content = (
 		<>
 			<CommonLayout title="Thông tin Sản phẩm" width={60}>
@@ -127,18 +149,7 @@ const Product = () => {
 						totalPages={totalPages}
 						page={page}
 						setPage={setPage}
-						onEdit={(row) => {
-							setEditData(row);
-							setFormAction("update");
-							setOpenForm(true);
-						}}
-						onDelete={handleDelete}
-						onDetail={handleDetail}
-						onEditImages={(row) => {
-							setEditData(row);
-							setFormAction("updateImages");
-							setOpenForm(true);
-						}}
+						onAction={handleAction}
 					></ProductTable>
 				</div>
 			</CommonLayout>

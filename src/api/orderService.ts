@@ -13,14 +13,14 @@ export interface Order {
 	slug?: string;
 
 	status: OrderStatus;
-    totalPrice: number;
-    description: string;
+	totalPrice: number;
+	description: string;
 
-    user?: User | null;
-    
-    shippingAddress: ShippingAddress;
+	user?: User | null;
 
-    items: OrderItem[];
+	shippingAddress: ShippingAddress;
+
+	items: OrderItem[];
 }
 
 export interface OrderItem {
@@ -34,15 +34,22 @@ export interface OrderQuery extends BaseQuery {
 	names?: string;
 }
 
+interface OrderObjectStatusForm {
+	id: number;
+	status: OrderStatus;
+	description?: string;
+	userId?: number;
+}
+
 export const DEFAULT_ORDER: Order = {
-    status: OrderStatus.CONFIRMED,
-    totalPrice: 0,
-    description: "",
+	status: OrderStatus.CONFIRMED,
+	totalPrice: 0,
+	description: "",
 	slug: "",
 
-    shippingAddress: DEFAULT_SHIPPING_ADDRESS,
-    items: []
-}
+	shippingAddress: DEFAULT_SHIPPING_ADDRESS,
+	items: [],
+};
 
 export const fetchData = async (query: OrderQuery = {}) => {
 	const params = new URLSearchParams();
@@ -79,6 +86,16 @@ export const deleteOrder = async (id: number) => {
 		return res.data;
 	} catch (error) {
 		console.error("Failed to delete order:", error);
+		throw error;
+	}
+};
+
+export const updateOrderStatus = async (payload: OrderObjectStatusForm) => {
+	try {
+		const res = await axios.put<Order>(`${API_URL}/${payload.id}/change-status`, payload);
+		return res.data;
+	} catch (error) {
+		console.error("Failed to create order:", error);
 		throw error;
 	}
 };

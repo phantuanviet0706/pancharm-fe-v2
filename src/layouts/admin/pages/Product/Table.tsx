@@ -9,24 +9,18 @@ import { formatVND } from "../../../../utils/helper";
 
 interface ProductTableProps {
 	products: Product[];
-	onEdit: (perm: Product) => void;
-	onDelete: (id: number) => void;
-	onDetail: (id: number) => void;
 	totalPages: number;
 	page: number;
 	setPage: (page: number) => void;
-	onEditImages: (product: Product) => void;
+	onAction: (type: string, product: Product) => void;
 }
 
 const Table = ({
 	products,
-	onEdit,
-	onDelete,
-	onDetail,
 	totalPages,
 	page,
 	setPage,
-	onEditImages,
+	onAction,
 }: ProductTableProps) => {
 	// ==== Confirm delete state ====
 	const [confirmOpen, setConfirmOpen] = useState(false);
@@ -39,7 +33,7 @@ const Table = ({
 
 	const handleConfirmDelete = async () => {
 		if (pendingRow?.id != null) {
-			await onDelete(pendingRow.id);
+			await onAction("delete", pendingRow);
 		}
 		setConfirmOpen(false);
 		setPendingRow(null);
@@ -48,6 +42,33 @@ const Table = ({
 	const handleCancelDelete = () => {
 		setConfirmOpen(false);
 		setPendingRow(null);
+	};
+
+	// ==== Get actions ====
+	const getActions = (row: any) => {
+		var action: any[] = [];
+		if (!row) {
+			return action;
+		}
+
+		action.push(
+			{
+				label: "Sửa",
+				onClick: () => onAction("edit", row),
+			},
+			{
+				label: "Chỉnh sửa hiển thị ảnh",
+				onClick: () => onAction("editImage", row),
+				acl: row.productImages && row.productImages.length > 0,
+			},
+			{
+				label: "Xóa",
+				onClick: () => askDelete(row),
+				color: "red",
+			},
+		);
+
+		return action;
 	};
 
 	return (
@@ -60,23 +81,23 @@ const Table = ({
 					{
 						key: "name",
 						label: "Tên",
-						onClick: (row) => onDetail(row?.id ? row.id : 0),
+						onClick: (row) => onAction("detail", row),
 					},
 					{ key: "slug", label: "Mã" },
-					{ key: "quantity", label: "Số lượng" },
-					{
-						key: "unitPrice",
-						label: "Đơn giá",
-						render: (row) => {
-							return (
-								<div>
-									<div className="product-unit-price">
-										{formatVND(row.unitPrice)}
-									</div>
-								</div>
-							);
-						},
-					},
+					// { key: "quantity", label: "Số lượng" },
+					// {
+					// 	key: "unitPrice",
+					// 	label: "Đơn giá",
+					// 	render: (row) => {
+					// 		return (
+					// 			<div>
+					// 				<div className="product-unit-price">
+					// 					{formatVND(row.unitPrice)}
+					// 				</div>
+					// 			</div>
+					// 		);
+					// 	},
+					// },
 					{
 						key: "status",
 						label: "Trạng thái",
@@ -99,22 +120,7 @@ const Table = ({
 						headerStyle: { marginRight: "10px" },
 						render: (row) => (
 							<ActionMenu
-								actions={[
-									{
-										label: "Sửa",
-										onClick: () => onEdit(row),
-									},
-									{
-										label: "Chỉnh sửa hiển thị ảnh",
-										onClick: () => onEditImages(row),
-										acl: row.productImages && row.productImages.length > 0,
-									},
-									{
-										label: "Xóa",
-										onClick: () => askDelete(row),
-										color: "red",
-									},
-								]}
+								actions={getActions(row)}
 							/>
 						),
 					},

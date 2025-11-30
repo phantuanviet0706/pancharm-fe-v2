@@ -7,22 +7,18 @@ import GenericDialog from "../../../../components/GenericDialog";
 
 interface TableProps {
 	categories: Category[];
-	onEdit: (category: Category) => void;
-	onDelete: (id: number) => void;
-	onDetail: (id: number) => void;
 	totalPages: number;
 	page: number;
 	setPage: (page: number) => void;
+	onAction: (type: string, category: Category) => void;
 }
 
 const Table = ({
 	categories,
-	onEdit,
-	onDelete,
-	onDetail,
 	totalPages,
 	page,
 	setPage,
+	onAction,
 }: TableProps) => {
 	// ==== Confirm delete state ====
 	const [confirmOpen, setConfirmOpen] = useState(false);
@@ -35,7 +31,7 @@ const Table = ({
 
 	const handleConfirmDelete = async () => {
 		if (pendingRow?.id != null) {
-			await onDelete(pendingRow.id);
+			await onAction("delete", pendingRow);
 		}
 		setConfirmOpen(false);
 		setPendingRow(null);
@@ -44,6 +40,28 @@ const Table = ({
 	const handleCancelDelete = () => {
 		setConfirmOpen(false);
 		setPendingRow(null);
+	};
+
+	// ==== Get actions ====
+	const getActions = (row: any) => {
+		var action: any[] = [];
+		if (!row) {
+			return action;
+		}
+
+		action.push(
+			{
+				label: "Sửa",
+				onClick: () => onAction("edit", row),
+			},
+			{
+				label: "Xóa",
+				onClick: () => askDelete(row),
+				color: "red",
+			},
+		);
+
+		return action;
 	};
 
 	return (
@@ -56,7 +74,7 @@ const Table = ({
 					{
 						key: "name",
 						label: "Tên",
-						onClick: (row) => onDetail(row?.id ? row.id : 0),
+						onClick: (row) => onAction("detail", row),
 					},
 					{ key: "slug", label: "Mã" },
 					{
@@ -67,17 +85,7 @@ const Table = ({
 						headerStyle: { marginRight: "10px" },
 						render: (row) => (
 							<ActionMenu
-								actions={[
-									{
-										label: "Sửa",
-										onClick: () => onEdit(row),
-									},
-									{
-										label: "Xóa",
-										onClick: () => askDelete(row),
-										color: "red",
-									},
-								]}
+								actions={getActions(row)}
 							/>
 						),
 					},

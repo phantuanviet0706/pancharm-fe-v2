@@ -15,39 +15,42 @@ const menuItems = {
 		// 		},
 		// 	],
 		// },
-		{
-			id: "orders",
-			name: "Chung",
-			subtitle: "",
-			type: "group",
-			children: [
-				{
-					id: "order",
-					title: "Đơn hàng",
-					type: "item",
-					url: "/admin",
-					icon: "shopping_cart",
-				},
-			],
-		},
+
+
+		//--------------ORDERS-----------------
+		// {
+		// 	id: "orders",
+		// 	name: "Chung",
+		// 	subtitle: "",
+		// 	type: "group",
+		// 	children: [
+		// 		{
+		// 			id: "order",
+		// 			title: "Đơn hàng",
+		// 			type: "item",
+		// 			url: "/admin",
+		// 			icon: "shopping_cart",
+		// 		},
+		// 	],
+		// },
 		{
 			id: "system",
 			name: "Hệ thống",
 			subtitle: "Quản lý người dùng & thông tin công ty",
 			type: "group",
 			children: [
-				{
-					id: "user",
-					title: "Người dùng",
-					type: "item",
-					url: "/admin/users",
-					icon: "person",
-				},
+				// {
+				// 	id: "user",
+				// 	title: "Người dùng",
+				// 	type: "item",
+				// 	url: "/admin/users",
+				// 	icon: "person",
+				// },
 				{
 					id: "company",
 					title: "Công ty",
 					type: "item",
-					url: "/admin/company",
+					url: "/admin",
 					icon: "business",
 				},
 			],

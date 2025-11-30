@@ -4,8 +4,9 @@ import ErrorPage from "../../../common/ErrorPage";
 import CommonLayout from "../../components/CommonLayout";
 import { useSnackbar } from "../../../../contexts/SnackbarProvider";
 import { useOrders } from "../../../../hooks/useOrders";
-import { Order as OrderObject } from "../../../../api/orderService";
+import { Order as OrderObject, updateOrderStatus } from "../../../../api/orderService";
 import Table from "./Table";
+import { OrderStatus } from "../../../../constants/orderStatus";
 
 type FormAction = "";
 
@@ -26,6 +27,8 @@ const Order = () => {
 	const [detailOpen, setDetailOpen] = useState(false);
 
 	const onCloseForm = () => setOpenForm(false);
+	
+	// Xử lý chức năng
 	const handleDetail = async (id: number) => {
 		const order = orders.find((c) => c.id === id);
 		if (order) {
@@ -34,10 +37,68 @@ const Order = () => {
 		}
 	};
 
+	const handleConfirm = async (order: OrderObject) => {
+		if (!order) {
+			return showSnackbar({
+				message: "Đơn hàng không hợp lệ",
+				severity: "error",
+			});
+		}
+
+		if (order.status != OrderStatus.PROCESSING) {
+			return showSnackbar({
+				message: "Chỉ có thể xác nhận đơn hàng đang xử lý",
+				severity: "error",
+			});
+		}
+
+		try {
+			const res = await updateOrderStatus({
+				id: Number(order.id),
+				status: OrderStatus.CONFIRMED,
+				// description: "",
+				// userId?: 1,
+			});
+		} catch (error) {
+			return showSnackbar({
+				message: "Xác nhận đơn hàng thất bại",
+				severity: "error",
+			});
+		}
+	}
+
+	const handleCancel = async (order: OrderObject) => {
+		if (!order) {
+			return showSnackbar({
+				message: "Đơn hàng không hợp lệ",
+				severity: "error",
+			});
+		}
+		if (order.status != OrderStatus.PROCESSING) {
+			return showSnackbar({
+				message: "Chỉ có thể hủy đơn hàng đang xử lý",
+				severity: "error",
+			});
+		}
+		try {
+		} catch (error) {
+			return showSnackbar({
+				message: "Hủy đơn hàng thất bại",
+				severity: "error",
+			});
+		}
+	}
+
 	const handleAction = (type: string, order: OrderObject) => {
 		switch (type) {
 			case "detail":
 				handleDetail(order?.id ?? 0);
+				break;
+			case "confirm":
+				handleConfirm(order);
+				break;
+			case "cancel":
+				handleCancel(order);
 				break;
 		}
 	}
@@ -55,6 +116,8 @@ const Order = () => {
 					></Table>
 				</div>
 			</CommonLayout>
+
+			{/* <Form></Form> */}
 		</>
 	);
 

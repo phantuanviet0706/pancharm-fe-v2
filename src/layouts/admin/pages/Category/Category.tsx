@@ -14,6 +14,8 @@ import {
 import { useCategories } from "../../../../hooks/useCategories";
 import ErrorPage from "../../../common/ErrorPage";
 import { useSnackbar } from "../../../../contexts/SnackbarProvider";
+import GenericDetailDialog from "../../../../components/GenericDetailDialog";
+import Detail from "./Detail";
 
 type FormAction = "create" | "update";
 
@@ -97,6 +99,22 @@ const Category = () => {
 		}
 	};
 
+	const handleAction = (type: string, object: CategoryObject) => {
+		switch (type) {
+			case "detail":
+				handleDetail(object?.id ?? 0);
+				break;
+			case "edit":
+				setEditData(object);
+				setFormAction("update");
+				setOpenForm(true);
+				break;
+			case "delete":
+				handleDelete(object?.id ?? 0);
+				break;
+		}
+	};
+
 	let content = (
 		<>
 			<CommonLayout title="Thông tin Danh mục" width={60}>
@@ -106,12 +124,7 @@ const Category = () => {
 						totalPages={totalPages}
 						page={page}
 						setPage={setPage}
-						onEdit={(perm) => {
-							setEditData(perm);
-							setOpenForm(true);
-						}}
-						onDelete={handleDelete}
-						onDetail={handleDetail}
+						onAction={handleAction}
 					></Table>
 				</div>
 			</CommonLayout>
@@ -126,12 +139,24 @@ const Category = () => {
 						case "create":
 							return handleCreate(body as FormData);
 						case "update":
+							alert(123)
 							return handleUpdate(editData?.id!, body as FormData);
 						default:
 							return Promise.resolve({ code: -1, message: "Thiếu dữ liệu" });
 					}
 				}}
 			></Form>
+
+			<GenericDetailDialog
+				open={detailOpen}
+				onClose={() => {
+					setDetailOpen(false);
+					setDetailData(null);
+				}}
+				title="Chi tiết Danh mục"
+			>
+				{detailData && <Detail category={detailData} />}
+			</GenericDetailDialog>
 		</>
 	);
 

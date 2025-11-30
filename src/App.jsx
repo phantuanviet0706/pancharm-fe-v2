@@ -101,7 +101,7 @@ function App() {
 						{/* Admin Routes */}
 						<Route path="/admin" element={<RequireAdmin />}>
 							{/* <Route index element={<AdminHome />} /> */}
-							<Route index element={<AdminOrder />} />
+							<Route index element={<Company />} />
 							<Route path="users" element={<User />} />
 							<Route path="others" element={<Other />}></Route>
 							<Route path="company">

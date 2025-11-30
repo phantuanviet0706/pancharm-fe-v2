@@ -310,7 +310,7 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 							}));
 						}}
 					/>
-					<div className="grid grid-cols-2 gap-4">
+					{/* <div className="grid grid-cols-2 gap-4">
 						<FormInput
 							type="int"
 							label="Số lượng"
@@ -325,7 +325,7 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 							value={form?.unitPrice}
 							onChange={(e) => setForm({ ...form, unitPrice: e })}
 						></FormInput>
-					</div>
+					</div> */}
 					<FormInput
 						type="textarea"
 						label="Mô tả"

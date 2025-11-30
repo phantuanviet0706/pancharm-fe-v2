@@ -36,7 +36,7 @@ const Navbar = () => {
 					</div>
 				</div>
 			</Link>
-			<div className="nav-body pt-[10px] overflow-y-auto thin-scrollbar">
+			<div className="nav-body pt-[10px] overflow-y-auto thin-scrollbar h-[80em]">
 				{navigation.items.map((item) => (
 					<div key={item.id}>
 						<NavGroup item={item} />
