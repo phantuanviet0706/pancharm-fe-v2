@@ -141,7 +141,6 @@ const Category = () => {
 						case "create":
 							return handleCreate(body as FormData);
 						case "update":
-							alert(123)
 							return handleUpdate(editData?.id!, body as FormData);
 						default:
 							return Promise.resolve({ code: -1, message: "Thiếu dữ liệu" });
