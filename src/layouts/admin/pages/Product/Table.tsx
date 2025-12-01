@@ -46,7 +46,7 @@ const Table = ({ products, totalPages, page, setPage, onAction, getBy = "list" }
 			return action;
 		}
 
-		if (getBy) {
+		if (getBy == "object") {
 			return [
 				{
 					label: "Bỏ khỏi bộ sưu tập",
