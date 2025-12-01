@@ -7,25 +7,13 @@ import { Pagination } from "@mui/material";
 
 interface TableProps {
 	collections: Collection[];
-	onEdit: (collection: Collection) => void;
-	onDelete: (id: number) => void;
-	onDetail: (id: number) => void;
 	totalPages: number;
 	page: number;
 	setPage: (page: number) => void;
-	onEditImages: (collection: Collection) => void;
+	onAction: (type: string, collection: Collection) => void;
 }
 
-const Table = ({
-	collections,
-	onEdit,
-	onDelete,
-	onDetail,
-	totalPages,
-	page,
-	setPage,
-	onEditImages,
-}: TableProps) => {
+const Table = ({ collections, totalPages, page, setPage, onAction }: TableProps) => {
 	// ==== Confirm delete state ====
 	const [confirmOpen, setConfirmOpen] = useState(false);
 	const [pendingRow, setPendingRow] = useState<Collection | null>(null);
@@ -37,7 +25,7 @@ const Table = ({
 
 	const handleConfirmDelete = async () => {
 		if (pendingRow?.id != null) {
-			await onDelete(pendingRow.id);
+			await onAction("delete", pendingRow);
 		}
 		setConfirmOpen(false);
 		setPendingRow(null);
@@ -46,6 +34,33 @@ const Table = ({
 	const handleCancelDelete = () => {
 		setConfirmOpen(false);
 		setPendingRow(null);
+	};
+
+	// ==== Get actions ====
+	const getActions = (row: any) => {
+		var action: any[] = [];
+		if (!row) {
+			return action;
+		}
+
+		action.push(
+			{
+				label: "Sửa",
+				onClick: () => onAction("edit", row),
+			},
+			{
+				label: "Chỉnh sửa hiển thị ảnh",
+				onClick: () => onAction("editImage", row),
+				acl: row.productImages && row.productImages.length > 0,
+			},
+			{
+				label: "Xóa",
+				onClick: () => askDelete(row),
+				color: "red",
+			},
+		);
+
+		return action;
 	};
 
 	return (
@@ -58,7 +73,7 @@ const Table = ({
 					{
 						key: "name",
 						label: "Tên",
-						onClick: (row) => onDetail(row?.id ? row.id : 0),
+						onClick: (row) => onAction("detail", row),
 					},
 					{ key: "slug", label: "Mã" },
 					{
@@ -67,27 +82,7 @@ const Table = ({
 						align: "right",
 						width: "140px",
 						headerStyle: { marginRight: "10px" },
-						render: (row) => (
-							<ActionMenu
-								actions={[
-									{
-										label: "Sửa",
-										onClick: () => onEdit(row),
-									},
-									{
-										label: "Chỉnh sửa hiển thị ảnh",
-										onClick: () => onEditImages(row),
-										acl:
-											row.collectionImages && row.collectionImages.length > 0,
-									},
-									{
-										label: "Xóa",
-										onClick: () => askDelete(row),
-										color: "red",
-									},
-								]}
-							/>
-						),
+						render: (row) => <ActionMenu actions={getActions(row)} />,
 					},
 				]}
 			/>

@@ -91,6 +91,7 @@ const Category = () => {
 			});
 		}
 	};
+
 	const handleDetail = async (id: number) => {
 		const cat = categories.find((c) => c.id === id);
 		if (cat) {
@@ -99,6 +100,7 @@ const Category = () => {
 		}
 	};
 
+	// ==== Handle actions from table ====
 	const handleAction = (type: string, object: CategoryObject) => {
 		switch (type) {
 			case "detail":
@@ -154,8 +156,9 @@ const Category = () => {
 					setDetailData(null);
 				}}
 				title="Chi tiết Danh mục"
+				maxWidth="sm"
 			>
-				{detailData && <Detail category={detailData} />}
+				{detailData && <Detail object={detailData} />}
 			</GenericDetailDialog>
 		</>
 	);

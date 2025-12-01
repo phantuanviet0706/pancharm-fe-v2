@@ -2,6 +2,7 @@ import axios from "axios";
 import { CollectionImage } from "./collectionImageService";
 import { BaseQuery } from "./commonService";
 import axiosClient from "./axiosClient";
+import { Product } from "./productService";
 
 const API_URL = `${import.meta.env.VITE_APP_URL}/collections`;
 
@@ -18,6 +19,8 @@ export interface Collection {
 	updatedAt?: Date;
 	createdBy?: number;
 	defaultImageId?: number | null;
+
+	products?: Product[];
 }
 
 export interface CollectionQuery extends BaseQuery {

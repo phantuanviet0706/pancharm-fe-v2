@@ -10,10 +10,33 @@ export default function RequireAdmin() {
 	if (loading)
 		return (
 			<div
-				className="flex text-center justify-center items-center 
-				h-screen text-2xl text-[var(--color-card-bg)] font-semibold"
+				className="
+					flex flex-col justify-center items-center h-screen text-center
+					bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200
+				"
 			>
-				Đang kiểm tra phiên đăng nhập...
+				<div className="animate-spin-slow mb-4">
+					<div
+						className="
+							h-16 w-16 rounded-full border-4 border-white/40 border-t-[var(--color-card-bg)]
+							shadow-lg shadow-[var(--color-card-bg)]/30
+						"
+					></div>
+				</div>
+
+				<div
+					className="
+						text-3xl font-bold text-[var(--color-card-bg)] drop-shadow-md
+						bg-white/30 px-6 py-3 rounded-2xl backdrop-blur-md
+						animate-fade-in
+					"
+				>
+					Đang kiểm tra phiên đăng nhập...
+				</div>
+
+				<p className="mt-3 text-[var(--color-card-bg)]/80 text-sm animate-pulse">
+					Vui lòng đợi trong giây lát ✨
+				</p>
 			</div>
 		);
 

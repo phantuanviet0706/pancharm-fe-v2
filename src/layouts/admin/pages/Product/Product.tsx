@@ -15,6 +15,8 @@ import {
 import { useProducts } from "../../../../hooks/useProducts";
 import ErrorPage from "../../../common/ErrorPage";
 import { useSnackbar } from "../../../../contexts/SnackbarProvider";
+import GenericDetailDialog from "../../../../components/GenericDetailDialog";
+import Detail from "./Detail";
 
 type FormAction = "create" | "update" | "updateImages";
 
@@ -172,6 +174,18 @@ const Product = () => {
 					}
 				}}
 			></Form>
+
+			<GenericDetailDialog
+				open={detailOpen}
+				onClose={() => {
+					setDetailOpen(false);
+					setDetailData(null);
+				}}
+				title="Chi tiết Sản phẩm"
+				maxWidth="lg"
+			>
+				{detailData && <Detail object={detailData} />}
+			</GenericDetailDialog>
 		</>
 	);
 

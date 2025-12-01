@@ -8,6 +8,7 @@ import {
 	Collection as CollectionObject,
 	createCollection,
 	deleteCollection,
+	getCollection,
 	updateCollection,
 	updateCollectionImage,
 } from "../../../../api/collectionService";
@@ -15,6 +16,8 @@ import { useCollections } from "../../../../hooks/useCollections";
 import Form from "./Form";
 import ErrorPage from "../../../common/ErrorPage";
 import { useSnackbar } from "../../../../contexts/SnackbarProvider";
+import GenericDetailDialog from "../../../../components/GenericDetailDialog";
+import Detail from "./Detail";
 
 type FormAction = "create" | "update" | "updateImages";
 
@@ -31,6 +34,9 @@ const Collection = () => {
 	const [openForm, setOpenForm] = useState(false);
 	const [editData, setEditData] = useState<CollectionObject | null>(null);
 	const [formAction, setFormAction] = useState<FormAction>("create");
+
+	const [detailData, setDetailData] = useState<CollectionObject | null>(null);
+	const [detailOpen, setDetailOpen] = useState(false);
 
 	const onCloseForm = () => setOpenForm(false);
 
@@ -106,27 +112,55 @@ const Collection = () => {
 		}
 	};
 
+	const handleDetail = async (id: number) => {
+		try {
+			const res = await getCollection(id);
+			if (res?.code === 1 && res?.result) {
+				let collection = res.result;
+				setDetailData(collection);
+				setDetailOpen(true);
+			}
+			return;
+		} catch (err: any) {
+			return showSnackbar({
+				message: err?.response?.data?.message || err.message,
+				severity: "error",
+			});
+		}
+	};
+
+	// ==== Handle actions from table ====
+	const handleAction = (type: string, object: CollectionObject) => {
+		switch (type) {
+			case "detail":
+				handleDetail(object?.id ?? 0);
+				break;
+			case "edit":
+				setEditData(object);
+				setFormAction("update");
+				setOpenForm(true);
+				break;
+			case "delete":
+				handleDelete(object?.id ?? 0);
+				break;
+			case "editImage":
+				setEditData(object);
+				setFormAction("updateImages");
+				setOpenForm(true);
+				break;
+		}
+	};
+
 	let content = (
 		<>
 			<CommonLayout title="Thông tin Bộ sưu tập" width={60}>
 				<div className="category-list">
 					<Table
 						collections={collections}
-						onEdit={(row) => {
-							setEditData(row);
-							setFormAction("update");
-							setOpenForm(true);
-						}}
-						onDelete={handleDelete}
-						onDetail={() => {}}
 						page={page}
 						totalPages={totalPages}
 						setPage={setPage}
-						onEditImages={(row) => {
-							setEditData(row);
-							setFormAction("updateImages");
-							setOpenForm(true);
-						}}
+						onAction={handleAction}
 					/>
 				</div>
 			</CommonLayout>
@@ -149,6 +183,18 @@ const Collection = () => {
 					}
 				}}
 			/>
+
+			<GenericDetailDialog
+				open={detailOpen}
+				onClose={() => {
+					setDetailOpen(false);
+					setDetailData(null);
+				}}
+				title="Chi tiết Bộ suu tập"
+				maxWidth="lg"
+			>
+				{detailData && <Detail object={detailData} />}
+			</GenericDetailDialog>
 		</>
 	);
 

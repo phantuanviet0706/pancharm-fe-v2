@@ -299,6 +299,60 @@ const icons = {
 			<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
 		</svg>
 	),
+
+	// Category Detail Icons
+	catName: (p: any) => (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="22"
+			height="22"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			{...p}
+		>
+			<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L3 13V3h10l7.59 7.59a2 2 0 0 1 0 2.82z" />
+			<circle cx="7.5" cy="7.5" r="1.5" />
+		</svg>
+	),
+	catSlug: (p: any) => (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="22"
+			height="22"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			{...p}
+		>
+			<path d="M3 3v18" />
+			<path d="M7 3v18" />
+			<path d="M10 3v18" />
+			<path d="M14 3v18" />
+			<path d="M17 3v18" />
+			<path d="M21 3v18" />
+		</svg>
+	),
+	catParent: (p: any) => (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="22"
+			height="22"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			{...p}
+		>
+			<path d="M3 7v10c0 1.1.9 2 2 2h9l7-7-7-7H5c-1.1 0-2 .9-2 2z" />
+		</svg>
+	),
 };
 
 export type IconProps = {

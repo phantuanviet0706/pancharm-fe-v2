@@ -13,15 +13,10 @@ interface ProductTableProps {
 	page: number;
 	setPage: (page: number) => void;
 	onAction: (type: string, product: Product) => void;
+	getBy?: "list" | "object";
 }
 
-const Table = ({
-	products,
-	totalPages,
-	page,
-	setPage,
-	onAction,
-}: ProductTableProps) => {
+const Table = ({ products, totalPages, page, setPage, onAction, getBy = "list" }: ProductTableProps) => {
 	// ==== Confirm delete state ====
 	const [confirmOpen, setConfirmOpen] = useState(false);
 	const [pendingRow, setPendingRow] = useState<Product | null>(null);
@@ -49,6 +44,15 @@ const Table = ({
 		var action: any[] = [];
 		if (!row) {
 			return action;
+		}
+
+		if (getBy) {
+			return [
+				{
+					label: "Bỏ khỏi bộ sưu tập",
+					onClick: () => onAction("removeFromCollection", row),
+				},
+			];
 		}
 
 		action.push(
@@ -118,11 +122,7 @@ const Table = ({
 						align: "right",
 						width: "100px",
 						headerStyle: { marginRight: "10px" },
-						render: (row) => (
-							<ActionMenu
-								actions={getActions(row)}
-							/>
-						),
+						render: (row) => <ActionMenu actions={getActions(row)} />,
 					},
 				]}
 			></GenericTable>
