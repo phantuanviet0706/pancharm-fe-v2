@@ -105,7 +105,7 @@ const Company = () => {
 					></FieldDisplay>
 
 					{/* Thông tin chuyển khoản */}
-					<div className="field-display-container">
+					{/* <div className="field-display-container">
 						<div className="field-display-wrapper">
 							<div className={`display-field flex gap-12`}>
 								<div
@@ -133,7 +133,7 @@ const Company = () => {
 						</div>
 					</div>
 
-					{bankInfoHtml}
+					{bankInfoHtml} */}
 				</div>
 			</CommonLayout>
 

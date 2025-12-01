@@ -10,14 +10,14 @@ export interface Company {
 	taxcode?: string;
 	phone?: string;
 	email?: string;
-	bankAttachment?: string;
-	bankAttachmentFile?: File;
+	// bankAttachment?: string;
+	// bankAttachmentFile?: File;
 	config?: JSON;
 	companyInfos: CompanyInfo[];
-	bankConfig?: string;
-	bankName?: string;
-	bankAccountHolder?: string;
-	bankNumber?: string;
+	// bankConfig?: string;
+	// bankName?: string;
+	// bankAccountHolder?: string;
+	// bankNumber?: string;
 }
 
 export const updateCompany = async (payload: FormData | Partial<Company>) => {

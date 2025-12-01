@@ -36,33 +36,33 @@ const CompanyForm = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) =>
 		}
 	};
 
-	useEffect(() => {
-		if (!data) {
-			return;
-		}
+	// useEffect(() => {
+	// 	if (!data) {
+	// 		return;
+	// 	}
 
-		let bankConfigObj: any = {};
+	// 	let bankConfigObj: any = {};
 
-		if (typeof data.bankConfig === "string" && data.bankConfig.trim() !== "") {
-			bankConfigObj = JSON.parse(data.bankConfig);
-		}
+	// 	if (typeof data.bankConfig === "string" && data.bankConfig.trim() !== "") {
+	// 		bankConfigObj = JSON.parse(data.bankConfig);
+	// 	}
 
-		if (typeof data.bankConfig === "object" && data.bankConfig !== null) {
-			bankConfigObj = data.bankConfig;
-		}
+	// 	if (typeof data.bankConfig === "object" && data.bankConfig !== null) {
+	// 		bankConfigObj = data.bankConfig;
+	// 	}
 
-		setForm({
-			...data,
-			bankName: bankConfigObj.bankName ?? bankConfigObj.bank_name ?? data.bankName ?? "",
-			bankAccountHolder:
-				bankConfigObj.bankAccountHolder ??
-				bankConfigObj.bank_account_holder ??
-				data.bankAccountHolder ??
-				"",
-			bankNumber:
-				bankConfigObj.bankNumber ?? bankConfigObj.bank_number ?? data.bankNumber ?? "",
-		});
-	}, [data, setForm]);
+	// 	setForm({
+	// 		...data,
+	// 		bankName: bankConfigObj.bankName ?? bankConfigObj.bank_name ?? data.bankName ?? "",
+	// 		bankAccountHolder:
+	// 			bankConfigObj.bankAccountHolder ??
+	// 			bankConfigObj.bank_account_holder ??
+	// 			data.bankAccountHolder ??
+	// 			"",
+	// 		bankNumber:
+	// 			bankConfigObj.bankNumber ?? bankConfigObj.bank_number ?? data.bankNumber ?? "",
+	// 	});
+	// }, [data, setForm]);
 
 	return (
 		<GenericDialog
@@ -127,7 +127,7 @@ const CompanyForm = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) =>
 				value={form.address}
 				onChange={(e) => setForm({ ...form, address: e })}
 			></FormInput>
-			<FormInput
+			{/* <FormInput
 				type="file"
 				label="Thông tin chuyển khoản"
 				name="bank_attachment"
@@ -156,7 +156,7 @@ const CompanyForm = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) =>
 					value={form.bankNumber}
 					onChange={(e) => setForm({ ...form, bankNumber: e })}
 				></FormInput>
-			</div>
+			</div> */}
 		</GenericDialog>
 	);
 };
