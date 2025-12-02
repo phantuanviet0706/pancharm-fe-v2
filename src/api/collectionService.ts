@@ -100,3 +100,13 @@ export const updateCollectionImage = async (id: number, payload: Partial<Collect
 		throw error;
 	}
 };
+
+export const getDefaultCollections = async () => {
+	try {
+		const res = await axios.get<Collection>(`${API_URL}/default`);
+		return res.data;
+	} catch (error) {
+		console.error("Failed to get collection:", error);
+		throw error;
+	}
+};

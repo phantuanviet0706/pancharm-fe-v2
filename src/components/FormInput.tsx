@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Autocomplete, TextField } from "@mui/material";
-import ReactQuill from "react-quill";
 import FileInput from "./files/FileInput";
 import DateInput from "./date/DateInput";
 import DatetimeInput from "./date/DateTimeInput";
+import EditorInput from "./editor/EditorInput";
+import DOMPurify from "dompurify";
 
 export interface FormInputProps {
 	label?: string;
@@ -139,6 +140,8 @@ const FormInput: React.FC<FormInputProps> = ({
 		const numericValue = allowDecimal ? parseFloat(raw) : parseInt(raw, 10);
 		onChange?.(raw === "" || Number.isNaN(numericValue) ? null : numericValue);
 	}
+
+	const [description, setDescription] = useState("");
 
 	// ====== Password toggle ======
 	const [showPassword, setShowPassword] = useState(false);
@@ -466,35 +469,28 @@ const FormInput: React.FC<FormInputProps> = ({
 				);
 
 			case "editor": {
-				const toolbarOptions = [
-					["bold", "italic", "underline", "strike"],
-					["blockquote", "code-block"],
-					["link", "image", "video", "formula"],
-					[{ header: 1 }, { header: 2 }],
-					[{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
-					[{ script: "sub" }, { script: "super" }],
-					[{ indent: "-1" }, { indent: "+1" }],
-					[{ direction: "rtl" }],
-					[{ size: ["small", false, "large", "huge"] }],
-					[{ header: [1, 2, 3, 4, 5, 6, false] }],
-					[{ color: [] }, { background: [] }],
-					[{ font: [] }],
-					[{ align: [] }],
-					["clean"],
-				];
-				const module = { toolbar: toolbarOptions };
+				const handleChange = (html: string) => {
+					const clean = DOMPurify.sanitize(html);
+					setDescription(clean);
+				};
+
 				return (
-					<div className="relative">
-						<ReactQuill
-							modules={module}
-							theme="snow"
-							value={value || ""}
-							onChange={onChange}
-							onBlur={handleBlur as any}
-							placeholder={placeholder}
-							className="pc-quill__root"
-						/>
-					</div>
+					<EditorInput
+						name="description"
+						value={value}
+						onChange={handleChange}
+						onUploadImage={async (file) => {
+							const formData = new FormData();
+							formData.append("file", file);
+
+							const res = await fetch("/api/upload", {
+								method: "POST",
+								body: formData,
+							});
+							const data = await res.json();
+							return data.url;
+						}}
+					/>
 				);
 			}
 

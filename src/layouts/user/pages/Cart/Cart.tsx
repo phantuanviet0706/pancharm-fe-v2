@@ -7,6 +7,9 @@ import { CartItemType, getCart, saveCart } from "../../../../utils/cart";
 import { useNavigate } from "react-router-dom";
 import { useCartDialog } from "./CartDialogProvider";
 
+const VITE_MESSENGER_URL = import.meta.env.VITE_MESSENGER_URL;
+const VITE_PAGE_ID = import.meta.env.VITE_PAGE_ID;
+
 const Cart = () => {
 	const [items, setItems] = useState<CartItemType[]>([]);
 	const [note, setNote] = useState("");
@@ -40,20 +43,25 @@ const Cart = () => {
 	const handleCheckout = () => {
 		if (!items.length) return;
 
-		const payloadItems = items.map((it) => ({
-			productId: it.productId,
-			quantity: it.quantity,
-			unitPrice: it.unitPrice,
-		}));
+		// const payloadItems = items.map((it) => ({
+		// 	productId: it.productId,
+		// 	productName: it.productName,
+		// 	quantity: it.quantity,
+		// 	unitPrice: it.unitPrice,
+		// }));
 
-		closeCart();
-		navigate("/orders", {
-			state: {
-				mode: "cart",
-				items: payloadItems,
-				note,
-			},
-		});
+		// closeCart();
+		// navigate("/orders", {
+		// 	state: {
+		// 		mode: "cart",
+		// 		items: payloadItems,
+		// 		note,
+		// 	},
+		// });
+
+		const productNames = items.map((it) => it.productName).join("&");
+		window.open(VITE_MESSENGER_URL + `/${VITE_PAGE_ID}?ref=` + encodeURIComponent(productNames), "_blank");
+		syncCart([]);
 	};
 
 	return (
@@ -88,10 +96,10 @@ const Cart = () => {
 							/>
 						</div>
 
-						<div className="flex justify-between mb-3 font-semibold">
+						{/* <div className="flex justify-between mb-3 font-semibold">
 							<span>Tổng cộng:</span>
 							<span>{total.toLocaleString("vi-VN")} đ</span>
-						</div>
+						</div> */}
 
 						<div className="cart-btn">
 							<Button
@@ -108,7 +116,8 @@ const Cart = () => {
 							>
 								<div className="flex gap-2 text-[var(--color-cream-bg)]">
 									<span className="uppercase font-semibold leading-7">
-										Tiến hành thanh toán
+										{/* Tiến hành thanh toán */}
+										Nhận tư vấn
 									</span>
 									<span className="cart-icon-btn">
 										<ShoppingCartIcon />

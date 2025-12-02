@@ -300,6 +300,24 @@ const icons = {
 		</svg>
 	),
 
+	noImage: (p: any) => (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			className="h-12 w-12 text-gray-400 mb-2"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke="currentColor"
+			{...p}
+		>
+			<path
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				strokeWidth={1.5}
+				d="M3 5h18M3 10h18M3 15h18M3 20h18"
+			/>
+		</svg>
+	),
+
 	// Category Detail Icons
 	catName: (p: any) => (
 		<svg
@@ -351,6 +369,107 @@ const icons = {
 			{...p}
 		>
 			<path d="M3 7v10c0 1.1.9 2 2 2h9l7-7-7-7H5c-1.1 0-2 .9-2 2z" />
+		</svg>
+	),
+
+	// ==== Product Detail Icons ==== //
+	prodName: (p: any) => (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			fill="none"
+			stroke="#5a4a42"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			{...p}
+		>
+			<path d="M3 7l7 4 7-4" />
+			<path d="M3 7v6l7 4 7-4V7" />
+			<path d="M10 3l7 4" />
+			<path d="M3 7l7-4" />
+		</svg>
+	),
+	prodSlug: (p: any) => (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			fill="none"
+			stroke="#5a4a42"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			{...p}
+		>
+			<path d="M20 12l-8 8L0 8V0h8l12 12z" />
+			<circle cx="6" cy="6" r="1.5" />
+		</svg>
+	),
+	prodCategory: (p: any) => (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			fill="none"
+			stroke="#5a4a42"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			{...p}
+		>
+			<path d="M3 3h4l2 2h8v12H3V3z" />
+			<path d="M8 10h8M8 14h5" />
+		</svg>
+	),
+	prodPrice: (p: any) => (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			fill="none"
+			stroke="#5a4a42"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			{...p}
+		>
+			<path d="M12 1v18" />
+			<path d="M17 5a5 4 0 1 0-5 4h-2a5 4 0 1 0 5 4" />
+		</svg>
+	),
+	prodDesc: (p: any) => (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			fill="none"
+			stroke="#5a4a42"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			{...p}
+		>
+			<path d="M4 2h8l4 4v12H4z" />
+			<path d="M8 2v4h4" />
+			<path d="M7 10h6M7 14h6" />
+		</svg>
+	),
+	prodStatus: (p: any) => (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="20"
+			height="20"
+			fill="none"
+			stroke="#5a4a42"
+			strokeWidth="1.8"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			{...p}
+		>
+			<rect x="1" y="6" width="18" height="8" rx="4" />
+			<circle cx="13" cy="10" r="3" />
 		</svg>
 	),
 };

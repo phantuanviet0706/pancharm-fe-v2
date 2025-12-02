@@ -51,7 +51,7 @@ const CardItem = ({ item }: CardItemProps) => {
 				</div>
 				<div className="p-2 text-center mb-2 text-[var(--color-card-bg)] group-hover:text-[var(--color-cream-bg)] pt-0 mt-2 transition-colors duration-300">
 					<div className="p-2 pt-0">
-						<p className="text-sm font-semibold uppercase">
+						<p className="text-sm font-semibold uppercase line-clamp-1 overflow-hidden text-ellipsis">
 							{item?.name}
 						</p>
 					</div>

@@ -84,21 +84,21 @@ const menuItems = {
 				},
 			],
 		},
-		{
-			id: "other",
-			name: "Khác",
-			subtitle: "Quản lý dữ liệu tùy chỉnh",
-			type: "group",
-			children: [
-				{
-					id: "custom_footer",
-					title: "Danh mục khác",
-					type: "item",
-					url: "/admin/others",
-					icon: "widgets"
-				}
-			]
-		},
+		// {
+		// 	id: "other",
+		// 	name: "Khác",
+		// 	subtitle: "Quản lý dữ liệu tùy chỉnh",
+		// 	type: "group",
+		// 	children: [
+		// 		{
+		// 			id: "custom_footer",
+		// 			title: "Danh mục khác",
+		// 			type: "item",
+		// 			url: "/admin/others",
+		// 			icon: "widgets"
+		// 		}
+		// 	]
+		// },
 	],
 };
 

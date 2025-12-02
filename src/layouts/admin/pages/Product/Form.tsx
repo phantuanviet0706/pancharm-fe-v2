@@ -317,7 +317,7 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 							name="quantity"
 							value={form?.quantity}
 							onChange={(e) => setForm({ ...form, quantity: e })}
-						></FormInput>
+						></FormInput> */}
 						<FormInput
 							type="int"
 							label="Đơn giá"
@@ -325,9 +325,9 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 							value={form?.unitPrice}
 							onChange={(e) => setForm({ ...form, unitPrice: e })}
 						></FormInput>
-					</div> */}
+					{/* </div> */}
 					<FormInput
-						type="textarea"
+						type="editor"
 						label="Mô tả"
 						name="description"
 						value={form.description ?? ""}

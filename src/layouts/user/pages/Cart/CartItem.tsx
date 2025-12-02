@@ -40,13 +40,13 @@ const CartItem = ({ item, onChangeQty, onRemove }: CartItemProps) => {
 				>
 					<div>
 						<div className="uppercase font-semibold line-clamp-1 overflow-hidden text-ellipsis">
-							Vòng tay đá phong thủy cao cấp
+							{item.productName}
 						</div>
-						<div className="flex gap-4 justify-items-center">
+						<div className="flex gap-4 justify-items-bottom">
 							<div className="font-semibold leading-6">
 								<MoneyDisplay price={item.unitPrice} />
 							</div>
-							<div className="flex gap-2 justify-items-center align-middle">
+							{/* <div className="flex gap-2 justify-items-center align-middle">
 								<div className="text-[14px] leading-6">Số lượng</div>
 								<div className="relative top-[2px]">
 									<InputNumber
@@ -55,14 +55,14 @@ const CartItem = ({ item, onChangeQty, onRemove }: CartItemProps) => {
 										initial={item.quantity}
 									/>
 								</div>
-							</div>
+							</div> */}
 						</div>
-						<div className="flex font-semibold align-middle italic">
+						{/* <div className="flex font-semibold align-middle italic">
 							<div className="leading-6">Tổng tiền:</div>&nbsp;
 							<div className="leading-6">
 								<MoneyDisplay price={item.unitPrice * item.quantity} />
 							</div>
-						</div>
+						</div> */}
 					</div>
 				</div>
 				<div

@@ -3,6 +3,7 @@ import { Iframe } from "./Iframe";
 import Icon from "../../../components/Icon";
 import SocialIcons from "../../../components/SocialIcons";
 import { ConfigContext } from "../../../contexts/ConfigProvider";
+import { formatPhoneVN } from "../../../utils/helper";
 
 const FOOTER_ITEM = [
 	{
@@ -10,19 +11,19 @@ const FOOTER_ITEM = [
 		content: (
 			<div className="">
 				<div>
-					<a href="dieu-khoan">Điều khoản dịch vụ</a>
+					<a href="#">Điều khoản dịch vụ</a>
 				</div>
 				<div>
-					<a href="faq">Câu hỏi thường gặp</a>
+					<a href="#">Câu hỏi thường gặp</a>
 				</div>
 				<div>
-					<a href="van-chuyen">Chính sách vận chuyển</a>
+					<a href="#">Chính sách vận chuyển</a>
 				</div>
 				<div>
-					<a href="bao-hanh">Chính sách & bảo hành</a>
+					<a href="#">Chính sách & bảo hành</a>
 				</div>
 				<div>
-					<a href="thanh-toan">Chính sách thanh toán</a>
+					<a href="#">Chính sách thanh toán</a>
 				</div>
 			</div>
 		),
@@ -59,6 +60,11 @@ const Footer = () => {
 
 	const date = new Date();
 
+	let subPhoneNumber = "";
+	if (company?.config?.sub_phone_number) {
+		subPhoneNumber = company?.config?.sub_phone_number;
+	}
+
 	return (
 		<>
 			<div className="footer h-full px-10 mt-15 py-10 border-t-black border-t-1 bg-[var(--color-card-bg)] mb-0">
@@ -83,9 +89,17 @@ const Footer = () => {
 							<div>
 								<div className="leading-[28px]">
 									<span className="font-semibold">Điện thoại: </span>
-									<a href={`tel:${company?.phone}`}>{company?.phone}</a>
-									&nbsp;-&nbsp;
-									<a href={`tel:${company?.phone}`}>{company?.phone}</a>
+									<a href={`tel:${company?.phone}`}>
+										{formatPhoneVN(company?.phone)}
+									</a>
+									{subPhoneNumber && (
+										<>
+											&nbsp;-&nbsp;
+											<a href={`tel:${subPhoneNumber}`}>
+												{formatPhoneVN(subPhoneNumber)}
+											</a>
+										</>
+									)}
 								</div>
 								<div className="leading-[28px]">
 									<span className="font-semibold">Gmail: </span>

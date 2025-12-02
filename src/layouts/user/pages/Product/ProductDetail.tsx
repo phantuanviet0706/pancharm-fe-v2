@@ -11,6 +11,9 @@ import { formatVND } from "../../../../utils/helper";
 import { useSnackbar } from "../../../../contexts/SnackbarProvider";
 import { getCart, saveCart } from "../../../../utils/cart";
 
+const VITE_MESSENGER_URL = import.meta.env.VITE_MESSENGER_URL;
+const VITE_PAGE_ID = import.meta.env.VITE_PAGE_ID;
+
 const SLIDES = [
 	{
 		src: "/product/01.jpeg",
@@ -80,6 +83,7 @@ const ProductDetail = () => {
 		} else {
 			carts.push({
 				productId: product?.id ?? 0,
+				productName: product?.name ?? "",
 				unitPrice: product?.unitPrice ?? 0,
 				quantity,
 			});
@@ -92,6 +96,11 @@ const ProductDetail = () => {
 			severity: "success",
 		});
 	};
+
+	// ~ Handle contact ~
+	const handleContact = () => {
+		window.open(`${VITE_MESSENGER_URL}/${VITE_PAGE_ID}?ref=${product?.name}`, "_blank");
+	}
 
 	// ---- Scroll description ----
 	const rootRef = useRef<HTMLDivElement | null>(null);
@@ -164,7 +173,7 @@ const ProductDetail = () => {
 							</div>
 						</div>
 						<div className="pt-8">
-							<div className="input-title font-semibold text-xl text-[var(--color-card-bg)] mb-2">
+							{/* <div className="input-title font-semibold text-xl text-[var(--color-card-bg)] mb-2">
 								Số lượng:
 							</div>
 							<div className="flex justify-between gap-10">
@@ -176,9 +185,10 @@ const ProductDetail = () => {
 										onChange={(e) => setQuantity(e)}
 									/>
 								</div>
-							</div>
-							<div className="mt-5">
-								<Button
+							</div> */}
+							{/* <div className="mt-5"> */}
+							<div>
+								{/* <Button
 									sx={{
 										border: "1px solid var(--color-text-light)",
 										background: "var(--color-card-bg)",
@@ -191,6 +201,20 @@ const ProductDetail = () => {
 									onClick={handleBuyNow}
 								>
 									Mua ngay
+								</Button> */}
+								<Button
+									sx={{
+										border: "1px solid var(--color-text-light)",
+										background: "var(--color-card-bg)",
+										color: "white",
+										"&:hover": {
+											background: "var(--color-card-light)",
+										},
+										marginRight: "10px",
+									}}
+									onClick={handleContact}
+								>
+									Liên hệ đặt hàng
 								</Button>
 								<Button
 									sx={{

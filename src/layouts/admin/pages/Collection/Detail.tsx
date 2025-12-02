@@ -3,6 +3,7 @@ import FieldDisplay from "../../../../components/FieldDisplay";
 import Icon from "../../../../components/Icon";
 import { Collection } from "../../../../api/collectionService";
 import SwipeSlider from "../../../user/components/SwipeSlider";
+import NoImage from "../Common/NoImage";
 
 interface DetailProps {
 	object: Collection;
@@ -61,7 +62,11 @@ const Detail = ({ object }: DetailProps) => {
 					)}
 				</div>
 				<div className="image-preview w-[40%] mr-3">
-					<SwipeSlider showThumbs width="30rem" height="40rem" slides={slides} />
+					{slides.length > 0 ? (
+						<SwipeSlider showThumbs width="30rem" height="40rem" slides={slides} />
+					) : (
+						<NoImage />
+					)}
 				</div>
 			</div>
 		</>

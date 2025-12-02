@@ -5,12 +5,13 @@ interface CardProps {
 	item: any;
 	width?: number;
 	height?: number;
+	path?: string;
 }
 
-const Card = ({ item, width = 360, height = 350 }: CardProps) => {
+const Card = ({ item, width = 360, height = 350, path = "#" }: CardProps) => {
 	return (
 		<div className="relative group overflow-hidden" style={{ width, height }}>
-			<Link href="/collections/detail" className="block h-full w-full">
+			<Link href={path} className="block h-full w-full">
 				<img
 					src={item?.src}
 					alt="Card item"

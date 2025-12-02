@@ -93,6 +93,7 @@ export default function GenericTable<T>({
 											style={{
 												width: col.width || "auto",
 												...col.cellStyle,
+												maxWidth: col.width || "12vw"
 											}}
 											onClick={() => col.onClick?.(row)}
 											title={

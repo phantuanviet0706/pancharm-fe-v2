@@ -18,6 +18,15 @@ const PRICE_FILTER_LABELS = [
 	"Từ 1 - 2 triệu",
 ];
 
+// mapping từng label -> khoảng giá
+const PRICE_FILTER_RANGES = [
+	null, // "Tất cả"
+	{ min: 0, max: 200000 }, // Dưới 200K
+	{ min: 200000, max: 500000 }, // Từ 200K - 500K
+	{ min: 500000, max: 1000000 }, // Từ 500K - 1 triệu
+	{ min: 1000000, max: 2000000 }, // Từ 1 - 2 triệu
+];
+
 const Product = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 
@@ -25,10 +34,37 @@ const Product = () => {
 	const initialPage = Number(searchParams.get("page") || 1) - 1;
 	const [page, setPage] = useState(initialPage < 0 ? 0 : initialPage);
 
-	// ===== CHECKBOX MỨC GIÁ =====
-	const [priceChecks, setPriceChecks] = useState(PRICE_FILTER_LABELS.map(() => false));
+	// ===== CHECKBOX MỨC GIÁ (init từ URL nếu có) =====
+	const buildInitialPriceChecks = () => {
+		const checks = PRICE_FILTER_LABELS.map(() => false);
+		const param = searchParams.get("priceRanges"); // vd: "0-200000,200000-500000"
 
-	const togglePriceCheck = (index) => {
+		if (!param) return checks;
+
+		const rangesFromUrl = param.split(",");
+		rangesFromUrl.forEach((r) => {
+			const [minStr, maxStr] = r.split("-");
+			const min = Number(minStr);
+			const max = Number(maxStr);
+
+			PRICE_FILTER_RANGES.forEach((range, idx) => {
+				if (!range || checks[idx]) return;
+				if (range.min === min && range.max === max) {
+					checks[idx] = true;
+				}
+			});
+		});
+
+		// nếu tất cả các khoảng (1..n) đều true -> bật "Tất cả"
+		const allSelected = checks.slice(1).every((v) => v === true);
+		if (allSelected) checks[0] = true;
+
+		return checks;
+	};
+
+	const [priceChecks, setPriceChecks] = useState(buildInitialPriceChecks);
+
+	const togglePriceCheck = (index: number) => {
 		let newChecks = [...priceChecks];
 
 		if (index === 0) {
@@ -44,77 +80,80 @@ const Product = () => {
 	};
 
 	// ===== SLIDER GIÁ =====
-	const initialMin = Number(searchParams.get("minPrice") || 200000);
-	const initialMax = Number(searchParams.get("maxPrice") || 1200000);
+	const initialMin = Number(searchParams.get("unitPriceFrom") || 200000);
+	const initialMax = Number(searchParams.get("unitPriceTo") || 1200000);
 
-	const [minPrice, setMinPrice] = useState(Number.isNaN(initialMin) ? 200000 : initialMin);
-	const [maxPrice, setMaxPrice] = useState(Number.isNaN(initialMax) ? 1200000 : initialMax);
+	const [unitPriceFrom, setUnitPriceFrom] = useState(Number.isNaN(initialMin) ? 200000 : initialMin);
+	const [unitPriceTo, setUnitPriceTo] = useState(Number.isNaN(initialMax) ? 1200000 : initialMax);
+
+	// đọc param cho BE
+	const priceRangesParam = searchParams.get("priceRanges") || "";
 
 	const { products, totalPages, total } = useProducts(
 		useMemo(
 			() => ({
 				limit: 20,
 				page,
-				// có thể truyền minPrice / maxPrice cho BE tại đây
-				// minPrice,
-				// maxPrice,
+				priceRanges: priceRangesParam,
+				unitPriceFrom: unitPriceFrom,
+				unitPriceTo: unitPriceTo,
 			}),
-			[page], // + thêm minPrice/maxPrice nếu muốn refetch khi đổi giá
+			[page, priceRangesParam],
 		),
 	);
 
-	const formatCurrency = (value) => new Intl.NumberFormat("vi-VN").format(value) + "đ";
+	const formatCurrency = (value: number) => new Intl.NumberFormat("vi-VN").format(value) + "đ";
 
-	const handleMinChange = (e) => {
+	const handleMinChange = (e: any) => {
 		const value = Number(e.target.value);
 
-		if (minPrice === PRICE_MIN && maxPrice === PRICE_MIN && value > PRICE_MIN) {
-			setMinPrice(PRICE_MIN);
-			setMaxPrice(value);
+		if (unitPriceFrom === PRICE_MIN && unitPriceTo === PRICE_MIN && value > PRICE_MIN) {
+			setUnitPriceFrom(PRICE_MIN);
+			setUnitPriceTo(value);
 			return;
 		}
 
-		if (minPrice === PRICE_MAX && maxPrice === PRICE_MAX && value < PRICE_MAX) {
-			setMinPrice(value);
-			setMaxPrice(PRICE_MAX);
+		if (unitPriceFrom === PRICE_MAX && unitPriceTo === PRICE_MAX && value < PRICE_MAX) {
+			setUnitPriceFrom(value);
+			setUnitPriceTo(PRICE_MAX);
 			return;
 		}
 
-		if (value > maxPrice) {
-			setMinPrice(value);
-			setMaxPrice(value);
+		if (value > unitPriceTo) {
+			setUnitPriceFrom(value);
+			setUnitPriceTo(value);
 		} else {
-			setMinPrice(value);
+			setUnitPriceFrom(value);
 		}
 	};
 
-	const handleMaxChange = (e) => {
+	const handleMaxChange = (e: any) => {
 		const value = Number(e.target.value);
 
-		if (minPrice === PRICE_MIN && maxPrice === PRICE_MIN && value > PRICE_MIN) {
-			setMinPrice(PRICE_MIN);
-			setMaxPrice(value);
+		if (unitPriceFrom === PRICE_MIN && unitPriceTo === PRICE_MIN && value > PRICE_MIN) {
+			setUnitPriceFrom(PRICE_MIN);
+			setUnitPriceTo(value);
 			return;
 		}
 
-		if (minPrice === PRICE_MAX && maxPrice === PRICE_MAX && value < PRICE_MAX) {
-			setMinPrice(value);
-			setMaxPrice(PRICE_MAX);
+		if (unitPriceFrom === PRICE_MAX && unitPriceTo === PRICE_MAX && value < PRICE_MAX) {
+			setUnitPriceFrom(value);
+			setUnitPriceTo(PRICE_MAX);
 			return;
 		}
 
-		if (value < minPrice) {
-			setMinPrice(value);
-			setMaxPrice(value);
+		if (value < unitPriceFrom) {
+			setUnitPriceFrom(value);
+			setUnitPriceTo(value);
 		} else {
-			setMaxPrice(value);
+			setUnitPriceTo(value);
 		}
 	};
 
-	const minPercent = ((minPrice - PRICE_MIN) / (PRICE_MAX - PRICE_MIN)) * 100;
-	const maxPercent = ((maxPrice - PRICE_MIN) / (PRICE_MAX - PRICE_MIN)) * 100;
+	const minPercent = ((unitPriceFrom - PRICE_MIN) / (PRICE_MAX - PRICE_MIN)) * 100;
+	const maxPercent = ((unitPriceTo - PRICE_MIN) / (PRICE_MAX - PRICE_MIN)) * 100;
 
-	const handleTrackClick = (e) => {
+	const handleTrackClick = (e: any) => {
 		const rect = e.currentTarget.getBoundingClientRect();
 		const clickX = e.clientX - rect.left;
 		const clickPercent = (clickX / rect.width) * 100;
@@ -126,8 +165,8 @@ const Product = () => {
 		if (clickValue < PRICE_MIN) clickValue = PRICE_MIN;
 		if (clickValue > PRICE_MAX) clickValue = PRICE_MAX;
 
-		const distToMin = Math.abs(clickValue - minPrice);
-		const distToMax = Math.abs(clickValue - maxPrice);
+		const distToMin = Math.abs(clickValue - unitPriceFrom);
+		const distToMax = Math.abs(clickValue - unitPriceTo);
 
 		if (distToMin <= distToMax) {
 			handleMinChange({ target: { value: clickValue } });
@@ -136,14 +175,54 @@ const Product = () => {
 		}
 	};
 
+	// ✅ Áp dụng: đẩy CẢ checkbox + slider vào URL, lúc này mới trigger API
 	const handleApply = () => {
-		const url = new URL(window.location.href);
+		const next = new URLSearchParams(searchParams);
 
-		url.searchParams.set("minPrice", String(minPrice));
-		url.searchParams.set("maxPrice", String(maxPrice));
-		url.searchParams.set("page", String(page + 1));
+		// 1. Ghi unitPriceFrom/unitPriceTo vào URL (nếu BE muốn dùng)
+		next.set("unitPriceFrom", String(unitPriceFrom));
+		next.set("unitPriceTo", String(unitPriceTo));
 
-		window.location.href = url.toString();
+		// 2. Ghi priceRanges từ state checkbox
+		const activeRanges: any = [];
+		priceChecks.forEach((checked, idx) => {
+			if (!checked || idx === 0) return; // bỏ "Tất cả"
+			const range = PRICE_FILTER_RANGES[idx];
+			if (!range) return;
+			activeRanges.push(`${range.min}-${range.max}`);
+		});
+
+		if (activeRanges.length > 0) {
+			next.set("priceRanges", activeRanges.join(","));
+		} else {
+			next.delete("priceRanges");
+		}
+
+		// reset page về 1 khi đổi filter
+		next.set("page", "1");
+		setSearchParams(next);
+		setPage(0);
+		window.location.reload();
+	};
+
+	const handleReset = () => {
+		// reset state checkbox
+		setPriceChecks(PRICE_FILTER_LABELS.map(() => false));
+
+		// reset slider về default
+		setUnitPriceFrom(200000);
+		setUnitPriceTo(1200000);
+
+		// xoá params liên quan filter khỏi URL
+		const next = new URLSearchParams(searchParams);
+		next.delete("priceRanges");
+		next.delete("unitPriceFrom");
+		next.delete("unitPriceTo");
+		next.set("page", "1");
+
+		setSearchParams(next);
+		setPage(0);
+		window.location.reload();
 	};
 
 	return (
@@ -192,14 +271,14 @@ const Product = () => {
 										<div className="flex items-center justify-between gap-[0.5em] mb-[0.75em]">
 											<input
 												type="text"
-												value={formatCurrency(minPrice)}
+												value={formatCurrency(unitPriceFrom)}
 												readOnly
 												className="w-[6.25em] bg-transparent border border-white/40 rounded px-[0.5em] py-[0.2em] text-sm text-white placeholder-white/70 text-center"
 											/>
 											<span className="text-white">~</span>
 											<input
 												type="text"
-												value={formatCurrency(maxPrice)}
+												value={formatCurrency(unitPriceTo)}
 												readOnly
 												className="w-[6.25em] bg-transparent border border-white/40 rounded px-[0.5em] py-[0.2em] text-sm text-white placeholder-white/70 text-center"
 											/>
@@ -228,7 +307,7 @@ const Product = () => {
 												min={PRICE_MIN}
 												max={PRICE_MAX}
 												step={PRICE_STEP}
-												value={minPrice}
+												value={unitPriceFrom}
 												onChange={handleMinChange}
 												className="absolute w-full appearance-none bg-transparent top-[0.3125em] pointer-events-none"
 												style={{ zIndex: 3 }}
@@ -240,7 +319,7 @@ const Product = () => {
 												min={PRICE_MIN}
 												max={PRICE_MAX}
 												step={PRICE_STEP}
-												value={maxPrice}
+												value={unitPriceTo}
 												onChange={handleMaxChange}
 												className="absolute w-full appearance-none bg-transparent top-[0.3125em] pointer-events-none"
 												style={{ zIndex: 2 }}
@@ -249,7 +328,19 @@ const Product = () => {
 									</div>
 								</div>
 
-								<div className="mt-4 flex justify-end">
+								<div className="mt-4 flex justify-between">
+									<Button
+										className="w-[100px]"
+										variant="outlined"
+										sx={{
+											borderColor: "var(--color-cream-bg)",
+											color: "var(--color-cream-bg)",
+											paddingInline: "0px",
+										}}
+										onClick={handleReset}
+									>
+										Khôi phục
+									</Button>
 									<Button
 										className="w-[100px]"
 										sx={{
