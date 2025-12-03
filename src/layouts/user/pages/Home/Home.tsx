@@ -10,8 +10,18 @@ import { useNavigate } from "react-router-dom";
 
 const Home = () => {
 	const { collections } = useCollections(useMemo(() => ({ limit: 2, isDefault: 1 }), []));
-	const { products } = useProducts(useMemo(() => ({ limit: 10 }), []));
+	let { products } = useProducts(useMemo(() => ({ limit: 10 }), []));
 	const navigate = useNavigate();
+
+	products.length > 0 && products.map((p) => {
+		const defaultImage = p.productImages?.find((img) => {
+			return img.isDefault == true ? img : null;
+		});
+
+		if (defaultImage) {
+			p.src = defaultImage.path;
+		}
+	});
 
 	return (
 		<>
