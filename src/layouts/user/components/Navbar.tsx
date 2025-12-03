@@ -301,7 +301,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 												style={{ backgroundColor: "var(--color-card-bg)" }}
 											>
 												<ul className="py-2">
-													{categories.map((op: Category, idx: number) => (
+													{categories.length > 0 && categories.map((op: Category, idx: number) => (
 														<li key={idx}>
 															<a
 																role="menuitem"
