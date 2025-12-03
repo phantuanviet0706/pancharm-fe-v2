@@ -153,12 +153,15 @@ const ProductDetail = () => {
 	// ---- Quantity config ----
 	const [quantity, setQuantity] = useState(1);
 
+	const productImages = product?.productImages || [];
+	const productSlides = productImages.length > 0 ? productImages.map((img) => ({ src: img.path })) : [];
+
 	return (
 		<BaseLayout>
 			<div ref={rootRef} style={{ margin: 0 }}></div>
 			<div className="xl:flex justify-between px-10">
 				<div className="product-images w-[45%]">
-					<SwipeSlider showThumbs width="30rem" height="40rem" slides={SLIDES} />
+					<SwipeSlider showThumbs width="30rem" height="40rem" slides={productSlides} />
 				</div>
 				<div className="product-basic-info px-8 w-[55%] flex justify-left">
 					<div
