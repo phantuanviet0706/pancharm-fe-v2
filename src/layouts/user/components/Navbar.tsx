@@ -153,7 +153,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 				{openProfile && (
 					<div
 						role="menu"
-						className="absolute right-0 mt-3 w-48 overflow-hidden rounded-xl shadow-xl"
+						className="profile-menu absolute right-0 mt-3 w-48 overflow-hidden rounded-xl shadow-xl"
 						style={{ backgroundColor: "var(--color-card-bg)" }}
 					>
 						<UserNav settings={PROFILE_SETTINGS}></UserNav>
