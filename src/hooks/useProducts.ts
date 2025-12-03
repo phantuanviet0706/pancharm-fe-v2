@@ -13,7 +13,7 @@ export function useProducts(query: ProductQuery = {}) {
 		fetchData(query)
 			.then((res) => {
 				const mock_data = res.result;
-				let products = mock_data.contet || [];
+				let products = mock_data.content || [];
 
 				products.length > 0 &&
 					products.map((p: Product) => {
