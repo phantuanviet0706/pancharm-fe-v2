@@ -96,6 +96,7 @@ const CompanyForm = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) =>
 				name="name"
 				value={form.name}
 				onChange={(e) => setForm({ ...form, name: e })}
+				required
 			></FormInput>
 			<FormInput
 				type="text"
@@ -103,21 +104,31 @@ const CompanyForm = ({ open, onClose, onSubmit, data, onSuccess }: FormProps) =>
 				name="email"
 				value={form.email}
 				onChange={(e) => setForm({ ...form, email: e })}
+				required
+			></FormInput>
+			<FormInput
+				type="text"
+				label="Mã số thuế"
+				name="taxCode"
+				value={form.taxcode}
+				onChange={(e) => setForm({ ...form, taxcode: e })}
+				required
 			></FormInput>
 			<div className="grid grid-cols-2 gap-4">
-				<FormInput
-					type="text"
-					label="Mã số thuế"
-					name="taxCode"
-					value={form.taxcode}
-					onChange={(e) => setForm({ ...form, taxcode: e })}
-				></FormInput>
 				<FormInput
 					type="text"
 					label="Số điện thoại"
 					name="phone"
 					value={form.phone}
 					onChange={(e) => setForm({ ...form, phone: e })}
+					required
+				></FormInput>
+				<FormInput
+					type="text"
+					label="Số điện thoại phụ"
+					name="phone"
+					value={form.subPhone}
+					onChange={(e) => setForm({ ...form, subPhone: e })}
 				></FormInput>
 			</div>
 			<FormInput

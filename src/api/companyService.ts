@@ -9,10 +9,11 @@ export interface Company {
 	avatar?: string;
 	taxcode?: string;
 	phone?: string;
+	subPhone?: string
 	email?: string;
 	// bankAttachment?: string;
 	// bankAttachmentFile?: File;
-	config?: JSON;
+	config?: string;
 	companyInfos: CompanyInfo[];
 	// bankConfig?: string;
 	// bankName?: string;

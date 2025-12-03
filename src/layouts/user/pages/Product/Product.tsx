@@ -79,27 +79,38 @@ const Product = () => {
 		setPriceChecks(newChecks);
 	};
 
-	// ===== SLIDER GIÁ =====
+	// ===== SLIDER GIÁ (UI) =====
 	const initialMin = Number(searchParams.get("unitPriceFrom") || 200000);
 	const initialMax = Number(searchParams.get("unitPriceTo") || 1200000);
 
-	const [unitPriceFrom, setUnitPriceFrom] = useState(Number.isNaN(initialMin) ? 200000 : initialMin);
+	const [unitPriceFrom, setUnitPriceFrom] = useState(
+		Number.isNaN(initialMin) ? 200000 : initialMin,
+	);
 	const [unitPriceTo, setUnitPriceTo] = useState(Number.isNaN(initialMax) ? 1200000 : initialMax);
 
-	// đọc param cho BE
+	// ===== PARAM GỬI CHO BE (từ URL, không từ state) =====
 	const priceRangesParam = searchParams.get("priceRanges") || "";
+	const unitPriceFromParam = searchParams.get("unitPriceFrom");
+	const unitPriceToParam = searchParams.get("unitPriceTo");
 
 	const { products, totalPages, total } = useProducts(
-		useMemo(
-			() => ({
+		useMemo(() => {
+			const params: any = {
 				limit: 20,
 				page,
 				priceRanges: priceRangesParam,
-				unitPriceFrom: unitPriceFrom,
-				unitPriceTo: unitPriceTo,
-			}),
-			[page, priceRangesParam],
-		),
+			};
+
+			// chỉ gắn vào request nếu URL thật sự có
+			if (unitPriceFromParam) {
+				params.unitPriceFrom = Number(unitPriceFromParam);
+			}
+			if (unitPriceToParam) {
+				params.unitPriceTo = Number(unitPriceToParam);
+			}
+
+			return params;
+		}, [page, priceRangesParam, unitPriceFromParam, unitPriceToParam]),
 	);
 
 	const formatCurrency = (value: number) => new Intl.NumberFormat("vi-VN").format(value) + "đ";
@@ -175,16 +186,16 @@ const Product = () => {
 		}
 	};
 
-	// ✅ Áp dụng: đẩy CẢ checkbox + slider vào URL, lúc này mới trigger API
+	// ✅ Áp dụng: cập nhật URL (từ state) → BE đọc từ URL param
 	const handleApply = () => {
 		const next = new URLSearchParams(searchParams);
 
-		// 1. Ghi unitPriceFrom/unitPriceTo vào URL (nếu BE muốn dùng)
+		// 1. Ghi unitPriceFrom/unitPriceTo vào URL
 		next.set("unitPriceFrom", String(unitPriceFrom));
 		next.set("unitPriceTo", String(unitPriceTo));
 
 		// 2. Ghi priceRanges từ state checkbox
-		const activeRanges: any = [];
+		const activeRanges: string[] = [];
 		priceChecks.forEach((checked, idx) => {
 			if (!checked || idx === 0) return; // bỏ "Tất cả"
 			const range = PRICE_FILTER_RANGES[idx];
@@ -209,7 +220,7 @@ const Product = () => {
 		// reset state checkbox
 		setPriceChecks(PRICE_FILTER_LABELS.map(() => false));
 
-		// reset slider về default
+		// reset slider về default (UI)
 		setUnitPriceFrom(200000);
 		setUnitPriceTo(1200000);
 

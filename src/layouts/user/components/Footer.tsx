@@ -4,6 +4,7 @@ import Icon from "../../../components/Icon";
 import SocialIcons from "../../../components/SocialIcons";
 import { ConfigContext } from "../../../contexts/ConfigProvider";
 import { formatPhoneVN } from "../../../utils/helper";
+import { parseConfig } from "../../../utils/company";
 
 const FOOTER_ITEM = [
 	{
@@ -60,10 +61,8 @@ const Footer = () => {
 
 	const date = new Date();
 
-	let subPhoneNumber = "";
-	if (company?.config?.sub_phone_number) {
-		subPhoneNumber = company?.config?.sub_phone_number;
-	}
+	const config = parseConfig(company?.config);
+	const subPhoneNumber = config?.subPhone || null;
 
 	return (
 		<>

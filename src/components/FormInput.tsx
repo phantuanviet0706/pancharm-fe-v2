@@ -6,6 +6,8 @@ import DatetimeInput from "./date/DateTimeInput";
 import EditorInput from "./editor/EditorInput";
 import DOMPurify from "dompurify";
 
+const VITE_API_URL = import.meta.env.VITE_APP_URL;
+
 export interface FormInputProps {
 	label?: string;
 	type:
@@ -51,6 +53,7 @@ export interface FormInputProps {
 	tabIndex?: number;
 
 	showActions?: boolean;
+	draftId?: string;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -83,6 +86,7 @@ const FormInput: React.FC<FormInputProps> = ({
 	tabIndex,
 
 	showActions = false,
+	draftId = crypto.randomUUID(),
 }) => {
 	// ====== Styles ======
 	const pillStyle =
@@ -470,8 +474,10 @@ const FormInput: React.FC<FormInputProps> = ({
 
 			case "editor": {
 				const handleChange = (html: string) => {
-					const clean = DOMPurify.sanitize(html);
-					setDescription(clean);
+					const clean = DOMPurify.sanitize(html, {
+						USE_PROFILES: { html: true },
+					});
+					onChange?.(clean);
 				};
 
 				return (
@@ -482,13 +488,14 @@ const FormInput: React.FC<FormInputProps> = ({
 						onUploadImage={async (file) => {
 							const formData = new FormData();
 							formData.append("file", file);
+							formData.append("draftId", draftId);
 
-							const res = await fetch("/api/upload", {
+							const res = await fetch(`${VITE_API_URL}/upload`, {
 								method: "POST",
 								body: formData,
 							});
 							const data = await res.json();
-							return data.url;
+							return data.result;
 						}}
 					/>
 				);

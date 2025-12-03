@@ -40,6 +40,8 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 	);
 	const [defaultImageId, setDefaultImageId] = useState<number | null>(initialDefaultId);
 
+	const [draftId] = useState(() => crypto.randomUUID());
+
 	useEffect(() => {
 		if (action === "updateImages" && open) {
 			setDefaultImageId(initialDefaultId ?? null);
@@ -283,7 +285,7 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 					</div>
 					<FormInput
 						type="autocomplete"
-						label="Danh mục cha"
+						label="Danh mục sản phẩm"
 						name="categoryId"
 						value={
 							form.categoryId
@@ -332,6 +334,7 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 						name="description"
 						value={form.description ?? ""}
 						onChange={(e) => setForm({ ...form, description: e })}
+						draftId={draftId}
 					></FormInput>
 					{action == "update" && (
 						<FormInput

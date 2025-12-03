@@ -10,6 +10,7 @@ import { getProduct, Product } from "../../../../api/productService";
 import { formatVND } from "../../../../utils/helper";
 import { useSnackbar } from "../../../../contexts/SnackbarProvider";
 import { getCart, saveCart } from "../../../../utils/cart";
+import DOMPurify from "dompurify";
 
 const VITE_MESSENGER_URL = import.meta.env.VITE_MESSENGER_URL;
 const VITE_PAGE_ID = import.meta.env.VITE_PAGE_ID;
@@ -100,7 +101,7 @@ const ProductDetail = () => {
 	// ~ Handle contact ~
 	const handleContact = () => {
 		window.open(`${VITE_MESSENGER_URL}/${VITE_PAGE_ID}?ref=${product?.name}`, "_blank");
-	}
+	};
 
 	// ---- Scroll description ----
 	const rootRef = useRef<HTMLDivElement | null>(null);
@@ -240,9 +241,12 @@ const ProductDetail = () => {
 						Thông tin sản phẩm
 					</div>
 					<DetailSection>
-						<section className="description-content expanded grid gap-4 mt-4 text-center px-12">
-							{product?.description}
-						</section>
+						<section
+							className="description-content expanded grid gap-4 mt-4 text-left px-12"
+							dangerouslySetInnerHTML={{
+								__html: DOMPurify.sanitize(product.description || ""),
+							}}
+						/>
 					</DetailSection>
 				</div>
 			)}

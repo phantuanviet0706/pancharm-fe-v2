@@ -118,6 +118,11 @@ h6 {
 }
 
 a {
+	color: var(--color-card-bg);
+	text-decoration: none;
+}
+
+.footer a {
 	color: var(--color-cream-bg);
 	text-decoration: none;
 }

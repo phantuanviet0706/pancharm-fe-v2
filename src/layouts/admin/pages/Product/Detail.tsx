@@ -6,7 +6,6 @@ import { Product } from "../../../../api/productService";
 import NoImage from "../Common/NoImage";
 import { formatVND } from "../../../../utils/helper";
 import { ProductStatusVariable } from "../../../../constants/productStatus";
-import DOMPurify from "dompurify";
 
 interface DetailProps {
 	object: Product;
@@ -70,8 +69,9 @@ const Detail = ({ object }: DetailProps) => {
 
 						<FieldDisplay
 							label="Mô tả sản phẩm"
-							value={DOMPurify.sanitize(object.description || "")}
+							value={object.description}
 							icon={<Icon name="prodDesc" />}
+							isHtml
 						></FieldDisplay>
 					</div>
 				</div>

@@ -26,9 +26,10 @@ import { logout } from "../../../api/authService";
 import { ConfigContext } from "../../../contexts/ConfigProvider";
 import { useCartDialog } from "../pages/Cart/CartDialogProvider";
 import { getCookie } from "../../../utils/auth";
+import { Category } from "../../../api/categoryService";
 
 const MAIN_MENU = [
-	{ key: "collections", label: "BST Mới", href: "/collections" },
+	{ key: "collections", label: "Bộ Sưu Tập", href: "/collections" },
 	{ key: "categories", label: "Trang sức" },
 	{ key: "products", label: "Sản phẩm", href: "/products" },
 	// { key: "gifts", label: "Quà tặng", href: "/gifts" },
@@ -92,33 +93,7 @@ const handleLogout = async () => {
 const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => {
 	const { state: APP_CONFIG } = useContext(ConfigContext);
 	const company = APP_CONFIG?.company || {};
-
-	const HEADER_ITEMS = [
-		{
-			title: "Hotline",
-			className: "phone-contact relative",
-			icon: <PhoneIcon />,
-			content: company?.phone,
-			href: `tel:${company?.phone}`,
-			display: company?.phone,
-		},
-		{
-			title: "Email",
-			className: "email-contact absolute left-3/7",
-			icon: <EmailIcon />,
-			content: company?.email,
-			href: `mailto:${company?.email}`,
-			display: company?.email,
-		},
-		{
-			title: "Địa chỉ",
-			className: "address-contact relative",
-			icon: <LocationOnIcon />,
-			content: company?.address,
-			icon_right: true,
-			display: company?.address,
-		},
-	];
+	const categories = APP_CONFIG?.categories || {};
 
 	const [openProfile, setOpenProfile] = useState(false);
 	const profileRef = useRef<HTMLDivElement | null>(null);
@@ -326,17 +301,17 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 												style={{ backgroundColor: "var(--color-card-bg)" }}
 											>
 												<ul className="py-2">
-													{CATEGORY_OPTIONS.map((op) => (
-														<li key={op.href}>
+													{categories.map((op: Category, idx: number) => (
+														<li key={idx}>
 															<a
 																role="menuitem"
-																href={op.href}
+																href={`/products?categoryId=${op.id}`}
 																className="block px-4 py-2 text-sm text-[var(--color-cream-bg)] hover:bg-[color:var(--color-cream-soft)]/15"
 																onClick={() =>
 																	setOpenCategories(false)
 																}
 															>
-																{op.label}
+																{op.name}
 															</a>
 														</li>
 													))}

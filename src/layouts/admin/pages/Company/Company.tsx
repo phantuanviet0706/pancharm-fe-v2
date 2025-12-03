@@ -11,7 +11,7 @@ import { useCompany } from "../../../../hooks/useCompany";
 import FilePreviewButton from "../../../../components/FilePreviewButton";
 import ErrorPage from "../../../common/ErrorPage";
 import { useSnackbar } from "../../../../contexts/SnackbarProvider";
-import { parseBankConfig } from "../../../../utils/company";
+import { parseBankConfig, parseConfig } from "../../../../utils/company";
 
 const Company = () => {
 	const { showSnackbar } = useSnackbar();
@@ -69,6 +69,8 @@ const Company = () => {
 		);
 	}
 
+	const config = parseConfig(data?.config);
+
 	let content = (
 		<div>
 			<CommonLayout title="Thông tin công ty" className="company-page">
@@ -94,6 +96,12 @@ const Company = () => {
 					<FieldDisplay
 						label="Số điện thoại"
 						value={data?.phone || ""}
+						icon={<Icon name="phone" />}
+						inline
+					></FieldDisplay>
+					<FieldDisplay
+						label="Số điện thoại phụ"
+						value={config?.subPhone || ""}
 						icon={<Icon name="phone" />}
 						inline
 					></FieldDisplay>
