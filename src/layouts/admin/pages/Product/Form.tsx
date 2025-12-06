@@ -71,7 +71,7 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 							name: form.name,
 							slug: form.slug,
 							description: form.description,
-							quantity: form.quantity,
+							quantity: form.quantity || 0,
 							unitPrice: form.unitPrice,
 							categoryId: form.categoryId,
 							productImageFiles: (form as any)?.productImageFiles,

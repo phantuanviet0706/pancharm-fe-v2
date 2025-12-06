@@ -54,6 +54,10 @@ export const handleFormData = (data: Object) => {
 			return;
 		}
 
+		if (typeof value === "number" && isNaN(value)) {
+			return;
+		}
+
 		if (typeof value === "object" && !(value instanceof File)) {
 			fd.append(key, JSON.stringify(value));
 		} else {

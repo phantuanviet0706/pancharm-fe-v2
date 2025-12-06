@@ -117,7 +117,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 					}}
 				>
 					<Link
-						href="login"
+						href="/login"
 						sx={{
 							color: "var(--color-cream-bg)",
 							"&:hover": {
