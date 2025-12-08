@@ -153,7 +153,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 				{openProfile && (
 					<div
 						role="menu"
-						className="profile-menu absolute right-0 mt-3 w-48 overflow-hidden rounded-xl shadow-xl"
+						className="t-container absolute right-0 mt-3 w-48 overflow-hidden rounded-xl shadow-xl"
 						style={{ backgroundColor: "var(--color-card-bg)" }}
 					>
 						<UserNav settings={PROFILE_SETTINGS}></UserNav>
@@ -297,7 +297,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 										{openCategories && (
 											<div
 												role="menu"
-												className="absolute left-full -translate-x-1/2 mt-2 w-48 rounded-2xl shadow-xl overflow-hidden"
+												className="t-container absolute left-full -translate-x-1/2 mt-2 w-48 rounded-2xl shadow-xl overflow-hidden"
 												style={{ backgroundColor: "var(--color-card-bg)" }}
 											>
 												<ul className="py-2">
