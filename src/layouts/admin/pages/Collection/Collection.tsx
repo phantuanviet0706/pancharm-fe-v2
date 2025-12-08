@@ -11,6 +11,7 @@ import {
 	getCollection,
 	updateCollection,
 	updateCollectionImage,
+	updateCollectionProducts,
 } from "../../../../api/collectionService";
 import { useCollections } from "../../../../hooks/useCollections";
 import Form from "./Form";
@@ -18,8 +19,11 @@ import ErrorPage from "../../../common/ErrorPage";
 import { useSnackbar } from "../../../../contexts/SnackbarProvider";
 import GenericDetailDialog from "../../../../components/GenericDetailDialog";
 import Detail from "./Detail";
+import { ObjectPicker } from "../../../../components/ObjectPickerDialog";
+import { Product, fetchData } from "../../../../api/productService";
 
 type FormAction = "create" | "update" | "updateImages";
+type ProductPage = { id: string; index: number; name: string };
 
 const Collection = () => {
 	const { showSnackbar } = useSnackbar();
@@ -40,6 +44,73 @@ const Collection = () => {
 
 	const onCloseForm = () => setOpenForm(false);
 
+	// ==== Product picker state ====
+	const [productPickerOpen, setProductPickerOpen] = useState(false);
+	const [productPickerCollection, setProductPickerCollection] = useState<CollectionObject | null>(
+		null,
+	);
+
+	const [selectedProductIds, setSelectedProductIds] = useState<number[]>([]);
+
+	const [productPage, setProductPage] = useState(0);
+	const productLimit = 10;
+
+	const [productItems, setProductItems] = useState<Product[]>([]);
+	const [productTotalPages, setProductTotalPages] = useState(1);
+	const [loadingProducts, setLoadingProducts] = useState(false);
+
+	const [collectionId, setCollectionId] = useState<number>(0);
+
+	const fetchProductsForPicker = async (page: number) => {
+		try {
+			setLoadingProducts(true);
+
+			const res = await fetchData({
+				page,
+				limit: productLimit,
+				keyword: "",
+				collectionId: collectionId ?? 0,
+				ignoreCollection: true
+			} as any);
+
+			if (res?.code === 1 && res?.result) {
+				const items =
+					(res.result.items as Product[]) ||
+					(res.result.content as Product[]) ||
+					(res.result as Product[]);
+				const totalP = res.result.totalPages ?? res.result.total ?? 1;
+
+				setProductItems(items || []);
+				setProductTotalPages(totalP || 1);
+			}
+		} catch (err: any) {
+			console.error(err);
+			showSnackbar({
+				message: err?.response?.data?.message || "Không thể tải danh sách sản phẩm",
+				severity: "error",
+			});
+		} finally {
+			setLoadingProducts(false);
+		}
+	};
+
+	const productPages: ProductPage[] = useMemo(
+		() =>
+			Array.from({ length: productTotalPages || 1 }, (_, i) => ({
+				id: `page-${i}`,
+				index: i,
+				name: `Trang ${i + 1}`,
+			})),
+		[productTotalPages],
+	);
+
+	const itemsByPage = useMemo(() => {
+		const currentPageId = `page-${productPage}`;
+		return { [currentPageId]: productItems || [] };
+	}, [productItems, productPage]);
+	// ==== End product picker state ====
+
+	// ==== Handlers for CRUD operations ====
 	const handleCreate = async (body: FormData) => {
 		try {
 			const res = await createCollection(body as any);
@@ -116,7 +187,7 @@ const Collection = () => {
 		try {
 			const res = await getCollection(id);
 			if (res?.code === 1 && res?.result) {
-				let collection = res.result;
+				const collection = res.result;
 				setDetailData(collection);
 				setDetailOpen(true);
 			}
@@ -129,8 +200,27 @@ const Collection = () => {
 		}
 	};
 
+	const handleSaveProductsForCollection = async (collectionId: number, productIds: number[]) => {
+		try {
+			const res = await updateCollectionProducts(collectionId, { productIds });
+			if (res?.code === 1 && res?.result) {
+				setCollections(collections.map((c) => (c.id === res.result.id ? res.result : c)));
+			}
+			showSnackbar({
+				message: res?.message || "Cập nhật sản phẩm cho bộ sưu tập thành công",
+				severity: "success",
+			});
+		} catch (err: any) {
+			showSnackbar({
+				message: err?.response?.data?.message || err.message,
+				severity: "error",
+			});
+		}
+	};
+	// === End handlers for CRUD operations ====
+
 	// ==== Handle actions from table ====
-	const handleAction = (type: string, object: CollectionObject) => {
+	const handleAction = async (type: string, object: CollectionObject) => {
 		switch (type) {
 			case "detail":
 				handleDetail(object?.id ?? 0);
@@ -148,8 +238,30 @@ const Collection = () => {
 				setFormAction("updateImages");
 				setOpenForm(true);
 				break;
+
+			case "chooseProducts":
+				setProductPickerCollection(object);
+				setCollectionId(object?.id || 0);
+				{
+					const initIds = (object.products || []).map((p: any) => p.id);
+					setSelectedProductIds(initIds);
+				}
+				setProductPage(0);
+				await fetchProductsForPicker(0);
+				setProductPickerOpen(true);
+				break;
 		}
 	};
+	// ==== End handle actions from table ====
+
+	// ==== Handle page change trong picker ====
+	const handlePickerPageChange = async (pageId: string) => {
+		const target = productPages.find((p) => p.id === pageId);
+		if (!target) return;
+		setProductPage(target.index);
+		await fetchProductsForPicker(target.index);
+	};
+	// ==== End handle page change ====
 
 	let content = (
 		<>
@@ -195,6 +307,80 @@ const Collection = () => {
 			>
 				{detailData && <Detail object={detailData} />}
 			</GenericDetailDialog>
+
+			{/* Object picker chọn sản phẩm */}
+			<ObjectPicker<Product, ProductPage>
+				open={productPickerOpen}
+				onClose={() => {
+					setProductPickerOpen(false);
+					setProductPickerCollection(null);
+					setIgnoreCollection(null); // đóng dialog thì reset luôn cũng được
+				}}
+				title="Chọn sản phẩm cho Bộ sưu tập"
+				description={
+					productPickerCollection
+						? `Bộ sưu tập: ${productPickerCollection.name}`
+						: undefined
+				}
+				pages={productPages}
+				getPageId={(p) => p.id}
+				getPageLabel={(p) => ({ primary: p.name })}
+				itemsByPage={itemsByPage}
+				getItemId={(item) => String(item.id)}
+				initialSelectedIds={selectedProductIds.map(String)}
+				matchSearch={(item, keyword) =>
+					item.name.toLowerCase().includes(keyword) ||
+					(item.slug || "").toLowerCase().includes(keyword)
+				}
+				loading={loadingProducts}
+				onPageChange={handlePickerPageChange}
+				renderItem={({ item, selected, toggle }) => (
+					<div
+						onClick={toggle}
+						className={`flex items-center justify-between rounded-xl border px-4 py-3 cursor-pointer transition-all ${
+							selected
+								? "border-emerald-400 bg-emerald-50"
+								: "border-slate-200 hover:border-slate-300 hover:bg-slate-50/60"
+						}`}
+					>
+						<div className="min-w-0">
+							<p className="text-sm font-medium truncate">{item.name}</p>
+							<p className="text-xs text-slate-500 truncate">
+								Mã: {item.slug} · ID: {item.id}
+							</p>
+						</div>
+						<div className="flex flex-col items-end gap-1">
+							{item.unitPrice != null && (
+								<span className="text-sm font-semibold">
+									{item.unitPrice.toLocaleString("vi-VN")} ₫
+								</span>
+							)}
+							<button
+								type="button"
+								className={`text-xs px-3 py-1 rounded-full border ${
+									selected
+										? "bg-emerald-500 text-white border-emerald-500"
+										: "border-slate-300 text-slate-700"
+								}`}
+							>
+								{selected ? "Đã chọn" : "Chọn"}
+							</button>
+						</div>
+					</div>
+				)}
+				onConfirm={({ selectedIds }) => {
+					const ids = selectedIds.map((id) => Number(id));
+					setSelectedProductIds(ids);
+
+					if (productPickerCollection?.id != null) {
+						handleSaveProductsForCollection(productPickerCollection.id, ids);
+					}
+
+					setProductPickerOpen(false);
+					setProductPickerCollection(null);
+					setIgnoreCollection(null);
+				}}
+			/>
 		</>
 	);
 

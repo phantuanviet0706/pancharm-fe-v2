@@ -54,6 +54,10 @@ const Table = ({ collections, totalPages, page, setPage, onAction }: TableProps)
 				acl: row.productImages && row.productImages.length > 0,
 			},
 			{
+				label: "Chọn sản phẩm",
+				onClick: () => onAction("chooseProducts", row),
+			},
+			{
 				label: "Xóa",
 				onClick: () => askDelete(row),
 				color: "red",

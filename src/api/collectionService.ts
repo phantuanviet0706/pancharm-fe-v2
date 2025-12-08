@@ -110,3 +110,13 @@ export const getDefaultCollections = async () => {
 		throw error;
 	}
 };
+
+export const updateCollectionProducts = async (id: number, payload: Object) => {
+	try {
+		const res = await axiosClient.put<Collection>(`${API_URL}/${id}/update-products`, payload);
+		return res.data;
+	} catch (error) {
+		console.error("Failed to update collection:", error);
+		throw error;
+	}
+};

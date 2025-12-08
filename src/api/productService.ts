@@ -27,7 +27,9 @@ export interface Product {
 	src?: string;
 }
 
-export interface ProductQuery extends BaseQuery {}
+export interface ProductQuery extends BaseQuery {
+	ignoreId?: boolean | false;
+}
 
 export const DEFAULT_PRODUCT: Product = {
 	name: "",
