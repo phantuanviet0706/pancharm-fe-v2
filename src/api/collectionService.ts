@@ -21,6 +21,8 @@ export interface Collection {
 	defaultImageId?: number | null;
 
 	products?: Product[];
+
+	productId: number;
 }
 
 export interface CollectionQuery extends BaseQuery {
@@ -117,6 +119,16 @@ export const updateCollectionProducts = async (id: number, payload: Object) => {
 		return res.data;
 	} catch (error) {
 		console.error("Failed to update collection:", error);
+		throw error;
+	}
+};
+
+export const removeProductFromCollections = async (id: number, payload: Object) => {
+	try {
+		const res = await axiosClient.put<Collection>(`${API_URL}/${id}/remove-product`, payload);
+		return res.data;
+	} catch (error) {
+		console.error("Failed to remove product from collection:", error);
 		throw error;
 	}
 };

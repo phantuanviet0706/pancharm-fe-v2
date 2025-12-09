@@ -14,7 +14,7 @@ interface FormProps {
 	onSubmit: (data: any) => any;
 	data?: Collection;
 	onSuccess?: (code: number, message: string) => void;
-	action?: "create" | "update" | "updateImages";
+	action?: "create" | "update" | "updateImages" | "unlinkProduct";
 }
 
 const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: FormProps) => {
@@ -216,6 +216,23 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 				</>
 			);
 			break;
+		case "unlinkProduct":
+			const productName = (data as any)?.productName || (data as any)?.name || "sản phẩm này";
+
+			title = "Gỡ sản phẩm khỏi Bộ sưu tập";
+			formContent = (
+				<div className="py-2">
+					<p className="text-sm text-slate-700 mb-2">
+						Muốn gỡ <b>{productName}</b> khỏi bộ sưu tập{" "}
+						<b>{(data as any)?.collectionName || form.name}</b>?
+					</p>
+					<p className="text-xs text-slate-500">
+						Hành động này <b>không xóa sản phẩm</b>, chỉ bỏ liên kết khỏi bộ sưu tập.
+						Bạn vẫn có thể thêm lại sản phẩm vào bộ sưu tập sau này.
+					</p>
+				</div>
+			);
+			break;
 		default:
 			title = data ? "Chỉnh sửa Bộ sưu tập" : "Thêm mới Bộ sưu tập";
 			formContent = (
@@ -258,30 +275,47 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 			);
 	}
 
-	return (
-		<GenericDialog
-			open={open}
-			title={title}
-			onClose={onClose}
-			actions={[
-				{
-					label: "Đóng",
-					variant: "outlined",
-					onClick: onClose,
-					sx: {
-						width: "50%",
-						borderColor: "var(--color-card-bg)",
-						color: "var(--color-card-bg)",
+	const actions =
+		action === "create" || action === "update"
+			? [
+					{
+						label: "Đóng",
+						variant: "outlined",
+						onClick: onClose,
+						sx: {
+							width: "50%",
+							borderColor: "var(--color-card-bg)",
+							color: "var(--color-card-bg)",
+						},
 					},
-				},
-				{
-					label: "Lưu",
-					variant: "contained",
-					onClick: handleSave,
-					sx: { width: "50%", backgroundColor: "var(--color-card-bg)" },
-				},
-			]}
-		>
+					{
+						label: "Lưu",
+						variant: "contained",
+						onClick: handleSave,
+						sx: { width: "50%", backgroundColor: "var(--color-card-bg)" },
+					},
+				]
+			: [
+					{
+						label: "Đóng",
+						variant: "outlined",
+						onClick: onClose,
+						sx: {
+							width: "50%",
+							borderColor: "var(--color-card-bg)",
+							color: "var(--color-card-bg)",
+						},
+					},
+					{
+						label: "Đồng ý",
+						variant: "contained",
+						onClick: handleSave,
+						sx: { width: "50%", backgroundColor: "var(--color-card-bg)" },
+					},
+				];
+
+	return (
+		<GenericDialog open={open} title={title} onClose={onClose} actions={actions}>
 			{formContent}
 		</GenericDialog>
 	);

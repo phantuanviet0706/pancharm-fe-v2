@@ -9,6 +9,7 @@ import {
 	createCollection,
 	deleteCollection,
 	getCollection,
+	removeProductFromCollections,
 	updateCollection,
 	updateCollectionImage,
 	updateCollectionProducts,
@@ -22,7 +23,7 @@ import Detail from "./Detail";
 import { ObjectPicker } from "../../../../components/ObjectPickerDialog";
 import { Product, fetchData } from "../../../../api/productService";
 
-type FormAction = "create" | "update" | "updateImages";
+type FormAction = "create" | "update" | "updateImages" | "unlinkProduct";
 type ProductPage = { id: string; index: number; name: string };
 
 const Collection = () => {
@@ -53,7 +54,7 @@ const Collection = () => {
 	const [selectedProductIds, setSelectedProductIds] = useState<number[]>([]);
 
 	const [productPage, setProductPage] = useState(0);
-	const productLimit = 10;
+	const productLimit = 20;
 
 	const [productItems, setProductItems] = useState<Product[]>([]);
 	const [productTotalPages, setProductTotalPages] = useState(1);
@@ -61,27 +62,44 @@ const Collection = () => {
 
 	const [collectionId, setCollectionId] = useState<number>(0);
 
-	const fetchProductsForPicker = async (page: number) => {
+	const fetchProductsForPicker = async (page: number, cid?: number) => {
 		try {
 			setLoadingProducts(true);
 
-			const res = await fetchData({
+			const effectiveCollectionId = cid ?? collectionId ?? 0;
+
+			const params: any = {
 				page,
 				limit: productLimit,
 				keyword: "",
-				collectionId: collectionId ?? 0,
-				ignoreCollection: true
-			} as any);
+				ignoreCollection: true,
+			};
+
+			// chỉ gửi collectionId nếu > 0
+			if (effectiveCollectionId && effectiveCollectionId > 0) {
+				params.collectionId = effectiveCollectionId;
+			}
+
+			const res = await fetchData(params);
 
 			if (res?.code === 1 && res?.result) {
 				const items =
 					(res.result.items as Product[]) ||
 					(res.result.content as Product[]) ||
 					(res.result as Product[]);
-				const totalP = res.result.totalPages ?? res.result.total ?? 1;
+
+				const totalPagesFromApi = res.result.totalPages;
+
+				const totalItemsFromApi =
+					res.result.totalElements ?? res.result.total ?? items.length;
+
+				const computedTotalPages =
+					totalPagesFromApi != null
+						? totalPagesFromApi
+						: Math.max(1, Math.ceil(totalItemsFromApi / productLimit));
 
 				setProductItems(items || []);
-				setProductTotalPages(totalP || 1);
+				setProductTotalPages(computedTotalPages);
 			}
 		} catch (err: any) {
 			console.error(err);
@@ -217,6 +235,29 @@ const Collection = () => {
 			});
 		}
 	};
+
+	const handleUnlinkProduct = async (collectionId: number, productId: number) => {
+		try {
+			const res = await removeProductFromCollections(collectionId, { productId });
+
+			if (res?.code === 1 && res?.result) {
+				setCollections(collections.map((c) => (c.id === res.result.id ? res.result : c)));
+				setDetailData({ ...res.result });
+				setOpenForm(false);
+
+				showSnackbar({
+					message: "Đã gỡ sản phẩm khỏi bộ sưu tập",
+					severity: "success",
+				});
+			}
+		} catch (err: any) {
+			showSnackbar({
+				message: err?.response?.data?.message || err.message,
+				severity: "error",
+			});
+		}
+	};
+
 	// === End handlers for CRUD operations ====
 
 	// ==== Handle actions from table ====
@@ -239,17 +280,35 @@ const Collection = () => {
 				setOpenForm(true);
 				break;
 
-			case "chooseProducts":
+			case "chooseProducts": {
 				setProductPickerCollection(object);
-				setCollectionId(object?.id || 0);
-				{
-					const initIds = (object.products || []).map((p: any) => p.id);
-					setSelectedProductIds(initIds);
-				}
+				const cid = object?.id || 0;
+				setCollectionId(cid);
+
+				const initIds = (object.products || []).map((p: any) => p.id);
+				setSelectedProductIds(initIds);
+
 				setProductPage(0);
-				await fetchProductsForPicker(0);
+				// ⚠️ dùng luôn cid, không đợi state collectionId
+				await fetchProductsForPicker(0, cid);
 				setProductPickerOpen(true);
 				break;
+			}
+		}
+	};
+
+	const handleProductAction = async (action: string, product: Product) => {
+		switch (action) {
+			case "unlink": {
+				setEditData({
+					id: detailData?.id,
+					name: detailData?.name || "",
+					productId: product?.id || 0,
+				});
+				setFormAction("unlinkProduct");
+				setOpenForm(true);
+				break;
+			}
 		}
 	};
 	// ==== End handle actions from table ====
@@ -290,8 +349,13 @@ const Collection = () => {
 							return handleUpdate(editData?.id!, body as FormData);
 						case "updateImages":
 							return handleUpdateImage(editData?.id!, body as FormData);
+						case "unlinkProduct":
+							return handleUnlinkProduct(editData!.id || 0, editData!.productId);
 						default:
-							return Promise.resolve({ code: -1, message: "Thiếu dữ liệu" });
+							return Promise.resolve({
+								code: -1,
+								message: "Thiếu dữ liệu",
+							});
 					}
 				}}
 			/>
@@ -305,7 +369,7 @@ const Collection = () => {
 				title="Chi tiết Bộ suu tập"
 				maxWidth="lg"
 			>
-				{detailData && <Detail object={detailData} />}
+				{detailData && <Detail object={detailData} onProductAction={handleProductAction} />}
 			</GenericDetailDialog>
 
 			{/* Object picker chọn sản phẩm */}
@@ -314,7 +378,7 @@ const Collection = () => {
 				onClose={() => {
 					setProductPickerOpen(false);
 					setProductPickerCollection(null);
-					setIgnoreCollection(null); // đóng dialog thì reset luôn cũng được
+					setCollectionId(0);
 				}}
 				title="Chọn sản phẩm cho Bộ sưu tập"
 				description={
@@ -378,7 +442,7 @@ const Collection = () => {
 
 					setProductPickerOpen(false);
 					setProductPickerCollection(null);
-					setIgnoreCollection(null);
+					setCollectionId(0);
 				}}
 			/>
 		</>

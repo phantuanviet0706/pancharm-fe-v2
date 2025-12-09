@@ -13,6 +13,7 @@ import {
 	ListItemButton,
 	ListItemText,
 	Typography,
+	TextField,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
@@ -44,6 +45,51 @@ export type ObjectPickerProps<TItem, TPage> = {
 	loading?: boolean;
 };
 
+type PageChip = { type: "page"; index: number } | { type: "ellipsis"; key: string };
+
+function buildPageChips(totalPages: number, currentIndex: number): PageChip[] {
+	if (totalPages <= 0) return [];
+
+	if (totalPages <= 7) {
+		return Array.from({ length: totalPages }, (_, i) => ({
+			type: "page" as const,
+			index: i,
+		}));
+	}
+
+	// normalized currentIndex
+	const cur = currentIndex < 0 ? 0 : currentIndex;
+
+	const indices = new Set<number>();
+	indices.add(0);
+	indices.add(1);
+	indices.add(totalPages - 1);
+	indices.add(totalPages - 2);
+	indices.add(cur - 1);
+	indices.add(cur);
+	indices.add(cur + 1);
+
+	const validIndices = Array.from(indices)
+		.filter((i) => i >= 0 && i < totalPages)
+		.sort((a, b) => a - b);
+
+	const chips: PageChip[] = [];
+	let prev: number | null = null;
+
+	for (const idx of validIndices) {
+		if (prev !== null && idx - prev > 1) {
+			chips.push({
+				type: "ellipsis",
+				key: `ellipsis-${prev + 1}-${idx - 1}`,
+			});
+		}
+		chips.push({ type: "page", index: idx });
+		prev = idx;
+	}
+
+	return chips;
+}
+
 export function ObjectPicker<TItem, TPage>({
 	open,
 	onClose,
@@ -63,20 +109,34 @@ export function ObjectPicker<TItem, TPage>({
 	onPageChange,
 	loading = false,
 }: ObjectPickerProps<TItem, TPage>) {
-	const [currentPageId, setCurrentPageId] = useState<string>(pages[0] ? getPageId(pages[0]) : "");
+	const firstPageId = pages[0] ? getPageId(pages[0]) : "";
+	const [currentPageId, setCurrentPageId] = useState<string>(firstPageId);
 	const [searchText, setSearchText] = useState("");
 
 	const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set(initialSelectedIds));
 
-	// CHỈ reset khi dialog được mở mới, không phụ thuộc pages / initialSelectedIds
+	const [showJumpBox, setShowJumpBox] = useState(false);
+	const [jumpPageInput, setJumpPageInput] = useState("");
+
+	// reset khi mở dialog
 	useEffect(() => {
 		if (!open) return;
-		const firstPageId = pages[0] ? getPageId(pages[0]) : "";
-		setCurrentPageId(firstPageId);
+		const fpId = pages[0] ? getPageId(pages[0]) : "";
+		setCurrentPageId(fpId);
 		setSearchText("");
 		setSelectedIds(new Set(initialSelectedIds));
+		setShowJumpBox(false);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [open]);
+
+	const changePageByIndex = (index: number) => {
+		if (!pages.length) return;
+		if (index < 0 || index >= pages.length) return;
+		const id = getPageId(pages[index]);
+		setCurrentPageId(id);
+		setSearchText("");
+		onPageChange?.(id);
+	};
 
 	const handleToggleSelect = (id: string) => {
 		setSelectedIds((prev) => {
@@ -88,9 +148,16 @@ export function ObjectPicker<TItem, TPage>({
 	};
 
 	const handleChangePage = (pageId: string) => {
-		setCurrentPageId(pageId);
-		setSearchText("");
-		onPageChange?.(pageId);
+		const idx = pages.findIndex((p) => getPageId(p) === pageId);
+		if (idx === -1) return;
+		changePageByIndex(idx);
+	};
+
+	const handlePrevNext = (delta: -1 | 1) => {
+		if (!pages.length) return;
+		const currentIndex = pages.findIndex((p) => getPageId(p) === currentPageId);
+		const nextIndex = currentIndex + delta;
+		changePageByIndex(nextIndex);
 	};
 
 	const handleConfirm = () => {
@@ -117,6 +184,31 @@ export function ObjectPicker<TItem, TPage>({
 	}, [items, enableSearch, searchText, matchSearch]);
 
 	const selectedCount = selectedIds.size;
+	const currentPageIndex = pages.findIndex((p) => getPageId(p) === currentPageId);
+	const totalPages = pages.length;
+
+	const pageChips = buildPageChips(totalPages, currentPageIndex);
+
+	const openJumpPopup = () => {
+		const safeIndex = currentPageIndex >= 0 ? currentPageIndex : 0;
+		setJumpPageInput(String(safeIndex + 1));
+		setShowJumpBox(true);
+	};
+
+	const handleSubmitJump = (e: React.FormEvent) => {
+		e.preventDefault();
+		if (!totalPages) return;
+
+		const raw = parseInt(jumpPageInput, 10);
+		if (Number.isNaN(raw)) return;
+
+		let pageNum = raw;
+		if (pageNum < 1) pageNum = 1;
+		if (pageNum > totalPages) pageNum = totalPages;
+
+		changePageByIndex(pageNum - 1);
+		setShowJumpBox(false);
+	};
 
 	return (
 		<Dialog
@@ -162,34 +254,76 @@ export function ObjectPicker<TItem, TPage>({
 
 					<Box className="overflow-auto flex-1">
 						<List dense disablePadding>
-							{pages.map((p) => {
-								const id = getPageId(p);
-								const label = getPageLabel(p);
-								return (
+							{pageChips.map((chip) =>
+								chip.type === "page" ? (
 									<ListItemButton
-										key={id}
-										selected={id === currentPageId}
-										onClick={() => handleChangePage(id)}
+										key={`page-${chip.index}`}
+										selected={chip.index === currentPageIndex}
+										onClick={() =>
+											handleChangePage(getPageId(pages[chip.index]))
+										}
 										className="px-4 py-2"
 									>
 										<ListItemText
 											primary={
 												<span className="text-sm font-medium">
-													{label.primary}
+													Trang {chip.index + 1}
 												</span>
-											}
-											secondary={
-												label.secondary && (
-													<span className="text-xs text-slate-500">
-														{label.secondary}
-													</span>
-												)
 											}
 										/>
 									</ListItemButton>
-								);
-							})}
+								) : (
+									<ListItemButton
+										key={chip.key}
+										onClick={openJumpPopup}
+										className="px-4 py-2"
+									>
+										<ListItemText
+											primary={
+												<span className="text-sm font-semibold text-slate-500">
+													…
+												</span>
+											}
+											secondary={
+												<span className="text-[11px] text-slate-400">
+													Nhảy tới trang…
+												</span>
+											}
+										/>
+									</ListItemButton>
+								),
+							)}
 						</List>
+
+						{showJumpBox && totalPages > 0 && (
+							<Box className="px-4 py-3 border-t border-slate-200 bg-slate-50">
+								<form
+									onSubmit={handleSubmitJump}
+									className="flex items-center gap-2"
+								>
+									<TextField
+										size="small"
+										type="number"
+										label={`Trang (1–${totalPages})`}
+										value={jumpPageInput}
+										onChange={(e) => setJumpPageInput(e.target.value)}
+										inputProps={{ min: 1, max: totalPages }}
+										fullWidth
+									/>
+									<Button type="submit" variant="contained" size="small">
+										Đi
+									</Button>
+									<Button
+										type="button"
+										variant="text"
+										size="small"
+										onClick={() => setShowJumpBox(false)}
+									>
+										Hủy
+									</Button>
+								</form>
+							</Box>
+						)}
 					</Box>
 				</Box>
 
