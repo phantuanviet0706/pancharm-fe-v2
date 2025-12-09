@@ -51,7 +51,7 @@ const Table = ({ collections, totalPages, page, setPage, onAction }: TableProps)
 			{
 				label: "Chỉnh sửa hiển thị ảnh",
 				onClick: () => onAction("editImage", row),
-				acl: row.productImages && row.productImages.length > 0,
+				acl: row.collectionImages && row.collectionImages.length > 0,
 			},
 			{
 				label: "Chọn sản phẩm",
