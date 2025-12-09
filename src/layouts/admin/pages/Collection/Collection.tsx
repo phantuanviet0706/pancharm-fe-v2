@@ -188,6 +188,7 @@ const Collection = () => {
 			const res = await updateCollectionImage(id, body as any);
 			if (res?.code === 1 && res?.result) {
 				setCollections(collections.map((p) => (p.id === res.result.id ? res.result : p)));
+				setOpenForm(false);
 			}
 			return showSnackbar({
 				message: res?.message || "Cập nhật thành công",
