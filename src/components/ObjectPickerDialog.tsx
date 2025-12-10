@@ -172,16 +172,27 @@ export function ObjectPicker<TItem, TPage>({
 
 	const items = itemsByPage[currentPageId] ?? [];
 
+	const sortedItems: TItem[] = useMemo(() => {
+		const arr = [...items];
+		return arr.sort((a, b) => {
+			const aSelected = selectedIds.has(getItemId(a));
+			const bSelected = selectedIds.has(getItemId(b));
+
+			if (aSelected === bSelected) return 0;
+			return aSelected ? -1 : 1;
+		});
+	}, [items, selectedIds, getItemId]);
+
 	const filteredItems: TItem[] = useMemo(() => {
-		if (!enableSearch || !searchText.trim()) return items;
+		if (!enableSearch || !searchText.trim()) return sortedItems;
 
 		const keyword = searchText.trim().toLowerCase();
 
-		return items.filter((item) => {
+		return sortedItems.filter((item) => {
 			if (matchSearch) return matchSearch(item, keyword);
 			return JSON.stringify(item).toLowerCase().includes(keyword);
 		});
-	}, [items, enableSearch, searchText, matchSearch]);
+	}, [sortedItems, enableSearch, searchText, matchSearch]);
 
 	const selectedCount = selectedIds.size;
 	const currentPageIndex = pages.findIndex((p) => getPageId(p) === currentPageId);

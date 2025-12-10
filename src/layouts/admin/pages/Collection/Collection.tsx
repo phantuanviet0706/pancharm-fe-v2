@@ -51,7 +51,6 @@ const Collection = () => {
 		null,
 	);
 
-	// Lưu state các ID đang được chọn (trong FE)
 	const [selectedProductIds, setSelectedProductIds] = useState<number[]>([]);
 
 	const [productPage, setProductPage] = useState(0);
@@ -73,7 +72,7 @@ const Collection = () => {
 				page,
 				limit: productLimit,
 				keyword: "",
-				ignoreCollection: true, // lấy các sản phẩm chưa nằm trong collection
+				ignoreCollection: true,
 			};
 
 			// chỉ gửi collectionId nếu > 0
@@ -220,57 +219,14 @@ const Collection = () => {
 		}
 	};
 
-	// 🟢 API này bây giờ hiểu là: chỉ ADD các productIds truyền vào
 	const handleSaveProductsForCollection = async (collectionId: number, productIds: number[]) => {
 		try {
 			const res = await updateCollectionProducts(collectionId, { productIds });
 			if (res?.code === 1 && res?.result) {
 				setCollections(collections.map((c) => (c.id === res.result.id ? res.result : c)));
-				// nếu đang mở detail đúng collection đó thì update luôn
-				if (detailData && detailData.id === res.result.id) {
-					setDetailData(res.result);
-				}
 			}
-			if (productIds.length > 0) {
-				showSnackbar({
-					message: "Đã thêm sản phẩm vào bộ sưu tập",
-					severity: "success",
-				});
-			}
-		} catch (err: any) {
 			showSnackbar({
-				message: err?.response?.data?.message || err.message,
-				severity: "error",
-			});
-		}
-	};
-
-	// 🟠 Remove nhiều product khỏi collection (dùng cho ObjectPicker khi bỏ chọn)
-	const handleRemoveProductsForCollection = async (
-		collectionId: number,
-		productIds: number[],
-	) => {
-		if (productIds.length === 0) return;
-
-		try {
-			let lastResult: any = null;
-
-			for (const pid of productIds) {
-				const res = await removeProductFromCollections(collectionId, { productId: pid });
-				if (res?.code === 1 && res?.result) {
-					lastResult = res.result;
-				}
-			}
-
-			if (lastResult) {
-				setCollections(collections.map((c) => (c.id === lastResult.id ? lastResult : c)));
-				if (detailData && detailData.id === lastResult.id) {
-					setDetailData(lastResult);
-				}
-			}
-
-			showSnackbar({
-				message: "Đã gỡ sản phẩm khỏi bộ sưu tập",
+				message: res?.message || "Cập nhật sản phẩm cho bộ sưu tập thành công",
 				severity: "success",
 			});
 		} catch (err: any) {
@@ -281,7 +237,6 @@ const Collection = () => {
 		}
 	};
 
-	// unlink 1 product (luồng có confirm qua Form)
 	const handleUnlinkProduct = async (collectionId: number, productId: number) => {
 		try {
 			const res = await removeProductFromCollections(collectionId, { productId });
@@ -331,12 +286,13 @@ const Collection = () => {
 				const cid = object?.id || 0;
 				setCollectionId(cid);
 
-				// các ID đang thuộc collection (trạng thái ban đầu)
-				const initIds = (object.products || []).map((p: any) => p.id);
+				const initIds = object.productIds
+					? object.productIds || []
+					: (object.products || []).map((p: any) => p.id);
+
 				setSelectedProductIds(initIds);
 
 				setProductPage(0);
-				// dùng luôn cid, không đợi state collectionId
 				await fetchProductsForPicker(0, cid);
 				setProductPickerOpen(true);
 				break;
@@ -351,7 +307,7 @@ const Collection = () => {
 					id: detailData?.id,
 					name: detailData?.name || "",
 					productId: product?.id || 0,
-				} as any);
+				});
 				setFormAction("unlinkProduct");
 				setOpenForm(true);
 				break;
@@ -397,10 +353,7 @@ const Collection = () => {
 						case "updateImages":
 							return handleUpdateImage(editData?.id!, body as FormData);
 						case "unlinkProduct":
-							return handleUnlinkProduct(
-								editData!.id || 0,
-								(editData as any).productId,
-							);
+							return handleUnlinkProduct(editData!.id || 0, editData!.productId);
 						default:
 							return Promise.resolve({
 								code: -1,
@@ -483,32 +436,20 @@ const Collection = () => {
 					</div>
 				)}
 				onConfirm={({ selectedIds }) => {
-					const newSelected = selectedIds.map((id) => Number(id));
-					const oldSelected = selectedProductIds;
-
-					// ID mới được chọn thêm
-					const added = newSelected.filter((id) => !oldSelected.includes(id));
-
-					// ID bị bỏ chọn (trước có, giờ không)
-					const removed = oldSelected.filter((id) => !newSelected.includes(id));
-
-					setSelectedProductIds(newSelected);
+					const ids = selectedIds.map((id) => Number(id));
+					setSelectedProductIds(ids);
 
 					if (productPickerCollection?.id != null) {
-						const cid = productPickerCollection.id;
-
-						if (added.length > 0) {
-							handleSaveProductsForCollection(cid, added);
-						}
-
-						if (removed.length > 0) {
-							handleRemoveProductsForCollection(cid, removed);
-						}
+						handleSaveProductsForCollection(productPickerCollection.id, ids);
 					}
 
 					setProductPickerOpen(false);
 					setProductPickerCollection(null);
 					setCollectionId(0);
+
+					setTimeout(() => {
+						window.location.reload();
+					}, 300)
 				}}
 			/>
 		</>

@@ -21,8 +21,9 @@ export interface Collection {
 	defaultImageId?: number | null;
 
 	products?: Product[];
+	productIds?: number[];
 
-	productId: number;
+	productId?: number;
 }
 
 export interface CollectionQuery extends BaseQuery {
