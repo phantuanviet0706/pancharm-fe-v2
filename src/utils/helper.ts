@@ -36,9 +36,9 @@ export function formatPhoneVN(input: string, type: "dot" | "space" | "internatio
 	}
 }
 
-export const handleKeyDown = (
+const handleKeyDown = (
 	e: React.KeyboardEvent<HTMLDivElement>,
-	buttonRef: HTMLButtonElement,
+	buttonRef: React.RefObject<HTMLButtonElement>,
 ) => {
 	if (e.key === "Enter") {
 		e.preventDefault();

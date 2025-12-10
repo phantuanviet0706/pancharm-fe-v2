@@ -5,6 +5,10 @@ import { CONFIG } from "../config/constant";
 import axios from "axios";
 
 const API_URL = `${import.meta.env.VITE_APP_URL}`;
+const APP_CONFIG_KEY = "APP_CONFIG";
+
+// optional: TTL 30 phút
+const CONFIG_TTL = 30 * 60 * 1000;
 
 const initialState = {
 	...CONFIG,
@@ -64,28 +68,69 @@ function ConfigProvider({ children }) {
 		}
 	}, initialState);
 
-	useEffect(() => {
-		const cached = localStorage.getItem("APP_CONFIG");
-		if (cached) {
-			try {
-				const parsed = JSON.parse(cached);
-				dispatch({ type: actionType.INIT_CONFIG, payload: parsed });
-				return;
-			} catch (e) {
-				console.warn("Invalid config cache, refetching...");
-			}
-		}
+	const loadConfigFromCache = () => {
+		const raw = localStorage.getItem(APP_CONFIG_KEY);
+		if (!raw) return null;
 
-		axios
-			.get(`${API_URL}/config`)
-			.then((res) => {
+		try {
+			const parsed = JSON.parse(raw);
+
+			const data = parsed?.data ?? parsed;
+			const cachedAt = parsed?.cachedAt ?? 0;
+
+			if (cachedAt && Date.now() - cachedAt > CONFIG_TTL) {
+				return null;
+			}
+
+			return data;
+		} catch (e) {
+			console.warn("Invalid APP_CONFIG cache, ignore.");
+			return null;
+		}
+	};
+
+	const saveConfigToCache = (data) => {
+		const wrapped = {
+			data,
+			cachedAt: Date.now(),
+		};
+		localStorage.setItem(APP_CONFIG_KEY, JSON.stringify(wrapped));
+	};
+
+	useEffect(() => {
+		let cancelled = false;
+
+		const initConfig = async () => {
+			const cached = loadConfigFromCache();
+			if (cached) {
+				dispatch({ type: actionType.INIT_CONFIG, payload: cached });
+			}
+
+			try {
+				const res = await axios.get(`${API_URL}/config`);
 				const configData = res?.data?.result || {};
-				localStorage.setItem("APP_CONFIG", JSON.stringify(configData));
-				dispatch({ type: actionType.INIT_CONFIG, payload: configData });
-			})
-			.catch((err) => {
+
+				if (!cancelled) {
+					dispatch({ type: actionType.INIT_CONFIG, payload: configData });
+					saveConfigToCache(configData);
+				}
+			} catch (err) {
 				console.error("Failed to fetch config:", err);
-			});
+			}
+		};
+
+		initConfig();
+
+		// OPTIONAL: auto refresh mỗi X phút nếu muốn cực tươi
+		// const interval = setInterval(initConfig, CONFIG_TTL);
+		// return () => {
+		//   cancelled = true;
+		//   clearInterval(interval);
+		// };
+
+		return () => {
+			cancelled = true;
+		};
 	}, []);
 
 	return <Provider value={{ state, dispatch }}>{children}</Provider>;

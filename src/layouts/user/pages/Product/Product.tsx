@@ -34,6 +34,10 @@ const Product = () => {
 	const initialPage = Number(searchParams.get("page") || 1) - 1;
 	const [page, setPage] = useState(initialPage < 0 ? 0 : initialPage);
 
+	// ===== PARAM LOẠI / BỘ SƯU TẬP TỪ URL =====
+	const categoryIdParam = searchParams.get("categoryId");
+	const collectionIdParam = searchParams.get("collectionId");
+
 	// ===== CHECKBOX MỨC GIÁ (init từ URL nếu có) =====
 	const buildInitialPriceChecks = () => {
 		const checks = PRICE_FILTER_LABELS.map(() => false);
@@ -109,8 +113,23 @@ const Product = () => {
 				params.unitPriceTo = Number(unitPriceToParam);
 			}
 
+			// ✅ thêm filter category / collection nếu có
+			if (categoryIdParam) {
+				params.categoryId = categoryIdParam;
+			}
+			if (collectionIdParam) {
+				params.collectionId = collectionIdParam;
+			}
+
 			return params;
-		}, [page, priceRangesParam, unitPriceFromParam, unitPriceToParam]),
+		}, [
+			page,
+			priceRangesParam,
+			unitPriceFromParam,
+			unitPriceToParam,
+			categoryIdParam,
+			collectionIdParam,
+		]),
 	);
 
 	const formatCurrency = (value: number) => new Intl.NumberFormat("vi-VN").format(value) + "đ";
@@ -213,7 +232,6 @@ const Product = () => {
 		next.set("page", "1");
 		setSearchParams(next);
 		setPage(0);
-		window.location.reload();
 	};
 
 	const handleReset = () => {
@@ -233,7 +251,6 @@ const Product = () => {
 
 		setSearchParams(next);
 		setPage(0);
-		window.location.reload();
 	};
 
 	return (
@@ -374,25 +391,42 @@ const Product = () => {
 
 					{/* ==== PRODUCT LIST ==== */}
 					<div className="product-list w-[80%]">
-						<div className="product-items grid grid-cols-1 xl:grid-cols-3 gap-[2em] justify-items-center mb-[2em]">
-							{products.map((item, idx) => (
-								<CardItem key={idx} item={item} />
-							))}
-						</div>
+						{products.length > 0 ? (
+							<>
+								<div className="product-items grid grid-cols-1 xl:grid-cols-3 gap-[2em] justify-items-center mb-[2em]">
+									{products.map((item, idx) => (
+										<CardItem key={idx} item={item} />
+									))}
+								</div>
 
-						<Pagination
-							className="flex justify-center"
-							size="large"
-							count={totalPages}
-							page={page + 1}
-							onChange={(e, value) => {
-								setPage(value - 1);
-								const next = new URLSearchParams(searchParams);
-								next.set("page", String(value));
-								setSearchParams(next);
-							}}
-							color="primary"
-						/>
+								<Pagination
+									className="flex justify-center"
+									size="large"
+									count={totalPages}
+									page={page + 1}
+									onChange={(e, value) => {
+										setPage(value - 1);
+										const next = new URLSearchParams(searchParams);
+										next.set("page", String(value));
+										setSearchParams(next);
+									}}
+									color="primary"
+								/>
+							</>
+						) : (
+							<>
+								<div className="flex flex-col items-center justify-center text-center py-[4em] px-[2em] bg-[var(--color-cream-soft)]/20 rounded-2xl shadow-sm border border-[var(--color-cream-soft)]/40">
+									<div className="text-[3em] mb-[0.3em] opacity-60">🔍</div>
+									<h3 className="text-[1.125em] font-semibold text-[var(--color-card-thick)] mb-[0.5em]">
+										Không tìm thấy sản phẩm phù hợp
+									</h3>
+									<p className="text-[0.95em] text-[var(--color-card-bg)] max-w-[26em] leading-relaxed">
+										Hãy thử thay đổi bộ lọc hoặc chọn một mức giá khác để xem
+										thêm nhiều sản phẩm hơn nhé.
+									</p>
+								</div>
+							</>
+						)}
 					</div>
 				</div>
 			</div>

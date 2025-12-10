@@ -301,20 +301,27 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 												style={{ backgroundColor: "var(--color-card-bg)" }}
 											>
 												<ul className="py-2">
-													{categories.length > 0 && categories.map((op: Category, idx: number) => (
-														<li key={idx}>
-															<a
-																role="menuitem"
-																href={`/products?categoryId=${op.id}`}
-																className="block px-4 py-2 text-sm text-[var(--color-cream-bg)] hover:bg-[color:var(--color-cream-soft)]/15"
-																onClick={() =>
-																	setOpenCategories(false)
-																}
-															>
-																{op.name}
-															</a>
-														</li>
-													))}
+													{categories.length > 0 &&
+														categories.map(
+															(op: Category, idx: number) => (
+																<li key={idx}>
+																	<a
+																		role="menuitem"
+																		href={`/products?categoryId=${op.id}`}
+																		onClick={() =>
+																			setOpenCategories(false)
+																		}
+																		className="
+																			block px-4 py-2 text-sm text-[var(--color-cream-bg)]
+																			hover:bg-[color:var(--color-cream-soft)]/15
+																			overflow-hidden text-ellipsis whitespace-nowrap
+																		"
+																	>
+																		{op.name}
+																	</a>
+																</li>
+															),
+														)}
 												</ul>
 											</div>
 										)}

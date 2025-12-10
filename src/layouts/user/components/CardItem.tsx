@@ -46,8 +46,8 @@ const CardItem = ({ item }: CardItemProps) => {
 					},
 				}}
 			>
-				<div className="w-full h-[280px] object-cover object-top">
-					<img className="" src={item?.src} alt="" />
+				<div className="w-full h-[280px] overflow-hidden">
+					<img className="w-full h-full object-cover object-center" src={item?.src} alt="" />
 				</div>
 				<div className="p-2 text-center mb-2 text-[var(--color-card-bg)] group-hover:text-[var(--color-cream-bg)] pt-0 mt-2 transition-colors duration-300">
 					<div className="p-2 pt-0">
