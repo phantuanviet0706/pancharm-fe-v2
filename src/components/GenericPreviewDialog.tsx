@@ -12,16 +12,19 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
 
-type FileKind = "image" | "pdf" | "other";
+type FileKind = "image" | "pdf" | "video" | "other";
 
+// Hàm nhận diện loại tệp
 function guessFileKind(url?: string | null, mimeType?: string | null): FileKind {
 	if (!url && !mimeType) return "other";
 	const mt = (mimeType || "").toLowerCase();
 	if (mt.includes("image/")) return "image";
 	if (mt.includes("pdf")) return "pdf";
+	if (mt.includes("video/")) return "video"; // Xử lý video
 	const ext = (url || "").split("?")[0].split("#")[0].split(".").pop()?.toLowerCase();
 	if (ext && ["png", "jpg", "jpeg", "gif", "webp", "bmp", "svg"].includes(ext)) return "image";
 	if (ext === "pdf") return "pdf";
+	if (["mp4", "webm", "ogg"].includes(ext)) return "video"; // Thêm các định dạng video phổ biến
 	return "other";
 }
 
@@ -91,7 +94,7 @@ export default function GenericPreviewDialog({
 									maxHeight: "60vh",
 									objectFit: "contain",
 									minWidth: "20em",
-									minHeight: "20em"
+									minHeight: "20em",
 								}}
 							/>
 						</Box>
@@ -100,6 +103,20 @@ export default function GenericPreviewDialog({
 							<object data={url} type="application/pdf" width="100%" height="100%">
 								<iframe title="pdf-preview" src={url} width="100%" height="100%" />
 							</object>
+						</Box>
+					) : kind === "video" ? (
+						<Box sx={{ display: "flex", justifyContent: "center" }}>
+							<video
+								src={url}
+								controls
+								style={{
+									maxWidth: "100%",
+									maxHeight: "60vh",
+									objectFit: "contain",
+								}}
+							>
+								Your browser does not support the video tag.
+							</video>
 						</Box>
 					) : (
 						<Box sx={{ p: 2 }}>
@@ -120,7 +137,7 @@ export default function GenericPreviewDialog({
 						width: "50%",
 						border: "1px solid var(--color-card-bg)",
 						color: "var(--color-card-bg)",
-						backgroundColor: "transparent"
+						backgroundColor: "transparent",
 					}}
 				>
 					Đóng
@@ -130,7 +147,11 @@ export default function GenericPreviewDialog({
 					<>
 						<Button
 							onClick={handleOpenNewTab}
-							sx={{ width: "50%", backgroundColor: "var(--color-card-bg)", color:"var(--color-cream-bg)" }}
+							sx={{
+								width: "50%",
+								backgroundColor: "var(--color-card-bg)",
+								color: "var(--color-cream-bg)",
+							}}
 						>
 							Mở tab mới
 						</Button>

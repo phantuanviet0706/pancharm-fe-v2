@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import SwipeSlider from "../../components/SwipeSlider";
 import Slide from "./Slide/Slide";
 import { Video } from "../../components/Video";
@@ -7,46 +7,67 @@ import { Button, Link } from "@mui/material";
 import { useCollections } from "../../../../hooks/useCollections";
 import { useProducts } from "../../../../hooks/useProducts";
 import { useNavigate } from "react-router-dom";
+import { useConfiguration } from "../../../../hooks/useConfiguration";
 
 const Home = () => {
 	const { collections } = useCollections(useMemo(() => ({ limit: 2, isDefault: 1 }), []));
 	const { products } = useProducts(useMemo(() => ({ limit: 10 }), []));
 	const navigate = useNavigate();
 
+	const { data } = useConfiguration();
+	const [videoUrl, setVideoUrl] = useState<string | null>(null);
+	const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (data?.config) {
+			try {
+				const config = JSON.parse(data.config);
+				const videoUrlFromConfig = config.videoUrl;
+				const imageUrlFromConfig = config.imageUrl;
+
+				if (videoUrlFromConfig && videoUrlFromConfig !== videoUrl) {
+					setVideoUrl(videoUrlFromConfig);
+				}
+
+				if (imageUrlFromConfig && imageUrlFromConfig !== imageUrl) {
+					setImageUrl(imageUrlFromConfig);
+				}
+			} catch (error) {
+				console.error("Error parsing config:", error);
+			}
+		}
+	}, [data?.config, videoUrl, imageUrl]);
+
 	return (
 		<>
 			<BaseLayout>
-				<div className="grid grid-cols-1 gap-6 text-[var(--color-card-bg)]">
-					<Video src="https://pancharm.s3.ap-northeast-1.amazonaws.com/video/Bao+l%C3%A2u+r%E1%BB%93i+ch%C6%B0a+thanh+t%E1%BA%A9y+%C4%91%C3%A1+10102025.mp4">
-						<div className="absolute inset-0 flex flex-col items-center justify-end bottom-10 gap-6 text-center z-10">
-							{/* <h1 className="text-white text-4xl md:text-5xl font-extrabold tracking-wide drop-shadow-lg">
-								CÂU CHUYỆN THƯƠNG HIỆU
-							</h1> */}
-
-							<Button
-								sx={{
-									backgroundColor: "var(--color-cream-bg)",
-									"&:hover": {
-										backgroundColor: "var(--color-cream-bg-hover)",
-										color: "var(--color-card-bg-hover)",
-									},
-									borderRadius: "9999px",
-									paddingInline: "32px",
-									paddingBlock: "10px",
-									boxShadow: "0 4px 20px rgba(0,0,0,0.25)",
-									color: "var(--color-card-bg)",
-									fontSize: "1em",
-									fontWeight: "700",
-									letterSpacing: "0.05em",
-								}}
-								onClick={() => navigate("/products")}
-							>
-								Mua ngay
-							</Button>
-						</div>
-					</Video>
-
-					{/* <SwipeSlider /> */}
+				<div className="grid grid-cols-1 gap-6 text-[var(--color-card-bg)] mt-[-40px]">
+					{videoUrl && (
+						<Video src={videoUrl}>
+							<div className="absolute inset-0 flex flex-col items-center justify-end bottom-30 gap-6 text-center z-10">
+								<Button
+									sx={{
+										backgroundColor: "var(--color-cream-bg)",
+										"&:hover": {
+											backgroundColor: "var(--color-cream-bg-hover)",
+											color: "var(--color-card-bg-hover)",
+										},
+										borderRadius: "9999px",
+										paddingInline: "32px",
+										paddingBlock: "10px",
+										boxShadow: "0 4px 20px rgba(0,0,0,0.25)",
+										color: "var(--color-card-bg)",
+										fontSize: "1em",
+										fontWeight: "700",
+										letterSpacing: "0.05em",
+									}}
+									onClick={() => navigate("/products")}
+								>
+									Mua ngay
+								</Button>
+							</div>
+						</Video>
+					)}
 
 					{/* Câu chuyện thương hiệu */}
 					<div className="brand-story">
@@ -83,7 +104,7 @@ const Home = () => {
 									}
 								>
 									<img
-										src="/product/04.jpeg"
+										src={imageUrl || "/product/04.jpeg"}
 										alt="brand-story"
 										className="absolute inset-0 object-cover w-full h-full"
 										style={{

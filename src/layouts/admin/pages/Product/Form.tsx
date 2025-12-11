@@ -4,7 +4,7 @@ import { useFormHandler } from "../../../../hooks/useFormHandler";
 import GenericDialog from "../../../../components/GenericDialog";
 import FormInput from "../../../../components/FormInput";
 import { handleFormData } from "../../../../utils/helper";
-import { fetchData } from "../../../../api/categoryService";
+import { CategoryQuery, fetchData } from "../../../../api/categoryService";
 import { ProductStatus, ProductStatusVariable } from "../../../../constants/productStatus";
 
 const isFile = (v: any): v is File => typeof File !== "undefined" && v instanceof File;
@@ -95,10 +95,10 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 	const [loadingCats, setLoadingCats] = useState(false);
 	const searchTimerRef = useRef<number | null>(null);
 
-	const loadCategories = async (keyword = "") => {
+	const loadCategories = async (keyword: string) => {
 		setLoadingCats(true);
 		try {
-			const res = await fetchData(keyword ? { keyword } : {});
+			const res = await fetchData({ keyword, limit: 0 });
 			setCatOpts(
 				(res?.result?.content ?? []).map((it: any) => ({ id: it.id, name: it.name })),
 			);
@@ -118,16 +118,23 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 	};
 
 	useEffect(() => {
-		if (open) loadCategories();
+		if (open) loadCategories(""); // Load categories mỗi khi form mở
 	}, [open]);
 
 	useEffect(() => {
-		if (!form.categoryId) return;
-		const exist = catOpts.some((o) => o.id === form.categoryId);
-		if (!exist) {
-			setCatOpts((prev) => [{ id: form.categoryId, name: form.categoryName || "" }, ...prev]);
+		// Kiểm tra nếu `categoryId` đã có trong `form`
+		if (form.categoryId) {
+			// Kiểm tra nếu `categoryId` có tồn tại trong danh sách `catOpts`
+			const exist = catOpts.some((o) => o.id === form.categoryId);
+			if (!exist) {
+				// Nếu không có, thêm `categoryId` vào đầu danh sách `catOpts`
+				setCatOpts((prev) => [
+					{ id: form.categoryId, name: form.categoryName || "" },
+					...prev,
+				]);
+			}
 		}
-	}, [form.categoryId, form.categoryName]);
+	}, [form.categoryId, form.categoryName, catOpts]);
 	// ---- End handle parent category ----
 
 	let formContent: React.ReactNode = null;
@@ -141,10 +148,10 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 				<>
 					<div
 						className="
-						items-stretch gap-3 no-scrollbar py-1 px-1
-						snap-x snap-mandatory h-[28em] overflow-y-scroll
-						thin-scrollbar
-					"
+            items-stretch gap-3 no-scrollbar py-1 px-1
+            snap-x snap-mandatory h-[28em] overflow-y-scroll
+            thin-scrollbar
+          "
 						style={{ scrollBehavior: "smooth" }}
 					>
 						{existingImages.map((it) => {
@@ -156,13 +163,13 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 								<div
 									key={it.id}
 									className={`
-									shrink-0 snap-start my-2
-									w-[520px] rounded-2xl border bg-white
-									flex items-center gap-3 px-3 py-2
-									${isChecked ? "border-[var(--color-card-bg)] shadow-[0_8px_24px_rgba(0,0,0,0.08)]" : "border-gray-200"}
-									transition-all duration-200
-									${isDisabled ? "opacity-60" : "hover:shadow-[0_6px_16px_rgba(0,0,0,0.08)]"}
-								`}
+                  shrink-0 snap-start my-2
+                  w-[520px] rounded-2xl border bg-white
+                  flex items-center gap-3 px-3 py-2
+                  ${isChecked ? "border-[var(--color-card-bg)] shadow-[0_8px_24px_rgba(0,0,0,0.08)]" : "border-gray-200"}
+                  transition-all duration-200
+                  ${isDisabled ? "opacity-60" : "hover:shadow-[0_6px_16px_rgba(0,0,0,0.08)]"}
+                `}
 									onClick={() => {
 										if (isChecked) setDefaultImageId(null);
 										else setDefaultImageId(it.id!);
@@ -247,13 +254,13 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 							disabled={defaultImageId === null}
 							onClick={() => setDefaultImageId(null)}
 							className={`
-							text-sm px-3 py-1.5 rounded-lg border transition
-							${
-								defaultImageId === null
-									? "text-gray-400 border-gray-200 cursor-not-allowed"
-									: "text-[var(--color-card-bg)] border-[var(--color-card-bg)]/30 hover:bg-[var(--color-card-bg)]/5"
-							}
-						`}
+              text-sm px-3 py-1.5 rounded-lg border transition
+              ${
+					defaultImageId === null
+						? "text-gray-400 border-gray-200 cursor-not-allowed"
+						: "text-[var(--color-card-bg)] border-[var(--color-card-bg)]/30 hover:bg-[var(--color-card-bg)]/5"
+				}
+            `}
 						>
 							Bỏ chọn
 						</button>
@@ -312,22 +319,13 @@ const Form = ({ open, onClose, onSubmit, data, onSuccess, action = "create" }: F
 							}));
 						}}
 					/>
-					{/* <div className="grid grid-cols-2 gap-4">
-						<FormInput
-							type="int"
-							label="Số lượng"
-							name="quantity"
-							value={form?.quantity}
-							onChange={(e) => setForm({ ...form, quantity: e })}
-						></FormInput> */}
-						<FormInput
-							type="int"
-							label="Đơn giá"
-							name="unitPrice"
-							value={form?.unitPrice}
-							onChange={(e) => setForm({ ...form, unitPrice: e })}
-						></FormInput>
-					{/* </div> */}
+					<FormInput
+						type="int"
+						label="Đơn giá"
+						name="unitPrice"
+						value={form?.unitPrice}
+						onChange={(e) => setForm({ ...form, unitPrice: e })}
+					></FormInput>
 					<FormInput
 						type="editor"
 						label="Mô tả"
