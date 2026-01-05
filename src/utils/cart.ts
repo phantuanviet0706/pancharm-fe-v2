@@ -3,6 +3,7 @@ export type CartItemType = {
 	productName: string;
 	unitPrice: number;
 	quantity: number;
+	imgSrc?: string;
 };
 
 const CART_KEY = "carts";

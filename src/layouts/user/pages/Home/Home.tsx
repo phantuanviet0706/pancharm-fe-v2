@@ -160,26 +160,32 @@ const Home = () => {
 					)}
 
 					{collections.length > 0 && (
-						<div className="grid gap-5">
-							<div className="uppercase text-3xl text-center">Bộ sưu tập</div>
+						<div className="grid gap-5 mt-10">
+							<div className="uppercase text-3xl text-center font-semibold">
+								Bộ sưu tập
+							</div>
 							<div className="home-page-collections">
-								<div className="flex gap-5 px-15 justify-center">
+								<div className="flex flex-wrap gap-8 xl:gap-5 px-4 xl:px-15 justify-center">
 									{collections.map((item, idx) => {
-										const defaultImage = item.collectionImages?.find((img) => {
-											return img.isDefault == true ? img : null;
-										});
+										const defaultImage = item.collectionImages?.find(
+											(img) => img.isDefault,
+										);
 
 										return (
-											<div className="relative w-[30em] h-[30em]" key={idx}>
-												<a className="relative" href="#">
+											<div
+												key={idx}
+												className="relative w-[90vw] h-[90vw] xl:w-[30em] xl:h-[30em] overflow-hidden rounded-2xl shadow-lg"
+											>
+												<a className="block w-full h-full" href={`products?collectionId=${item.id}`}>
 													<img
 														src={
 															defaultImage?.path ??
 															"/collection/01.jpeg"
 														}
-														className="w-[30em] h-[30em]"
+														alt={item.name}
+														className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
 													/>
-													<span className="absolute bottom-6 left-[50%] -translate-x-1/2 rounded-lg bg-black/50 px-4 py-2 text-white text-base md:text-md">
+													<span className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-lg bg-black/60 backdrop-blur-sm px-6 py-2 text-white text-base font-medium whitespace-nowrap">
 														{item.name}
 													</span>
 												</a>

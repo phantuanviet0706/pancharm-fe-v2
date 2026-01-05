@@ -154,16 +154,22 @@ const ProductDetail = () => {
 	const [quantity, setQuantity] = useState(1);
 
 	const productImages = product?.productImages || [];
-	const productSlides = productImages.length > 0 ? productImages.map((img) => ({ src: img.path })) : [];
+	const productSlides =
+		productImages.length > 0 ? productImages.map((img) => ({ src: img.path })) : [];
 
 	return (
 		<BaseLayout>
 			<div ref={rootRef} style={{ margin: 0 }}></div>
 			<div className="xl:flex justify-between px-10">
-				<div className="product-images w-[45%]">
-					<SwipeSlider showThumbs width="30rem" height="40rem" slides={productSlides} />
+				<div className="product-images w-full xl:w-[45%] [--slider-width:80vw] xl:[--slider-width:30rem] mb-4 xl:mb-0">
+					<SwipeSlider
+						showThumbs
+						width="var(--slider-width)"
+						height="40rem"
+						slides={productSlides}
+					/>
 				</div>
-				<div className="product-basic-info px-8 w-[55%] flex justify-left">
+				<div className="product-basic-info px-0 xl:px-8 w-[55%] flex justify-left">
 					<div
 						className="product-info-wrapper"
 						style={{
@@ -191,7 +197,7 @@ const ProductDetail = () => {
 								</div>
 							</div> */}
 							{/* <div className="mt-5"> */}
-							<div>
+							<div className="grid gap-2 xl:block xl:gap-0">
 								{/* <Button
 									sx={{
 										border: "1px solid var(--color-text-light)",

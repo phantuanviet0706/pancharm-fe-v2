@@ -33,7 +33,6 @@ const Other = () => {
 		}
 	}, [data]);
 
-	// Hàm chuyển đổi dữ liệu thành FormData
 	const toFormData = (data: any) => {
 		const fd = new FormData();
 		if (data.uploadFile) {
@@ -42,7 +41,6 @@ const Other = () => {
 		return fd;
 	};
 
-	// Hàm xử lý tải video
 	const handleUpload = async (body: any) => {
 		try {
 			const res = await updateHomeVideo("COMPANY_CONFIG", toFormData(body));
@@ -63,7 +61,6 @@ const Other = () => {
 		}
 	};
 
-	// Hàm xử lý tải ảnh
 	const handleUploadImage = async (body: any) => {
 		try {
 			const res = await updateHomeImage("COMPANY_CONFIG", toFormData(body));
@@ -88,7 +85,6 @@ const Other = () => {
 		const selectedFile = event.target.files?.[0];
 		if (selectedFile) {
 			setFile(selectedFile);
-
 			const body = { uploadFile: selectedFile };
 			if (isImage) {
 				handleUploadImage(body);
@@ -101,29 +97,31 @@ const Other = () => {
 	return (
 		<BaseLayout>
 			<CommonLayout title="Nguồn dữ liệu khác" className="company-page">
-				<div className="field-display-container">
-					<div className="field-display-wrapper grid gap-4">
+				<div className="field-display-container p-4 md:p-0">
+					<div className="field-display-wrapper grid gap-6 md:gap-4">
 						{/* Video màn hình chính */}
-						<div className={`display-field flex gap-12 relative`}>
-							<div className={`field-label mb-2 w-[12vw] items-center flex gap-3`}>
+						<div className="display-field flex flex-col md:flex-row md:gap-12 relative border-b md:border-none pb-4 md:pb-0">
+							<div className="field-label mb-2 w-full md:w-[12vw] items-center flex gap-3">
 								<Icon name="bank" />
 								<div className="label-content uppercase font-semibold text-[13px] leading-[20px]">
 									Video màn hình chính
 								</div>
 							</div>
 							<div
-								className="field-value line-clamp-1 overflow-hidden text-ellipsis leading-[20px] flex gap-4"
+								className="field-value flex flex-wrap md:flex-nowrap gap-4"
 								style={{
-									width: "calc(100% - 12vw)",
+									width: "100%", // Mặc định mobile 100%
 								}}
 							>
-								<FilePreviewButton
-									url={previewUrl}
-									title="Xem tệp đã tải lên"
-									fileName={file?.name}
-									mimeType="video"
-									label="Xem preview"
-								/>
+								<div className="flex-shrink-0">
+									<FilePreviewButton
+										url={previewUrl}
+										title="Xem tệp đã tải lên"
+										fileName={file?.name}
+										mimeType="video"
+										label="Xem preview"
+									/>
+								</div>
 
 								<input
 									id="uploadInput"
@@ -138,7 +136,7 @@ const Other = () => {
 									variant="outlined"
 									onClick={() => document.getElementById("uploadInput")?.click()}
 									sx={{
-										width: "10em",
+										width: { xs: "100%", sm: "10em" }, // Mobile chiếm hết chiều ngang, Desktop 10em
 									}}
 								>
 									Tải video lên
@@ -147,25 +145,27 @@ const Other = () => {
 						</div>
 
 						{/* Ảnh câu chuyện thương hiệu */}
-						<div className={`display-field flex gap-12 relative`}>
-							<div className={`field-label mb-2 w-[12vw] items-center flex gap-3`}>
+						<div className="display-field flex flex-col md:flex-row md:gap-12 relative border-b md:border-none pb-4 md:pb-0">
+							<div className="field-label mb-2 w-full md:w-[12vw] items-center flex gap-3">
 								<Icon name="bank" />
 								<div className="label-content uppercase font-semibold text-[13px] leading-[20px]">
 									Ảnh câu chuyện thương hiệu
 								</div>
 							</div>
 							<div
-								className="field-value line-clamp-1 overflow-hidden text-ellipsis leading-[20px] flex gap-4"
+								className="field-value flex flex-wrap md:flex-nowrap gap-4"
 								style={{
-									width: "calc(100% - 12vw)",
+									width: "100%",
 								}}
 							>
-								<FilePreviewButton
-									url={previewImageUrl}
-									title="Xem tệp đã tải lên"
-									fileName={file?.name}
-									label="Xem preview"
-								/>
+								<div className="flex-shrink-0">
+									<FilePreviewButton
+										url={previewImageUrl}
+										title="Xem tệp đã tải lên"
+										fileName={file?.name}
+										label="Xem preview"
+									/>
+								</div>
 
 								<input
 									id="uploadImage"
@@ -180,7 +180,7 @@ const Other = () => {
 									variant="outlined"
 									onClick={() => document.getElementById("uploadImage")?.click()}
 									sx={{
-										width: "10em",
+										width: { xs: "100%", sm: "10em" },
 									}}
 								>
 									Tải ảnh lên

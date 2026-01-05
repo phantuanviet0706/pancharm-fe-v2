@@ -43,7 +43,7 @@ const Collection = () => {
 			<div className="collection-container">
 				<div className="collection-wrapper">
 					<div className="collection-list flex justify-center">
-						<div className="grid grid-cols-2 gap-5">
+						<div className="grid xl:grid-cols-2 lg:grid-cols-1 gap-5">
 							{dataToRender.length > 0 ? (
 								dataToRender.map((item: CollectionObject, idx: number) => {
 									const defaultImage = item?.collectionImages?.find(

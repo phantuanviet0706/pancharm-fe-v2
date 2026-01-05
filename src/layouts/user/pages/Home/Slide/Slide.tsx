@@ -31,17 +31,15 @@ export interface SlideProps {
 	items?: Object[];
 }
 
-const Slide = ({ items = [1, 1, 1, 1, 1, 1] }: SlideProps) => {
-	const navigate = useNavigate();
-
+const Slide = ({ items = [] }: SlideProps) => {
 	const settings = {
 		dots: false,
 		infinite: true,
 		speed: 600,
-		slidesToShow: 4,
+		slidesToShow: 1,
 		slidesToScroll: 1,
-		centerMode: true,
-		centerPadding: "10px",
+		centerMode: false,
+		centerPadding: "1vw",
 		variableWidth: true,
 		nextArrow: <NextArrow />,
 		prevArrow: <PrevArrow />,
@@ -76,10 +74,12 @@ const Slide = ({ items = [1, 1, 1, 1, 1, 1] }: SlideProps) => {
 	};
 
 	return (
-		<div className="py-5 px-16 mx-auto relative">
+		<div className="py-5 px-4 sm:px-16 mx-auto relative w-full">
 			<Slider {...settings}>
 				{items.map((item, idx) => (
-					<CardItem key={idx} item={item} />
+					<div key={idx} className="px-2">
+						<CardItem item={item} />
+					</div>
 				))}
 			</Slider>
 		</div>

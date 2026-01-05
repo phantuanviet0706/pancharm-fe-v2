@@ -30,7 +30,7 @@ const CartItem = ({ item, onChangeQty, onRemove }: CartItemProps) => {
 		>
 			<div className="cart-item-wrapper flex gap-2 justify-between align-middle">
 				<div className="cart-item-img w-[80px] h-[80px]">
-					<img className="w-[80px] h-[80px]" src="/cart/DSC02707.jpeg" alt="Cart Item" />
+					<img className="w-[80px] h-[80px]" src={item?.imgSrc || "/cart/DSC02707.jpeg"} alt="Cart Item" />
 				</div>
 				<div
 					className="cart-item-info"

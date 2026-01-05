@@ -5,6 +5,7 @@ import { Button, Pagination } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { useProducts } from "../../../../hooks/useProducts";
 import { useSearchParams } from "react-router-dom";
+import CloseIcon from "@mui/icons-material/Close";
 
 const PRICE_MIN = 0;
 const PRICE_MAX = 2000000;
@@ -37,6 +38,7 @@ const Product = () => {
 	// ===== PARAM LOẠI / BỘ SƯU TẬP TỪ URL =====
 	const categoryIdParam = searchParams.get("categoryId");
 	const collectionIdParam = searchParams.get("collectionId");
+	const keywordParam = searchParams.get("keyword");
 
 	// ===== CHECKBOX MỨC GIÁ (init từ URL nếu có) =====
 	const buildInitialPriceChecks = () => {
@@ -119,6 +121,10 @@ const Product = () => {
 			}
 			if (collectionIdParam) {
 				params.collectionId = collectionIdParam;
+			}
+
+			if (keywordParam) {
+				params.keyword = keywordParam;
 			}
 
 			return params;
@@ -253,12 +259,23 @@ const Product = () => {
 		setPage(0);
 	};
 
+	const [isFilterOpen, setIsFilterOpen] = useState(false);
+
 	return (
 		<BaseLayout>
 			<div className="products-container px-[5em]">
+				{products.length > 0 && (
+					<button
+						onClick={() => setIsFilterOpen(true)}
+						className="xl:hidden w-full flex items-center justify-center gap-2 bg-[#BF6B57] text-white py-3 rounded-xl mb-6 shadow-lg font-bold"
+					>
+						<FilterListIcon />
+						BỘ LỌC TÌM KIẾM
+					</button>
+				)}
 				<div className="products-wrapper flex gap-[1em]">
 					{/* ==== FILTER SIDE ==== */}
-					<div className="product-filter w-[20%] rounded-2xl">
+					<div className="hidden xl:block product-filter w-[20%] rounded-2xl">
 						<div className="filter-container">
 							<div className="w-full rounded-2xl bg-[#BF6B57] text-white p-[1em] shadow-md">
 								{/* Header */}
@@ -390,10 +407,10 @@ const Product = () => {
 					</div>
 
 					{/* ==== PRODUCT LIST ==== */}
-					<div className="product-list w-[80%]">
+					<div className="product-list w-[100%] xl:w-[80%]">
 						{products.length > 0 ? (
 							<>
-								<div className="product-items grid grid-cols-1 xl:grid-cols-3 gap-[2em] justify-items-center mb-[2em]">
+								<div className="product-items grid grid-cols-1 xl:grid-cols-3 gap-[2em] justify-center justify-items-center mb-[2em]">
 									{products.map((item, idx) => (
 										<CardItem key={idx} item={item} />
 									))}
@@ -427,6 +444,161 @@ const Product = () => {
 								</div>
 							</>
 						)}
+					</div>
+				</div>
+
+				<div
+					className={`fixed inset-0 z-[999] transition-all ${isFilterOpen ? "visible" : "invisible"}`}
+				>
+					{/* Nền đen */}
+					<div
+						className={`absolute inset-0 bg-black/50 transition-opacity ${isFilterOpen ? "opacity-100" : "opacity-0"}`}
+						onClick={() => setIsFilterOpen(false)}
+					/>
+
+					{/* Nội dung popup */}
+					<div
+						className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 transition-transform duration-300 ${isFilterOpen ? "translate-y-0" : "translate-y-full"}`}
+					>
+						{/* Thanh handle nhỏ ở trên cùng (cái gạch ngang trong ảnh của bạn) */}
+						<div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
+
+						<div className="flex justify-between items-center mb-6">
+							<h2 className="text-lg font-bold text-[#BF6B57]">Bộ lọc sản phẩm</h2>
+							<button
+								onClick={() => setIsFilterOpen(false)}
+								className="p-1 bg-gray-100 rounded-full"
+							>
+								<CloseIcon />
+							</button>
+						</div>
+
+						{/* QUAN TRỌNG: Thêm vùng chứa cuộn nếu bộ lọc dài */}
+						<div className="max-h-[70vh] overflow-y-auto">
+							<div className="filter-container">
+								<div className="w-full rounded-2xl bg-[#BF6B57] text-white p-[1em] shadow-md">
+									{/* Mức giá */}
+									<div className="mb-[1.25em]">
+										<h4 className="text-[0.8125em] font-bold uppercase pb-[0.5em] opacity-95">
+											Mức giá
+										</h4>
+
+										<ul className="space-y-[0.5em] text-[0.875em]">
+											{PRICE_FILTER_LABELS.map((label, i) => (
+												<li
+													key={i}
+													className="flex items-center gap-[0.5em]"
+												>
+													<input
+														type="checkbox"
+														checked={priceChecks[i]}
+														onChange={() => togglePriceCheck(i)}
+														className="size-[1em] rounded-sm border-white/40 bg-transparent accent-white"
+													/>
+													<span>{label}</span>
+												</li>
+											))}
+										</ul>
+
+										{/* Khoảng giá */}
+										<div className="mt-[1em]">
+											<p className="text-[0.8125em] mb-[0.5em] opacity-90">
+												Hoặc nhập khoảng giá phù hợp với bạn:
+											</p>
+
+											{/* Ô hiển thị giá */}
+											<div className="flex items-center justify-between gap-[0.5em] mb-[0.75em]">
+												<input
+													type="text"
+													value={formatCurrency(unitPriceFrom)}
+													readOnly
+													className="w-[6.25em] bg-transparent border border-white/40 rounded px-[0.5em] py-[0.2em] text-sm text-white placeholder-white/70 text-center"
+												/>
+												<span className="text-white">~</span>
+												<input
+													type="text"
+													value={formatCurrency(unitPriceTo)}
+													readOnly
+													className="w-[6.25em] bg-transparent border border-white/40 rounded px-[0.5em] py-[0.2em] text-sm text-white placeholder-white/70 text-center"
+												/>
+											</div>
+
+											{/* Thanh range 2 đầu */}
+											<div className="relative w-full h-[1.5em] mt-[0.25em]">
+												{/* Track nền (click được) */}
+												<div
+													className="absolute top-1/2 left-0 w-full h-[0.25em] -translate-y-1/2 bg-white/30 rounded-full cursor-pointer"
+													onClick={handleTrackClick}
+												/>
+
+												{/* Track vùng chọn */}
+												<div
+													className="absolute top-1/2 h-[0.25em] -translate-y-1/2 bg-white rounded-full pointer-events-none"
+													style={{
+														left: `${minPercent}%`,
+														width: `${maxPercent - minPercent}%`,
+													}}
+												/>
+
+												{/* Slider MIN */}
+												<input
+													type="range"
+													min={PRICE_MIN}
+													max={PRICE_MAX}
+													step={PRICE_STEP}
+													value={unitPriceFrom}
+													onChange={handleMinChange}
+													className="absolute w-full appearance-none bg-transparent top-[0.3125em] pointer-events-none"
+													style={{ zIndex: 3 }}
+												/>
+
+												{/* Slider MAX */}
+												<input
+													type="range"
+													min={PRICE_MIN}
+													max={PRICE_MAX}
+													step={PRICE_STEP}
+													value={unitPriceTo}
+													onChange={handleMaxChange}
+													className="absolute w-full appearance-none bg-transparent top-[0.3125em] pointer-events-none"
+													style={{ zIndex: 2 }}
+												/>
+											</div>
+										</div>
+									</div>
+
+									<div className="mt-4 flex justify-between">
+										<Button
+											className="w-[100px]"
+											variant="outlined"
+											sx={{
+												borderColor: "var(--color-cream-bg)",
+												color: "var(--color-cream-bg)",
+												paddingInline: "0px",
+											}}
+											onClick={handleReset}
+										>
+											Khôi phục
+										</Button>
+										<Button
+											className="w-[100px]"
+											sx={{
+												backgroundColor: "var(--color-cream-bg)",
+												color: "var(--color-card-bg)",
+												paddingInline: "0px",
+												"&:click": {
+													backgroundColor: "var(--color-card-bg)",
+												},
+												border: "1px solid var(--color-card-thick)",
+											}}
+											onClick={handleApply}
+										>
+											Áp dụng
+										</Button>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

@@ -3,25 +3,26 @@ import {
 	Avatar,
 	Box,
 	Button,
+	Collapse,
 	Dialog,
 	DialogContent,
 	DialogTitle,
+	Drawer,
 	IconButton,
 	Link,
+	List,
+	ListItem,
+	ListItemButton,
+	ListItemText,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import PhoneIcon from "@mui/icons-material/Phone";
-import EmailIcon from "@mui/icons-material/Email";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
 import Icon from "../../../components/Icon";
-import SideBar from "./SideBar";
 import UserNav from "../../../components/UserNav";
-import Cart from "../pages/Cart/Cart";
 import { useMe } from "../../../hooks/useMe";
-import { User } from "../../../api/userService";
-import { href } from "react-router-dom";
 import { logout } from "../../../api/authService";
 import { ConfigContext } from "../../../contexts/ConfigProvider";
 import { useCartDialog } from "../pages/Cart/CartDialogProvider";
@@ -32,15 +33,6 @@ const MAIN_MENU = [
 	{ key: "collections", label: "Bộ Sưu Tập", href: "/collections" },
 	{ key: "categories", label: "Trang sức" },
 	{ key: "products", label: "Sản phẩm", href: "/products" },
-	// { key: "gifts", label: "Quà tặng", href: "/gifts" },
-	// { key: "others", label: "Phụ kiện phong thủy", href: "/others" },
-];
-
-const CATEGORY_OPTIONS = [
-	{ label: "Vòng tay nam", href: "/categories/bracelet-men" },
-	{ label: "Vòng tay nữ", href: "/categories/bracelet-women" },
-	{ label: "Dây chuyền", href: "/categories/necklace" },
-	{ label: "Nhẫn", href: "/categories/ring" },
 ];
 
 const PROFILE_SETTINGS = [
@@ -49,26 +41,11 @@ const PROFILE_SETTINGS = [
 		label: "Đi đến trang quản trị",
 		href: "/admin",
 	},
-	// {
-	// 	key: "profile",
-	// 	label: "Profile",
-	// 	href: "/profile",
-	// },
 	{
 		key: "change-password",
 		label: "Đổi mật khẩu",
 		href: "/change-password",
 	},
-	// {
-	// 	key: "orders",
-	// 	label: "Đặt Order",
-	// 	href: "/orders",
-	// },
-	// {
-	// 	key: "wishlist",
-	// 	label: "Danh sách yêu thích",
-	// 	href: "/wishlist",
-	// },
 	{
 		key: "logout",
 		label: "Đăng xuất",
@@ -79,13 +56,11 @@ const PROFILE_SETTINGS = [
 const handleLogout = async () => {
 	try {
 		const token = getCookie("ACCESS_TOKEN") || "";
-
 		await logout({ token });
 	} catch (err) {
 		console.error("Failed to logout:", err);
 	} finally {
 		document.cookie = "ACCESS_TOKEN=; Max-Age=0; Path=/;";
-
 		window.location.href = "/login";
 	}
 };
@@ -96,53 +71,68 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 	const categories = APP_CONFIG?.categories || {};
 
 	const [openProfile, setOpenProfile] = useState(false);
+	const [openDrawer, setOpenDrawer] = useState(false);
+	const [mobileOpenCategories, setMobileOpenCategories] = useState(false);
+
 	const profileRef = useRef<HTMLDivElement | null>(null);
-
 	const { openCart } = useCartDialog();
-
 	const [openCategories, setOpenCategories] = useState(false);
 	const categoriesRef = useRef<HTMLDivElement | null>(null);
 
+	// Search logic
+	const [showSearch, setShowSearch] = useState(false);
+	const [searchQuery, setSearchQuery] = useState("");
+	const searchRef = useRef<HTMLDivElement | null>(null);
+
+	const handleSearchSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		if (searchQuery.trim()) {
+			window.location.href = `/products?keyword=${encodeURIComponent(searchQuery.trim())}`;
+			setShowSearch(false);
+		}
+	};
+
 	let userProfileHtml = (
-		<>
-			<div className="relative authentication-btn">
-				<Button
+		<div className="relative authentication-btn">
+			<Button
+				sx={{
+					backgroundColor: "var(--color-card-bg)",
+					"&:hover": {
+						backgroundColor: "var(--color-card-bg-hover)",
+					},
+					borderRadius: "24px",
+					paddingInline: "15px",
+				}}
+			>
+				<Link
+					href="/login"
 					sx={{
-						backgroundColor: "var(--color-card-bg)",
+						color: "var(--color-cream-bg)",
 						"&:hover": {
-							backgroundColor: "var(--color-card-bg-hover)",
+							color: "var(--color-cream-bg-hover)",
 						},
-						borderRadius: "24px",
-						paddingInline: "15px",
 					}}
+					underline="none"
 				>
-					<Link
-						href="/login"
-						sx={{
-							color: "var(--color-cream-bg)",
-							"&:hover": {
-								color: "var(--color-cream-bg-hover)",
-							},
-						}}
-						underline="none"
-					>
-						<div className="login-btn">Đăng nhập</div>
-					</Link>
-				</Button>
-			</div>
-		</>
+					<div className="login-btn">Đăng nhập</div>
+				</Link>
+			</Button>
+		</div>
 	);
 
 	const token = getCookie("ACCESS_TOKEN");
+	const { me } = useMe();
 	if (token) {
-		const { me, setMe } = useMe();
 		userProfileHtml = (
 			<div className="relative" ref={profileRef}>
 				<IconButton
 					sx={{ color: "var(--color-card-bg)" }}
 					aria-label="Tài khoản"
 					aria-expanded={openProfile}
-					onClick={() => setOpenProfile((v) => !v)}
+					onClick={(e) => {
+						e.stopPropagation();
+						setOpenProfile((v) => !v);
+					}}
 				>
 					<Avatar
 						sx={{ width: 32, height: 32 }}
@@ -168,31 +158,24 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 			if (categoriesRef.current && !categoriesRef.current.contains(e.target as Node)) {
 				setOpenCategories(false);
 			}
+			if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+				setOpenProfile(false);
+			}
+			if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+				setShowSearch(false);
+			}
 		};
 		const onKey = (e: KeyboardEvent) => {
-			if (e.key === "Escape") setOpenCategories(false);
+			if (e.key === "Escape") {
+				setOpenCategories(false);
+				setOpenProfile(false);
+				setShowSearch(false);
+			}
 		};
 		document.addEventListener("mousedown", onDocClick);
 		document.addEventListener("keydown", onKey);
 		return () => {
 			document.removeEventListener("mousedown", onDocClick);
-			document.removeEventListener("keydown", onKey);
-		};
-	}, []);
-
-	useEffect(() => {
-		const onClick = (e: MouseEvent) => {
-			if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
-				setOpenProfile(false);
-			}
-		};
-		const onKey = (e: KeyboardEvent) => {
-			if (e.key === "Escape") setOpenProfile(false);
-		};
-		document.addEventListener("mousedown", onClick);
-		document.addEventListener("keydown", onKey);
-		return () => {
-			document.removeEventListener("mousedown", onClick);
 			document.removeEventListener("keydown", onKey);
 		};
 	}, []);
@@ -205,64 +188,33 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 	});
 
 	return (
-		<div className="sticky top-0 z-[1000] bg-[var(--color-cream-thick)] mb-0">
-			<div className="hidden lg:flex justify-between px-5 h-[30px] border-b font-normal text-base bg-[var(--color-card-bg)]">
-				{/* {HEADER_ITEMS.map(
-					(item, idx) =>
-						item.display && (
-							<div key={idx} className={item.className + " top-0.5 w-[33%]"}>
-								<div
-									className={
-										"flex items-center gap-1 " +
-										(item.icon_right ? "icon-right" : "")
-									}
-								>
-									<div className="item-icons">{item.icon}</div>
-									{item.href ? (
-										<a
-											href={item.href}
-											className="flex items-center text-[var(--color-cream-bg)]"
-										>
-											<span className="item-title text-sm">
-												{item.title}:
-											</span>
-											<span className="text-sm">&nbsp;</span>
-											<span className="item-content text-sm line-clamp-1 overflow-hidden text-ellipsis">
-												{item.content}
-											</span>
-										</a>
-									) : (
-										<span className="flex items-center text-[var(--color-cream-bg)]">
-											<span className="item-title text-sm w-[10em]">
-												{item.title}:
-											</span>
-											<span className="text-sm">&nbsp;</span>
-											<span className="item-content text-sm line-clamp-1 overflow-hidden text-ellipsis">
-												{item.content}
-											</span>
-										</span>
-									)}
-								</div>
-							</div>
-						),
-				)} */}
-			</div>
+		<div className="sticky top-0 z-[1000] bg-[var(--color-cream-thick)] mb-0" ref={searchRef}>
+			<div className="hidden lg:flex justify-between px-5 h-[30px] border-b font-normal text-base bg-[var(--color-card-bg)]"></div>
 
 			<Box component="nav" aria-label="Main navigation">
 				<div className="relative flex items-center justify-between px-4 md:px-5 h-[64px] md:h-[70px] border-b">
 					{/* Left Nav */}
-					<div
-						className="flex items-center gap-2"
-						onClick={() => {
-							window.location.href = "/";
-						}}
-					>
-						<div className="logo-icon w-7 h-7 md:w-10 md:h-10 flex items-center justify-center">
-							<Icon name="pancharm" color="var(--color-card-bg)" />
+					<div className="flex items-center gap-2">
+						<div className="lg:hidden">
+							<IconButton
+								sx={{ color: "var(--color-card-bg)", ml: -1 }}
+								onClick={() => setOpenDrawer(true)}
+							>
+								<MenuIcon />
+							</IconButton>
 						</div>
-						<h1 className="cursor-pointer text-lg md:text-2xl text-[var(--color-card-bg)] leading-none uppercase">
-							Pancharm
-						</h1>
+
+						<div
+							className="flex items-center gap-2 cursor-pointer"
+							onClick={() => (window.location.href = "/")}
+						>
+							<div className="logo-icon w-7 h-7 md:w-10 md:h-10 flex items-center justify-center">
+								<Icon name="pancharm" color="var(--color-card-bg)" />
+							</div>
+							<h1 className="text-lg md:text-2xl text-[var(--color-card-bg)] leading-none uppercase font-bold">
+								Pancharm
+							</h1>
+						</div>
 					</div>
 
 					{/* Mid Nav */}
@@ -312,10 +264,10 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 																			setOpenCategories(false)
 																		}
 																		className="
-																			block px-4 py-2 text-sm text-[var(--color-cream-bg)]
-																			hover:bg-[color:var(--color-cream-soft)]/15
-																			overflow-hidden text-ellipsis whitespace-nowrap
-																		"
+                                                                            block px-4 py-2 text-sm text-[var(--color-cream-bg)]
+                                                                            hover:bg-[color:var(--color-cream-soft)]/15
+                                                                            overflow-hidden text-ellipsis whitespace-nowrap
+                                                                        "
 																	>
 																		{op.name}
 																	</a>
@@ -356,9 +308,44 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 
 					{/* Right Nav */}
 					<div className="flex items-center gap-2 md:gap-3">
-						<IconButton sx={{ color: "var(--color-card-bg)" }} aria-label="Tìm kiếm">
-							<SearchIcon />
-						</IconButton>
+						<div className="relative hidden lg:flex items-center">
+							<Collapse orientation="horizontal" in={showSearch}>
+								<form onSubmit={handleSearchSubmit}>
+									<input
+										type="text"
+										placeholder="Tìm kiếm..."
+										value={searchQuery}
+										onChange={(e) => setSearchQuery(e.target.value)}
+										onClick={(e) => e.stopPropagation()}
+										className="outline-none border-b border-[var(--color-card-bg)] bg-transparent px-2 mr-2 w-48 transition-all"
+										autoFocus
+									/>
+								</form>
+							</Collapse>
+							<IconButton
+								sx={{ color: "var(--color-card-bg)" }}
+								onClick={() => {
+									if (showSearch) {
+										// Nếu đang mở mà nhấn icon thì submit luôn
+										const event = new Event("submit") as any;
+										handleSearchSubmit(event);
+									} else {
+										setShowSearch(true);
+									}
+								}}
+							>
+								<SearchIcon />
+							</IconButton>
+						</div>
+
+						<div className="lg:hidden">
+							<IconButton
+								sx={{ color: "var(--color-card-bg)" }}
+								onClick={() => setShowSearch(!showSearch)}
+							>
+								<SearchIcon />
+							</IconButton>
+						</div>
 
 						<IconButton
 							sx={{ color: "var(--color-card-bg)" }}
@@ -372,6 +359,146 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 					</div>
 				</div>
 			</Box>
+
+			<Drawer
+				anchor="left"
+				open={openDrawer}
+				onClose={() => setOpenDrawer(false)}
+				PaperProps={{
+					sx: { width: 280, backgroundColor: "var(--color-cream-thick)" },
+				}}
+			>
+				<Box
+					sx={{
+						p: 2,
+						display: "flex",
+						alignItems: "center",
+						borderBottom: "1px solid #ddd",
+					}}
+				>
+					<Icon name="pancharm" color="var(--color-card-bg)" />
+					<h2 className="ml-2 font-bold uppercase text-[var(--color-card-bg)]">
+						Pancharm
+					</h2>
+				</Box>
+				<List sx={{ px: 1 }}>
+					{MAIN_MENU.map((item) => {
+						if (item.key === "categories") {
+							return (
+								<React.Fragment key={item.key}>
+									<ListItemButton
+										onClick={() =>
+											setMobileOpenCategories(!mobileOpenCategories)
+										}
+									>
+										<ListItemText
+											primary={item.label}
+											primaryTypographyProps={{
+												fontWeight: 600,
+												color: "var(--color-card-bg)",
+											}}
+										/>
+										{mobileOpenCategories ? <ExpandLess /> : <ExpandMore />}
+									</ListItemButton>
+									<Collapse
+										in={mobileOpenCategories}
+										timeout="auto"
+										unmountOnExit
+									>
+										<List component="div" disablePadding>
+											{categories.length > 0 &&
+												categories.map((cat: Category) => (
+													<ListItemButton
+														key={cat.id}
+														component="a"
+														href={`/products?categoryId=${cat.id}`}
+														sx={{ pl: 4 }}
+													>
+														<ListItemText
+															primary={cat.name}
+															sx={{
+																color: "var(--color-card-bg)",
+															}}
+														/>
+													</ListItemButton>
+												))}
+										</List>
+									</Collapse>
+								</React.Fragment>
+							);
+						}
+						return (
+							<ListItem disablePadding key={item.key}>
+								<ListItemButton component="a" href={item.href}>
+									<ListItemText
+										primary={item.label}
+										primaryTypographyProps={{
+											fontWeight: 600,
+											sx: {
+												color: "var(--color-card-bg)",
+												display: "-webkit-box",
+												WebkitLineClamp: 1,
+												WebkitBoxOrient: "vertical",
+												overflow: "hidden",
+												wordBreak: "break-all",
+											},
+										}}
+										noWrap
+									/>
+								</ListItemButton>
+							</ListItem>
+						);
+					})}
+				</List>
+			</Drawer>
+
+			<Collapse in={showSearch} className="lg:hidden">
+				<Box
+					sx={{
+						px: 2,
+						pb: 2,
+						pt: 1,
+						backgroundColor: "var(--color-cream-thick)",
+						borderBottom: "1px solid rgba(0,0,0,0.05)",
+						boxShadow: "inset 0 2px 4px rgba(0,0,0,0.02)",
+					}}
+				>
+					<form onSubmit={handleSearchSubmit}>
+						<div className="relative flex items-center group">
+							<input
+								autoFocus
+								type="text"
+								placeholder="Bạn đang tìm gì hôm nay?"
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
+								className="w-full h-11 pl-4 pr-12 rounded-2xl border-none outline-none text-sm shadow-sm transition-all focus:shadow-md"
+								style={{
+									backgroundColor: "#ffffff",
+									color: "var(--color-card-bg)",
+								}}
+							/>
+							<IconButton
+								type="submit"
+								size="small"
+								sx={{
+									position: "absolute",
+									right: 8,
+									backgroundColor: "var(--color-card-bg)",
+									color: "white",
+									"&:hover": {
+										backgroundColor: "var(--color-card-bg-hover)",
+										opacity: 0.9,
+									},
+									width: 32,
+									height: 32,
+								}}
+							>
+								<SearchIcon sx={{ fontSize: 18 }} />
+							</IconButton>
+						</div>
+					</form>
+				</Box>
+			</Collapse>
 		</div>
 	);
 };
