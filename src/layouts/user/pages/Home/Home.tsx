@@ -76,7 +76,7 @@ const Home = () => {
 						</div>
 					</div>
 
-					<section className="w-full bg-[var(--color-cream-bg)] py-[3em] flex justify-center">
+					<section className="w-full bg-[var(--color-cream-bg)] py-[3em] hidden xl:flex justify-center">
 						<div className="max-w-[1200px] w-full grid grid-cols-12 gap-[2.2em] items-start">
 							<div className="col-span-5 pl-[0.4em] md:pt-[0.6em] relative h-full z-100 text-right">
 								<h2 className="relative uppercase font-extrabold leading-tight text-[var(--color-card-bg)] text-[2.1em] md:text-[2.6em] top-[50%] -translate-y-9/10">
