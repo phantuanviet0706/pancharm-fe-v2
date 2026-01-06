@@ -195,7 +195,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 				<div className="relative flex items-center justify-between px-4 md:px-5 h-[64px] md:h-[70px] border-b">
 					{/* Left Nav */}
 					<div className="flex items-center gap-2">
-						<div className="lg:hidden">
+						<div className="md:hidden">
 							<IconButton
 								sx={{ color: "var(--color-card-bg)", ml: -1 }}
 								onClick={() => setOpenDrawer(true)}
@@ -355,7 +355,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 							<ShoppingCartIcon />
 						</IconButton>
 
-						{userProfileHtml}
+						<div className="hidden xl:block">{userProfileHtml}</div>
 					</div>
 				</div>
 			</Box>
@@ -377,7 +377,7 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 					}}
 				>
 					<Icon name="pancharm" color="var(--color-card-bg)" />
-					<h2 className="ml-2 font-bold uppercase text-[var(--color-card-bg)]">
+					<h2 className="ml-4 font-bold uppercase text-[var(--color-card-bg)]">
 						Pancharm
 					</h2>
 				</Box>
@@ -443,7 +443,6 @@ const Navbar: React.FC<{ activeKey?: string }> = ({ activeKey = "default" }) => 
 												wordBreak: "break-all",
 											},
 										}}
-										noWrap
 									/>
 								</ListItemButton>
 							</ListItem>

@@ -10,6 +10,8 @@ import CloseIcon from "@mui/icons-material/Close";
 const PRICE_MIN = 0;
 const PRICE_MAX = 2000000;
 const PRICE_STEP = 100000;
+const DEFAULT_MIN_VIEW = 200000;
+const DEFAULT_MAX_VIEW = 1200000;
 
 const PRICE_FILTER_LABELS = [
 	"Tất cả",
@@ -19,17 +21,142 @@ const PRICE_FILTER_LABELS = [
 	"Từ 1 - 2 triệu",
 ];
 
-// mapping từng label -> khoảng giá
 const PRICE_FILTER_RANGES = [
-	null, // "Tất cả"
-	{ min: 0, max: 200000 }, // Dưới 200K
-	{ min: 200000, max: 500000 }, // Từ 200K - 500K
-	{ min: 500000, max: 1000000 }, // Từ 500K - 1 triệu
-	{ min: 1000000, max: 2000000 }, // Từ 1 - 2 triệu
+	null,
+	{ min: 0, max: 200000 },
+	{ min: 200000, max: 500000 },
+	{ min: 500000, max: 1000000 },
+	{ min: 1000000, max: 2000000 },
 ];
+
+const formatCurrency = (value: number) => new Intl.NumberFormat("vi-VN").format(value) + "đ";
+
+const FilterContent = ({
+	priceChecks,
+	togglePriceCheck,
+	unitPriceFrom,
+	unitPriceTo,
+	handleMinChange,
+	handleMaxChange,
+	handleTrackClick,
+	handleReset,
+	handleApply,
+	minPercent,
+	maxPercent,
+}: any) => (
+	<div className="w-full rounded-2xl bg-[#BF6B57] text-white p-[1em] shadow-md">
+		<div className="flex items-center gap-[0.5em] mb-[0.75em]">
+			<FilterListIcon />
+			<h3 className="text-[0.9375em] font-semibold uppercase tracking-wide">
+				Bộ lọc tìm kiếm
+			</h3>
+		</div>
+
+		<div className="mb-[1.25em]">
+			<h4 className="text-[0.8125em] font-bold uppercase pb-[0.5em] opacity-95">Mức giá</h4>
+			<ul className="space-y-[0.5em] text-[0.875em]">
+				{PRICE_FILTER_LABELS.map((label, i) => (
+					<li key={i} className="flex items-center gap-[0.5em]">
+						<input
+							type="checkbox"
+							checked={priceChecks[i]}
+							onChange={() => togglePriceCheck(i)}
+							className="size-[1em] rounded-sm border-white/40 bg-transparent accent-white cursor-pointer"
+						/>
+						<span>{label}</span>
+					</li>
+				))}
+			</ul>
+
+			<div className="mt-[1em]">
+				<p className="text-[0.8125em] mb-[0.5em] opacity-90">
+					Hoặc nhập khoảng giá phù hợp:
+				</p>
+				<div className="flex items-center justify-between gap-[0.5em] mb-[0.75em]">
+					<input
+						type="text"
+						value={formatCurrency(unitPriceFrom)}
+						readOnly
+						className="w-[6.25em] bg-transparent border border-white/40 rounded px-[0.5em] py-[0.2em] text-sm text-white text-center"
+					/>
+					<span className="text-white">~</span>
+					<input
+						type="text"
+						value={formatCurrency(unitPriceTo)}
+						readOnly
+						className="w-[6.25em] bg-transparent border border-white/40 rounded px-[0.5em] py-[0.2em] text-sm text-white text-center"
+					/>
+				</div>
+
+				<div className="relative w-full h-[1.5em] mt-[0.25em]">
+					<div
+						className="absolute top-1/2 left-0 w-full h-[0.25em] -translate-y-1/2 bg-white/30 rounded-full cursor-pointer"
+						onClick={handleTrackClick}
+					/>
+					<div
+						className="absolute top-1/2 h-[0.25em] -translate-y-1/2 bg-white rounded-full pointer-events-none"
+						style={{
+							left: `${minPercent}%`,
+							width: `${maxPercent - minPercent}%`,
+						}}
+					/>
+					<input
+						type="range"
+						min={PRICE_MIN}
+						max={PRICE_MAX}
+						step={PRICE_STEP}
+						value={unitPriceFrom}
+						onChange={handleMinChange}
+						className="absolute w-full appearance-none bg-transparent top-[0.3125em] pointer-events-none z-[3]"
+					/>
+					<input
+						type="range"
+						min={PRICE_MIN}
+						max={PRICE_MAX}
+						step={PRICE_STEP}
+						value={unitPriceTo}
+						onChange={handleMaxChange}
+						className="absolute w-full appearance-none bg-transparent top-[0.3125em] pointer-events-none z-[2]"
+					/>
+				</div>
+			</div>
+		</div>
+
+		<div className="mt-4 flex justify-between gap-2">
+			<Button
+				className="w-[100px]"
+				variant="outlined"
+				sx={{
+					borderColor: "var(--color-cream-bg)",
+					color: "var(--color-cream-bg)",
+					paddingInline: "0px",
+				}}
+				onClick={handleReset}
+			>
+				Khôi phục
+			</Button>
+			<Button
+				className="w-[100px]"
+				sx={{
+					backgroundColor: "var(--color-cream-bg)",
+					color: "var(--color-card-bg)",
+					paddingInline: "0px",
+					"&:click": {
+						backgroundColor: "var(--color-card-bg)",
+					},
+					border: "1px solid var(--color-card-thick)",
+				}}
+				onClick={handleApply}
+			>
+				Áp dụng
+			</Button>
+		</div>
+	</div>
+);
 
 const Product = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
+	const [isFilterOpen, setIsFilterOpen] = useState(false);
 
 	// ===== PAGE =====
 	const initialPage = Number(searchParams.get("page") || 1) - 1;
@@ -86,13 +213,15 @@ const Product = () => {
 	};
 
 	// ===== SLIDER GIÁ (UI) =====
-	const initialMin = Number(searchParams.get("unitPriceFrom") || 200000);
-	const initialMax = Number(searchParams.get("unitPriceTo") || 1200000);
+	const initialMin = Number(searchParams.get("unitPriceFrom") || DEFAULT_MIN_VIEW);
+	const initialMax = Number(searchParams.get("unitPriceTo") || DEFAULT_MAX_VIEW);
 
 	const [unitPriceFrom, setUnitPriceFrom] = useState(
-		Number.isNaN(initialMin) ? 200000 : initialMin,
+		Number.isNaN(initialMin) ? DEFAULT_MIN_VIEW : initialMin,
 	);
-	const [unitPriceTo, setUnitPriceTo] = useState(Number.isNaN(initialMax) ? 1200000 : initialMax);
+	const [unitPriceTo, setUnitPriceTo] = useState(
+		Number.isNaN(initialMax) ? DEFAULT_MAX_VIEW : initialMax,
+	);
 
 	// ===== PARAM GỬI CHO BE (từ URL, không từ state) =====
 	const priceRangesParam = searchParams.get("priceRanges") || "";
@@ -137,8 +266,6 @@ const Product = () => {
 			collectionIdParam,
 		]),
 	);
-
-	const formatCurrency = (value: number) => new Intl.NumberFormat("vi-VN").format(value) + "đ";
 
 	const handleMinChange = (e: any) => {
 		const value = Number(e.target.value);
@@ -238,6 +365,8 @@ const Product = () => {
 		next.set("page", "1");
 		setSearchParams(next);
 		setPage(0);
+
+		setIsFilterOpen(false);
 	};
 
 	const handleReset = () => {
@@ -259,7 +388,19 @@ const Product = () => {
 		setPage(0);
 	};
 
-	const [isFilterOpen, setIsFilterOpen] = useState(false);
+	const filterProps = {
+		priceChecks,
+		togglePriceCheck,
+		unitPriceFrom,
+		unitPriceTo,
+		handleMinChange,
+		handleMaxChange,
+		handleTrackClick,
+		handleReset,
+		handleApply,
+		minPercent,
+		maxPercent,
+	};
 
 	return (
 		<BaseLayout>
@@ -277,132 +418,7 @@ const Product = () => {
 					{/* ==== FILTER SIDE ==== */}
 					<div className="hidden xl:block product-filter w-[20%] rounded-2xl">
 						<div className="filter-container">
-							<div className="w-full rounded-2xl bg-[#BF6B57] text-white p-[1em] shadow-md">
-								{/* Header */}
-								<div className="flex items-center gap-[0.5em] mb-[0.75em]">
-									<FilterListIcon />
-									<h3 className="text-[0.9375em] font-semibold uppercase tracking-wide">
-										Bộ lọc tìm kiếm
-									</h3>
-								</div>
-
-								{/* Mức giá */}
-								<div className="mb-[1.25em]">
-									<h4 className="text-[0.8125em] font-bold uppercase pb-[0.5em] opacity-95">
-										Mức giá
-									</h4>
-
-									<ul className="space-y-[0.5em] text-[0.875em]">
-										{PRICE_FILTER_LABELS.map((label, i) => (
-											<li key={i} className="flex items-center gap-[0.5em]">
-												<input
-													type="checkbox"
-													checked={priceChecks[i]}
-													onChange={() => togglePriceCheck(i)}
-													className="size-[1em] rounded-sm border-white/40 bg-transparent accent-white"
-												/>
-												<span>{label}</span>
-											</li>
-										))}
-									</ul>
-
-									{/* Khoảng giá */}
-									<div className="mt-[1em]">
-										<p className="text-[0.8125em] mb-[0.5em] opacity-90">
-											Hoặc nhập khoảng giá phù hợp với bạn:
-										</p>
-
-										{/* Ô hiển thị giá */}
-										<div className="flex items-center justify-between gap-[0.5em] mb-[0.75em]">
-											<input
-												type="text"
-												value={formatCurrency(unitPriceFrom)}
-												readOnly
-												className="w-[6.25em] bg-transparent border border-white/40 rounded px-[0.5em] py-[0.2em] text-sm text-white placeholder-white/70 text-center"
-											/>
-											<span className="text-white">~</span>
-											<input
-												type="text"
-												value={formatCurrency(unitPriceTo)}
-												readOnly
-												className="w-[6.25em] bg-transparent border border-white/40 rounded px-[0.5em] py-[0.2em] text-sm text-white placeholder-white/70 text-center"
-											/>
-										</div>
-
-										{/* Thanh range 2 đầu */}
-										<div className="relative w-full h-[1.5em] mt-[0.25em]">
-											{/* Track nền (click được) */}
-											<div
-												className="absolute top-1/2 left-0 w-full h-[0.25em] -translate-y-1/2 bg-white/30 rounded-full cursor-pointer"
-												onClick={handleTrackClick}
-											/>
-
-											{/* Track vùng chọn */}
-											<div
-												className="absolute top-1/2 h-[0.25em] -translate-y-1/2 bg-white rounded-full pointer-events-none"
-												style={{
-													left: `${minPercent}%`,
-													width: `${maxPercent - minPercent}%`,
-												}}
-											/>
-
-											{/* Slider MIN */}
-											<input
-												type="range"
-												min={PRICE_MIN}
-												max={PRICE_MAX}
-												step={PRICE_STEP}
-												value={unitPriceFrom}
-												onChange={handleMinChange}
-												className="absolute w-full appearance-none bg-transparent top-[0.3125em] pointer-events-none"
-												style={{ zIndex: 3 }}
-											/>
-
-											{/* Slider MAX */}
-											<input
-												type="range"
-												min={PRICE_MIN}
-												max={PRICE_MAX}
-												step={PRICE_STEP}
-												value={unitPriceTo}
-												onChange={handleMaxChange}
-												className="absolute w-full appearance-none bg-transparent top-[0.3125em] pointer-events-none"
-												style={{ zIndex: 2 }}
-											/>
-										</div>
-									</div>
-								</div>
-
-								<div className="mt-4 flex justify-between">
-									<Button
-										className="w-[100px]"
-										variant="outlined"
-										sx={{
-											borderColor: "var(--color-cream-bg)",
-											color: "var(--color-cream-bg)",
-											paddingInline: "0px",
-										}}
-										onClick={handleReset}
-									>
-										Khôi phục
-									</Button>
-									<Button
-										className="w-[100px]"
-										sx={{
-											backgroundColor: "var(--color-cream-bg)",
-											color: "var(--color-card-bg)",
-											paddingInline: "0px",
-											"&:click": {
-												backgroundColor: "var(--color-card-bg)",
-											},
-											border: "1px solid var(--color-card-thick)",
-										}}
-										onClick={handleApply}
-									>
-										Áp dụng
-									</Button>
-								</div>
-							</div>
+							<FilterContent {...filterProps} />
 						</div>
 					</div>
 
@@ -476,127 +492,7 @@ const Product = () => {
 						{/* QUAN TRỌNG: Thêm vùng chứa cuộn nếu bộ lọc dài */}
 						<div className="max-h-[70vh] overflow-y-auto">
 							<div className="filter-container">
-								<div className="w-full rounded-2xl bg-[#BF6B57] text-white p-[1em] shadow-md">
-									{/* Mức giá */}
-									<div className="mb-[1.25em]">
-										<h4 className="text-[0.8125em] font-bold uppercase pb-[0.5em] opacity-95">
-											Mức giá
-										</h4>
-
-										<ul className="space-y-[0.5em] text-[0.875em]">
-											{PRICE_FILTER_LABELS.map((label, i) => (
-												<li
-													key={i}
-													className="flex items-center gap-[0.5em]"
-												>
-													<input
-														type="checkbox"
-														checked={priceChecks[i]}
-														onChange={() => togglePriceCheck(i)}
-														className="size-[1em] rounded-sm border-white/40 bg-transparent accent-white"
-													/>
-													<span>{label}</span>
-												</li>
-											))}
-										</ul>
-
-										{/* Khoảng giá */}
-										<div className="mt-[1em]">
-											<p className="text-[0.8125em] mb-[0.5em] opacity-90">
-												Hoặc nhập khoảng giá phù hợp với bạn:
-											</p>
-
-											{/* Ô hiển thị giá */}
-											<div className="flex items-center justify-between gap-[0.5em] mb-[0.75em]">
-												<input
-													type="text"
-													value={formatCurrency(unitPriceFrom)}
-													readOnly
-													className="w-[6.25em] bg-transparent border border-white/40 rounded px-[0.5em] py-[0.2em] text-sm text-white placeholder-white/70 text-center"
-												/>
-												<span className="text-white">~</span>
-												<input
-													type="text"
-													value={formatCurrency(unitPriceTo)}
-													readOnly
-													className="w-[6.25em] bg-transparent border border-white/40 rounded px-[0.5em] py-[0.2em] text-sm text-white placeholder-white/70 text-center"
-												/>
-											</div>
-
-											{/* Thanh range 2 đầu */}
-											<div className="relative w-full h-[1.5em] mt-[0.25em]">
-												{/* Track nền (click được) */}
-												<div
-													className="absolute top-1/2 left-0 w-full h-[0.25em] -translate-y-1/2 bg-white/30 rounded-full cursor-pointer"
-													onClick={handleTrackClick}
-												/>
-
-												{/* Track vùng chọn */}
-												<div
-													className="absolute top-1/2 h-[0.25em] -translate-y-1/2 bg-white rounded-full pointer-events-none"
-													style={{
-														left: `${minPercent}%`,
-														width: `${maxPercent - minPercent}%`,
-													}}
-												/>
-
-												{/* Slider MIN */}
-												<input
-													type="range"
-													min={PRICE_MIN}
-													max={PRICE_MAX}
-													step={PRICE_STEP}
-													value={unitPriceFrom}
-													onChange={handleMinChange}
-													className="absolute w-full appearance-none bg-transparent top-[0.3125em] pointer-events-none"
-													style={{ zIndex: 3 }}
-												/>
-
-												{/* Slider MAX */}
-												<input
-													type="range"
-													min={PRICE_MIN}
-													max={PRICE_MAX}
-													step={PRICE_STEP}
-													value={unitPriceTo}
-													onChange={handleMaxChange}
-													className="absolute w-full appearance-none bg-transparent top-[0.3125em] pointer-events-none"
-													style={{ zIndex: 2 }}
-												/>
-											</div>
-										</div>
-									</div>
-
-									<div className="mt-4 flex justify-between">
-										<Button
-											className="w-[100px]"
-											variant="outlined"
-											sx={{
-												borderColor: "var(--color-cream-bg)",
-												color: "var(--color-cream-bg)",
-												paddingInline: "0px",
-											}}
-											onClick={handleReset}
-										>
-											Khôi phục
-										</Button>
-										<Button
-											className="w-[100px]"
-											sx={{
-												backgroundColor: "var(--color-cream-bg)",
-												color: "var(--color-card-bg)",
-												paddingInline: "0px",
-												"&:click": {
-													backgroundColor: "var(--color-card-bg)",
-												},
-												border: "1px solid var(--color-card-thick)",
-											}}
-											onClick={handleApply}
-										>
-											Áp dụng
-										</Button>
-									</div>
-								</div>
+								<FilterContent {...filterProps} />
 							</div>
 						</div>
 					</div>
