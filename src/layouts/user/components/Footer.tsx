@@ -155,11 +155,12 @@ const Footer = () => {
 					</div>
 				</div>
 			</div>
-			<div className="copyright-wrapper h-[30px] bg-[var(--color-card-thick)]">
-				<div className="leading-[30px]">
+			<div className="copyright-wrapper h-[50px] md:h-[30px] bg-[var(--color-card-thick)]">
+				<div className="leading-[22px] pt-[0.25em] md:leading-[30px] md:pt-0">
 					<div className="text-center text-[14px] font-normal text-[var(--color-cream-bg)]">
-						Copyright © {date.getFullYear()} vietphan565@gmail.com. Designed by
-						Pancharm
+						Copyright © {date.getFullYear()} vietphan565@gmail.com.&nbsp;
+						<br className="block md:hidden" />
+						Designed by Pancharm
 					</div>
 				</div>
 			</div>
