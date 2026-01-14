@@ -38,16 +38,7 @@ const FOOTER_ITEM = [
 					<a href="#">Về trang sức Pancharm</a>
 				</div>
 				<div>
-					<a href="#">Kinh doanh bán sỉ</a>
-				</div>
-				<div>
 					<a href="#">Thông tin liên hệ</a>
-				</div>
-				<div>
-					<a href="#">Cửa hàng online & offline</a>
-				</div>
-				<div>
-					<a href="#">Kết nối với gian hàng</a>
 				</div>
 			</div>
 		),
